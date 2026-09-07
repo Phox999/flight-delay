@@ -1,9 +1,9 @@
-/* Shared header + external-link precision.
-   Header source: Figma 5200:11703.
+/* Shared raster header + external-link precision.
+   Header source: user-approved image aligned to Figma 5200:11703.
    External-link source: Figma 4874:42134 / 4874:42048. */
 
-/* Use one fixed Figma-aligned header asset instead of separately-positioned status icons.
-   This avoids signal / wifi / battery / title / Beta drifting independently. */
+/* One raster header keeps time / Dynamic Island / signal / wifi / battery /
+   back / title / Beta in one fixed image so none of the icons drift. */
 .s3-header{
   top:0 !important;
   left:0 !important;
@@ -15,8 +15,7 @@
   z-index:49 !important;
 }
 
-/* The visual arrow is already inside the shared header asset.
-   Keep a real invisible HTML button over it for navigation. */
+/* Visual back icon is inside the image. Keep a transparent real button for routing. */
 .s3-back{
   top:69px !important;
   left:6px !important;
@@ -33,11 +32,13 @@
 .s3-back img{opacity:0 !important;}
 .s3-title-group{display:none !important;}
 
-/* Hide the old separately-built status bar only on screens using the shared chatbot header.
-   Native file picker screens keep their own status bar. */
-.s3-device .wf-status,
-.s6o-device .wf-status,
-.s9f-root .wf-status{
+/* Remove all separately-built status bars on chatbot shells that also render s3-header.
+   File-picker shells are intentionally NOT included because they have their own native UI. */
+.s3-device > .wf-status,
+.s6-device > .wf-status,
+.s6o-device > .wf-status,
+.s7-convo-layer > .wf-status,
+.s9f-root > .wf-status{
   display:none !important;
 }
 
