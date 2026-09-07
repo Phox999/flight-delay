@@ -5,7 +5,7 @@
     { start: '2026/07/21', end: '2026/07/31' },
     { start: '2025/02/21', end: '2025/03/01' }
   ];
-  const customHashes = new Set(['#s6-no-policy', '#s6-not-eligible', '#s6-ocr-failure']);
+  const customHashes = new Set(['#s6-no-policy', '#s6-not-eligible', '#s6-ocr-failure', '#s6-api-error']);
 
   function nativeStatus() {
     return `<div class="wf-status" aria-hidden="true"><div class="wf-time">9:41</div><div class="wf-island"></div><div class="wf-signal"><i></i><i></i><i></i><i></i></div><div class="wf-wifi"><span class="wf-wifi-dot"></span></div><div class="wf-battery"></div></div>`;
@@ -47,6 +47,11 @@
     return shell(`${user('not-eligible')}${alpha('not-eligible', copy)}`);
   }
 
+  function apiErrorView() {
+    const copy = `<div class="s6o-api-copy"><p>系統出現異常，建議你可以到會員中心使用理賠申請服務。</p><div class="s6o-api-link-wrap"><button class="s6o-inline-link s6o-external" type="button" data-s6o-action="member-center">前往會員中心</button></div></div>`;
+    return shell(`${user('api-error')}${alpha('api-error', copy)}`);
+  }
+
   function ocrFailureView() {
     const first = `<div class="s6o-ocr-copy"><p>請上傳你的登機證。</p><p>如果有 2 筆（含）以上的班機延誤需要申請理賠，記得要分開申請喔！</p></div>`;
     const second = `<div class="s6o-ocr-copy"><p>你上傳的文件經辨識非登機證，請重新確認再上傳。</p></div>`;
@@ -71,6 +76,7 @@
     if (hash === '#s6-no-policy') return document.getElementById('s6-no-policy-screen');
     if (hash === '#s6-not-eligible') return document.getElementById('s6-not-eligible-screen');
     if (hash === '#s6-ocr-failure') return document.getElementById('s6-ocr-failure-screen');
+    if (hash === '#s6-api-error') return document.getElementById('s6-api-error-screen');
     return null;
   }
 
@@ -116,6 +122,7 @@
       const action = button.dataset.s6oAction;
       if (action === 'back') return history.back();
       if (action === 'reupload') return legacyRoute('boarding-pass-upload');
+      if (action === 'member-center') return legacyRoute('s8-member-center');
       if (action === 'phone') {
         window.location.href = 'tel:0227551299';
         return;
@@ -170,6 +177,7 @@
     createCustom('s6-no-policy-screen', '查無可申請保單', noPolicyView());
     createCustom('s6-not-eligible-screen', '不符合理賠資格', notEligibleView());
     createCustom('s6-ocr-failure-screen', '登機證辨識失敗', ocrFailureView());
+    createCustom('s6-api-error-screen', '登機證上傳系統異常', apiErrorView());
     bindCustomActions();
     bindOutcomeRouting();
     window.addEventListener('popstate', () => requestAnimationFrame(handleHistory));
