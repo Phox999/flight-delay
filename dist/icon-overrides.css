@@ -1,0 +1,40 @@
+/* Exact icon assets exported from the Next-Chatbot Figma Library.
+   Source: N2LC9mzDJ5Hw64wfENUr1p / 基本icon (21587:1447). */
+
+/* Welcome header back icon: ic_arrow_black_left_s */
+.wf-back {
+  left: 10px;
+  top: 14px;
+  width: 24px;
+  height: 24px;
+  background: url('./assets/ic-arrow-black-left-s.svg') center / 24px 24px no-repeat;
+}
+.wf-back::before,
+.wf-back::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Welcome tag button arrow: ic_arrow_grey_right_s */
+.wf-tag-arrow {
+  display: block;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  background: url('./assets/ic-arrow-grey-right-s.svg') center / 24px 24px no-repeat;
+}
+.wf-tag-arrow::before,
+.wf-tag-arrow::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Reuse the same library back icon on the remaining HTML/CSS screens. */
+.app-back {
+  width: 28px;
+  height: 24px;
+  font-size: 0 !important;
+  color: transparent !important;
+  transform: none !important;
+  background: url('./assets/ic-arrow-black-left-s.svg') left center / 24px 24px no-repeat;
+}
