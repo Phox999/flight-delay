@@ -142,7 +142,7 @@
   }
 
   function bindOutcomeRouting() {
-    /* Capture phase lets these business branches run before the older legacy click handlers. */
+    /* Only dates before 2025 trigger the no-policy branch. Dates from 2025 onward always continue through the normal policy flow. */
     document.addEventListener('click', (event) => {
       const dateConfirm = event.target.closest('.s6-date-popup-confirm');
       if (dateConfirm && !dateConfirm.disabled) {
@@ -151,18 +151,6 @@
           event.preventDefault();
           event.stopImmediatePropagation();
           showCustom('#s6-no-policy');
-          return;
-        }
-      }
-
-      const policyConfirm = event.target.closest('[data-s6-action="policy-confirm"]');
-      if (policyConfirm) {
-        const date = document.getElementById('departure-date')?.value || '';
-        const index = selectedPolicyIndex();
-        if (date && ranges[index] && !isWithin(date, ranges[index])) {
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          showCustom('#s6-not-eligible');
         }
       }
     }, true);
