@@ -67,23 +67,26 @@
     return `<div class="s3-turn-alpha"><div class="s3-avatar" aria-hidden="true"></div><div class="s3-alpha-body">
       <div class="s3-card">
         <div class="s3-card-content">
-          <p>阿發提醒你：</p>
-          <ol>
-            <li>此流程進行理賠申請，請先準備相關文件：</li>
-            <ul>
-              <li><span class="s3-highlight">登機證</span></li>
-              <li><span class="s3-highlight">本人匯款帳戶</span></li>
-              <li><span class="s3-highlight">班機延誤證明(將視情況通知上傳)</span></li>
-            </ul>
-            <li>限個人件</li>
-            <li>線上申請理賠時，要保人與被保險人須為同一人</li>
-            <li>需為國泰產險會員</li>
-            <li>每次僅能申請一個班機的理賠</li>
-          </ol>
+          <p><strong>班機延誤理賠注意事項</strong></p>
+          <p>本服務僅適用班機延誤後仍搭乘原航班。以下情況請改由產險官網或線下通路辦理：</p>
+          <ul>
+            <li>班機取消/改搭其他班機</li>
+            <li>申請實支實付型</li>
+            <li>錯過轉機航班</li>
+            <li>同時申請其他理賠項目</li>
+          </ul>
+          <p>限個人件，且要保人與被保險人須為同一人</p>
+          <p>須為國泰產險會員</p>
+          <p class="s3-card-section">申請前請準備：</p>
+          <ul>
+            <li><span class="s3-highlight">登機證</span></li>
+            <li><span class="s3-highlight">本人匯款帳戶</span></li>
+            <li><span class="s3-highlight">班機延誤證明（視情況）</span></li>
+          </ul>
         </div>
         <button class="s3-card-action" type="button" ${interactive ? 'data-s3-action="confirm"' : 'tabindex="-1"'}>確認申請</button>
         <button class="s3-card-action" type="button" ${interactive ? 'data-s3-action="join"' : 'tabindex="-1"'}>加入國泰產險會員</button>
-        <button class="s3-card-action" type="button" ${interactive ? 'data-s3-action="later"' : 'tabindex="-1"'}>稍後再說</button>
+        <button class="s3-card-action" type="button" ${interactive ? 'data-s3-action="official"' : 'tabindex="-1"'}>前往國泰產險官網</button>
       </div>${time()}
     </div></div>`;
   }
@@ -125,7 +128,6 @@
     return shell(`<div class="s3-scroll" data-s3-scroll="later"><div class="s3-thread s3-thread-later">
       ${user('我要諮詢')}
       ${preApplicationBubble()}
-      ${reminderCard()}
       ${user('稍後再說')}
       ${alpha('若有其他需要阿發幫忙的地方請再跟我說。')}
     </div></div>`);
@@ -133,8 +135,6 @@
 
   function login() {
     return shell(`<div class="s3-scroll" data-s3-scroll="login"><div class="s3-thread s3-thread-login">
-      ${user('我想申請')}
-      ${preApplicationBubble()}
       ${reminderCard()}
       ${user('確認申請')}
       ${alpha('請先登入才能繼續流程喔。')}
@@ -160,6 +160,7 @@
         if (action === 'back') return triggerLegacy(screen, ':scope > [data-goto="welcome"]');
         if (action === 'confirm') return triggerLegacy(screen, ':scope > [data-goto="s02-login"]');
         if (action === 'join') return triggerLegacy(screen, ':scope > [data-goto="s02-login"]');
+        if (action === 'official') return triggerLegacy(screen, ':scope > [data-goto="s03-official-site"]');
         if (action === 'later') return triggerLegacy(screen, ':scope > [data-goto="s03-later"]');
       });
     });
@@ -169,7 +170,7 @@
     const scroller = screen.querySelector('[data-s3-scroll]');
     if (!scroller) return;
     const type = scroller.dataset.s3Scroll;
-    const positions = { docs: 300, later: 600, login: 600 };
+    const positions = { docs: 470, later: 260, login: 470 };
     scroller.scrollTop = positions[type] || 0;
   }
 
