@@ -21,7 +21,7 @@
         if (!response.ok) throw new Error('legacy.html ' + response.status);
         let html = await response.text();
         html = html.replace('</head>', '<link rel="stylesheet" href="./htmlize.css?v=3"><link rel="stylesheet" href="./fidelity.css?v=1"></head>');
-        html = html.replace('</body>', '<script src="./htmlize.js?v=3"><' + '/script><script src="./fidelity.js?v=1"><' + '/script></body>');
+        html = html.replace('</body>', '<script src="./htmlize.js?v=3"><' + '/script><script src="./fidelity.js?v=2"><' + '/script></body>');
         document.open();
         document.write(html);
         document.close();
