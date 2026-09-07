@@ -1,0 +1,345 @@
+/* Section 7 fidelity — flight information correction / airport selection.
+   Source of truth: current Figma 4874:39959 / 40009 / 40079 / 40130 / 40650.
+   Bottom sheets intentionally keep the existing pre-sheet conversation/background. */
+
+#s7-flight-filled-screen .s7-sheet-layer,
+#s7-airport-results-screen .s7-sheet-layer,
+#s7-destination-input-screen .s7-sheet-layer,
+#s7-flight-alternate-screen .s7-sheet-layer,
+#s7-validation-error-screen .s7-sheet-layer {
+  position:absolute;
+  inset:0;
+  z-index:60;
+  width:393px;
+  height:852px;
+  pointer-events:none;
+  color:#3a3a3a;
+  font-family:"PingFang TC","Noto Sans TC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+.s7-sheet {
+  position:absolute;
+  left:0;
+  width:393px;
+  overflow:hidden;
+  border-radius:12px 12px 0 0;
+  background:#fff;
+  pointer-events:auto;
+}
+.s7-sheet.is-standard { top:150px; height:566px; }
+.s7-sheet.is-error { top:90px; height:626px; }
+
+.s7-sheet-header {
+  position:absolute;
+  z-index:5;
+  top:0;
+  left:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:393px;
+  height:46px;
+  border-bottom:.5px solid #bfbfbf;
+  background:#fff;
+}
+.s7-sheet-title {
+  margin:0;
+  color:#3a3a3a;
+  font-size:16px;
+  font-weight:400;
+  line-height:22px;
+  letter-spacing:.3px;
+}
+.s7-sheet-close {
+  position:absolute;
+  top:13px;
+  right:16px;
+  width:20px;
+  height:20px;
+  margin:0;
+  padding:0;
+  border:0;
+  background:transparent;
+  cursor:pointer;
+}
+.s7-sheet-close img { display:block; width:20px; height:20px; }
+
+.s7-sheet-body {
+  position:absolute;
+  top:46px;
+  left:0;
+  width:393px;
+  padding:24px;
+  overflow-x:hidden;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-y;
+  background:#fff;
+  scrollbar-width:none;
+}
+.s7-sheet.is-standard .s7-sheet-body { height:442px; }
+.s7-sheet.is-error .s7-sheet-body { height:502px; }
+.s7-sheet-body::-webkit-scrollbar { display:none; }
+
+.s7-form {
+  display:flex;
+  flex-direction:column;
+  gap:24px;
+  width:345px;
+  min-height:430px;
+}
+.s7-field {
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  width:345px;
+  margin:0;
+}
+.s7-field-label {
+  display:block;
+  min-height:22px;
+  color:#3a3a3a;
+  font-size:16px;
+  font-weight:400;
+  line-height:22px;
+  letter-spacing:.3px;
+  white-space:nowrap;
+}
+.s7-input,
+.s7-dropdown {
+  display:flex;
+  align-items:center;
+  width:345px;
+  height:48px;
+  margin:0;
+  padding:0 14.5px;
+  border:1.5px solid #bfbfbf;
+  border-radius:6px;
+  outline:0;
+  background:#fff;
+  color:#3a3a3a;
+  font:300 16px/22px "PingFang TC","Noto Sans TC",sans-serif;
+  letter-spacing:.3px;
+  appearance:none;
+}
+.s7-input:focus,
+.s7-dropdown:focus,
+.s7-dropdown.is-open { border-color:#9fc5fe; }
+.s7-input::placeholder { color:#a0a0a0; opacity:1; }
+.s7-input.is-invalid { border-color:#ec464a; }
+.s7-field-error {
+  display:none;
+  margin:0;
+  color:#ec464a;
+  font-size:15px;
+  font-weight:400;
+  line-height:22px;
+}
+.s7-field.has-error .s7-field-error { display:block; }
+
+.s7-dropdown {
+  position:relative;
+  justify-content:flex-start;
+  cursor:pointer;
+  text-align:left;
+}
+.s7-dropdown::after {
+  content:"";
+  position:absolute;
+  right:18px;
+  top:17px;
+  width:10px;
+  height:10px;
+  border-right:2px solid #3a3a3a;
+  border-bottom:2px solid #3a3a3a;
+  transform:rotate(45deg);
+}
+.s7-dropdown.is-open::after {
+  top:21px;
+  transform:rotate(225deg);
+}
+
+.s7-pair {
+  display:grid;
+  grid-template-columns:160.5px 160.5px;
+  column-gap:24px;
+  align-items:start;
+  width:345px;
+}
+.s7-pair .s7-field,
+.s7-pair .s7-input { width:160.5px; }
+.s7-pair .s7-field-label { overflow:visible; }
+
+.s7-sheet-footer {
+  position:absolute;
+  z-index:6;
+  left:0;
+  bottom:0;
+  display:flex;
+  align-items:flex-start;
+  width:393px;
+  height:78px;
+  padding:16px 24px;
+  background:#fff;
+  box-shadow:0 -8px 24px rgba(68,68,68,.08);
+}
+.s7-confirm {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:345px;
+  height:46px;
+  margin:0;
+  padding:12px 16px;
+  border:0;
+  border-radius:6px;
+  background:#9fc5fe;
+  color:#3a3a3a;
+  font:500 16px/22px "PingFang TC","Noto Sans TC",sans-serif;
+  letter-spacing:.3px;
+  cursor:pointer;
+}
+.s7-confirm:disabled {
+  background:#eaeaea;
+  color:#fff;
+  cursor:default;
+}
+
+.s7-airport-menu {
+  position:absolute;
+  z-index:9;
+  left:24px;
+  top:250px;
+  width:343px;
+  overflow:hidden;
+  border:1.5px solid #eaeaea;
+  border-radius:6px;
+  background:#fff;
+  box-shadow:0 2px 9px rgba(27,31,68,.08);
+}
+.s7-airport-option {
+  display:flex;
+  align-items:center;
+  width:343px;
+  height:48px;
+  margin:0;
+  padding:0 16px;
+  border:0;
+  background:#fff;
+  color:#3a3a3a;
+  font:300 16px/22px "PingFang TC","Noto Sans TC",sans-serif;
+  letter-spacing:.3px;
+  text-align:left;
+  cursor:pointer;
+}
+.s7-airport-option.is-selected { background:rgba(159,197,254,.32); }
+.s7-airport-option:active { background:#f4f8ff; }
+
+.s7-faux-scrollbar {
+  position:absolute;
+  z-index:11;
+  right:12px;
+  width:6px;
+  height:151px;
+  border-radius:12px;
+  background:#777;
+  pointer-events:none;
+  will-change:transform;
+}
+.s7-sheet.is-standard .s7-faux-scrollbar { top:53px; }
+.s7-sheet.is-error .s7-faux-scrollbar { top:100px; }
+
+/* OCR result card already existed as live HTML in legacy.html. Bring it in line with the current 393×852 scroll model. */
+#ocr-confirm-screen .ocr-scroll {
+  top:111px;
+  height:491px;
+  overflow-y:auto;
+  scrollbar-width:none;
+  background:transparent;
+}
+#ocr-confirm-screen .ocr-scroll::-webkit-scrollbar { display:none; }
+#ocr-confirm-screen .ocr-scroll-content { min-height:812px; padding:24px 0 36px; }
+#ocr-confirm-screen .ocr-card { border-radius:10px; }
+#ocr-confirm-screen .ocr-card-action {
+  border-top:2px solid #eaeaea;
+  color:#4f44c3;
+  font-weight:500;
+}
+
+/* Transient “資料有誤 → 好的，請修改資訊。” HTML layer. */
+#s7-data-error-screen .s7-convo-layer {
+  position:absolute;
+  inset:0;
+  z-index:8;
+  width:393px;
+  height:852px;
+  overflow:hidden;
+  background:#fff;
+  color:#3a3a3a;
+  font-family:"PingFang TC","Noto Sans TC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.s7-convo-layer .s7-convo-canvas {
+  position:absolute;
+  top:111px;
+  left:0;
+  width:393px;
+  height:491px;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse 210px 170px at 94% 88%,rgba(214,255,247,.76),rgba(214,255,247,0) 72%),
+    radial-gradient(ellipse 220px 175px at 5% 90%,rgba(222,216,255,.82),rgba(222,216,255,0) 72%),
+    radial-gradient(ellipse 155px 125px at 50% 45%,rgba(255,240,211,.54),rgba(255,240,211,0) 72%),
+    #fff;
+}
+.s7-summary-card {
+  position:absolute;
+  top:0;
+  left:71px;
+  width:250px;
+  overflow:hidden;
+  border-radius:0 0 12px 12px;
+  background:#fff;
+  box-shadow:0 2px 9px rgba(27,31,68,.08);
+}
+.s7-summary-row { padding:16px; }
+.s7-summary-label { margin:0 0 6px; font-size:16px; line-height:22px; font-weight:300; letter-spacing:.3px; }
+.s7-summary-value { margin:0; font-size:16px; line-height:22px; font-weight:500; letter-spacing:.3px; }
+.s7-summary-route { display:flex; gap:10px; align-items:center; font-size:15px; line-height:20px; font-weight:500; }
+.s7-summary-route .arrow { color:#4f44c3; }
+.s7-summary-actions button {
+  width:250px;
+  height:46px;
+  border:0;
+  border-top:2px solid #eaeaea;
+  background:#fff;
+  color:#4f44c3;
+  font:500 16px/22px "PingFang TC",sans-serif;
+  letter-spacing:.3px;
+}
+.s7-data-user {
+  position:absolute;
+  top:306px;
+  right:16px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:8px;
+}
+.s7-data-user .bubble { padding:12px 16px; border-radius:10px; background:#9fc5fe; box-shadow:0 2px 9px rgba(27,31,68,.12); font-size:16px; line-height:22px; letter-spacing:.3px; }
+.s7-data-time { color:#777; font-size:12px; line-height:18px; letter-spacing:.3px; }
+.s7-data-alpha {
+  position:absolute;
+  top:402px;
+  left:16px;
+  display:flex;
+  align-items:flex-start;
+  width:361px;
+}
+.s7-data-avatar { flex:0 0 32px; width:32px; height:32px; border-radius:50%; overflow:hidden; background-image:url('./s03-documents.png'); background-size:393px 852px; background-position:-16px -143px; }
+.s7-data-alpha-body { padding:3px 10px 0; }
+.s7-data-alpha .bubble { padding:12px 16px; border:1px solid rgba(224,224,224,.08); border-radius:10px; background:linear-gradient(137deg,#fff 8%,rgba(255,255,255,.68) 96%); box-shadow:0 2px 9px rgba(27,31,68,.08); font-size:16px; line-height:22px; letter-spacing:.3px; }
+
+@media (max-width:393px),(max-height:852px) {
+  .s7-sheet-body { -webkit-overflow-scrolling:touch; }
+}
