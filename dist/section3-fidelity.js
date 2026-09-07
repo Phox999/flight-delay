@@ -148,20 +148,25 @@
     's02-login-screen': login
   };
 
-  function triggerLegacy(screen, selector) {
-    const target = screen.querySelector(selector);
-    if (target) target.click();
+  function go(screen, goto, selector) {
+    const target = selector ? screen.querySelector(selector) : null;
+    if (target) {
+      target.click();
+      return;
+    }
+    history.pushState({ screen: goto }, '', `#${goto}`);
+    window.dispatchEvent(new PopStateEvent('popstate', { state: { screen: goto } }));
   }
 
   function bind(screen) {
     screen.querySelectorAll('.htmlized-screen [data-s3-action]').forEach((button) => {
       button.addEventListener('click', () => {
         const action = button.dataset.s3Action;
-        if (action === 'back') return triggerLegacy(screen, ':scope > [data-goto="welcome"]');
-        if (action === 'confirm') return triggerLegacy(screen, ':scope > [data-goto="s02-login"]');
-        if (action === 'join') return triggerLegacy(screen, ':scope > [data-goto="s02-login"]');
-        if (action === 'official') return triggerLegacy(screen, ':scope > [data-goto="s03-official-site"]');
-        if (action === 'later') return triggerLegacy(screen, ':scope > [data-goto="s03-later"]');
+        if (action === 'back') return go(screen, 'welcome', ':scope > [data-goto="welcome"]');
+        if (action === 'confirm') return go(screen, 's02-login', ':scope > [data-goto="s02-login"]');
+        if (action === 'join') return go(screen, 's02-login', ':scope > [data-goto="s02-login"]');
+        if (action === 'official') return go(screen, 's03-official-site', ':scope > [data-goto="s03-official-site"]');
+        if (action === 'later') return go(screen, 's03-later', ':scope > [data-goto="s03-later"]');
       });
     });
   }
