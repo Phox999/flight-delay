@@ -97,7 +97,10 @@
     const key = dateKey(value);
     return key.length === 8 && key >= dateKey(range.start) && key <= dateKey(range.end);
   }
-  function isWithinAnyPolicy(value) { return ranges.some((range) => isWithin(value, range)); }
+  function isBefore2025(value) {
+    const key = dateKey(value);
+    return key.length === 8 && key < '20250101';
+  }
 
   function selectedPolicyIndex() {
     const selected = document.querySelector('#selection-screen .htmlized-screen [data-s6-policy][aria-pressed="true"]');
@@ -144,7 +147,7 @@
       const dateConfirm = event.target.closest('.s6-date-popup-confirm');
       if (dateConfirm && !dateConfirm.disabled) {
         const value = document.querySelector('[data-popup-date]')?.value || document.getElementById('departure-date')?.value || '';
-        if (value && !isWithinAnyPolicy(value)) {
+        if (value && isBefore2025(value)) {
           event.preventDefault();
           event.stopImmediatePropagation();
           showCustom('#s6-no-policy');
