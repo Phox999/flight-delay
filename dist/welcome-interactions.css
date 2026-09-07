@@ -1,0 +1,43 @@
+/* Welcome page interaction alignment: visible text itself is clickable. */
+#welcome-screen .htmlized-screen {
+  z-index: 10;
+}
+
+#welcome-screen > .intro-link {
+  pointer-events: none !important;
+}
+
+.wf-inline-link {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #009eff;
+  font: inherit;
+  line-height: inherit;
+  text-decoration: underline;
+  text-underline-offset: 1px;
+  white-space: nowrap;
+  cursor: pointer;
+  vertical-align: baseline;
+}
+
+.wf-inline-link:focus-visible {
+  outline: 2px solid #1677ff;
+  outline-offset: 1px;
+  border-radius: 2px;
+}
+
+button.wf-tag {
+  margin: 0;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button.wf-tag:focus-visible {
+  outline: 2px solid #1677ff;
+  outline-offset: 2px;
+}
