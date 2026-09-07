@@ -20,8 +20,8 @@
         const response = await fetch('./legacy.html', { cache: 'no-store' });
         if (!response.ok) throw new Error('legacy.html ' + response.status);
         let html = await response.text();
-        html = html.replace('</head>', '<link rel="stylesheet" href="./htmlize.css?v=1"></head>');
-        html = html.replace('</body>', '<script src="./htmlize.js?v=1"><\\/script></body>');
+        html = html.replace('</head>', '<link rel="stylesheet" href="./htmlize.css?v=2"></head>');
+        html = html.replace('</body>', '<script src="./htmlize.js?v=2"><' + '/script></body>');
         document.open();
         document.write(html);
         document.close();
