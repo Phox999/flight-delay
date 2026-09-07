@@ -1,0 +1,39 @@
+/* Section 9 — 動態密碼驗證。重建 OTP bottom sheet；底下對話與 Safari chrome 仍沿用既有畫面。 */
+.s9f-layer{position:absolute;inset:0;z-index:24;pointer-events:none;color:#3a3a3a;font-family:"PingFang TC","Noto Sans TC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.s9f-layer *{box-sizing:border-box}
+.s9f-scrim{position:absolute;left:0;right:0;top:59px;bottom:136px;background:rgba(0,0,0,.34);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.s9f-sheet{position:absolute;left:0;top:248px;width:393px;overflow:hidden;border-radius:12px 12px 0 0;background:#fff;pointer-events:auto}
+.s9f-sheet.is-error,.s9f-sheet.is-too-many{top:218px}
+.s9f-header{position:relative;display:flex;align-items:center;justify-content:center;width:393px;height:46px;border-bottom:.5px solid #bfbfbf;background:#fff}
+.s9f-title{margin:0;color:#3a3a3a;font-size:16px;font-weight:400;line-height:22px;letter-spacing:.3px}
+.s9f-close{position:absolute;right:16px;top:13px;width:20px;height:20px;margin:0;padding:0;border:0;background:transparent;color:#3a3a3a;font-size:27px;font-weight:300;line-height:18px;cursor:pointer}
+.s9f-body{display:flex;flex-direction:column;gap:32px;width:393px;padding:32px 24px 0;background:#fff}
+.s9f-content{display:flex;flex-direction:column;gap:16px;width:345px}
+.s9f-main{display:flex;flex-direction:column;gap:24px;width:345px}
+.s9f-message{width:345px;margin:0;color:#3a3a3a;font-size:16px;font-weight:300;line-height:22px;letter-spacing:.3px}
+.s9f-message strong{font-weight:500}
+.s9f-expiry{display:block;color:#4f44c3;font-weight:400}
+.s9f-field{display:flex;flex-direction:column;gap:8px;width:345px}
+.s9f-label{font-size:16px;font-weight:400;line-height:22px;letter-spacing:.3px}
+.s9f-input{width:345px;height:48px;padding:12px 13px;border:1.5px solid #bfbfbf;border-radius:6px;background:#fff;color:#3a3a3a;font:400 16px/22px "PingFang TC","Noto Sans TC",sans-serif;letter-spacing:.3px;outline:0}
+.s9f-input::placeholder{color:#a0a0a0;opacity:1}
+.s9f-input:focus{border-color:#9fc5fe}
+.s9f-sheet.is-error .s9f-input,.s9f-sheet.is-too-many .s9f-input{border-color:#ec464a}
+.s9f-error-text{display:none;margin:-2px 0 0;color:#ec464a;font-size:15px;font-weight:400;line-height:22px}
+.s9f-sheet.is-error .s9f-error-text,.s9f-sheet.is-too-many .s9f-error-text{display:block}
+.s9f-resend-line{width:345px;margin:0;color:#3a3a3a;font-size:16px;line-height:22px;letter-spacing:.3px}
+.s9f-resend-time{color:#4f44c3}
+.s9f-resend-link{display:none;width:max-content;margin:0;padding:0;border:0;background:transparent;color:#009eff;font-size:16px;line-height:22px;text-decoration:underline;cursor:pointer}
+.s9f-sheet.is-too-many .s9f-resend-line{display:none}.s9f-sheet.is-too-many .s9f-resend-link{display:block}
+.s9f-help{position:relative;display:flex;align-items:center;gap:8px;width:max-content;height:20px;margin:0 0 32px;padding:0;border:0;background:transparent;color:#3a3a3a;font-size:14px;font-weight:400;line-height:20px;letter-spacing:.3px;cursor:pointer}
+.s9f-help-icon{display:grid;place-items:center;width:16px;height:16px;border:1.5px solid #009eff;border-radius:50%;color:#009eff;font-size:11px;font-weight:600;line-height:14px}
+.s9f-footer{height:78px;padding:16px 24px;background:#fff;box-shadow:0 -8px 24px rgba(68,68,68,.08)}
+.s9f-submit{display:flex;align-items:center;justify-content:center;width:345px;height:46px;margin:0;padding:0;border:0;border-radius:6px;background:#eaeaea;color:#fff;font-size:16px;font-weight:500;line-height:22px;letter-spacing:.3px}
+.s9f-submit.is-enabled{background:#9fc5fe;color:#3a3a3a;cursor:pointer}
+.s9f-submit.is-validating{background:#bfbfbf;color:#fff}
+.s9f-tooltip{position:absolute;left:12px;top:505px;width:300px;padding:12px 36px 12px 12px;border-radius:8px;background:rgba(58,58,58,.9);color:#f2f5f7;font-size:14px;line-height:20px;letter-spacing:.3px;pointer-events:auto}
+.s9f-tooltip:after{content:"";position:absolute;left:18px;bottom:-10px;width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:12px solid rgba(58,58,58,.9)}
+.s9f-tooltip-close{position:absolute;right:10px;top:8px;width:22px;height:22px;margin:0;padding:0;border:0;background:transparent;color:#fff;font-size:24px;font-weight:300;line-height:20px;cursor:pointer}
+.s9f-mounted>.otp-sheet{display:none!important}
+.s9f-mounted>.screen-hotspot[id^="otp-"]{display:none!important}
+@media(max-height:851px),(max-width:392px){.s9f-layer{transform-origin:top left}}
