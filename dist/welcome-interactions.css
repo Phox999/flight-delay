@@ -1,8 +1,10 @@
 /* Welcome page interaction alignment: visible text itself is clickable. */
 #welcome-screen .htmlized-screen {
   z-index: 10;
+  pointer-events: auto;
 }
 
+/* The old Figma-style transparent hotspots are no longer used on the welcome page. */
 #welcome-screen > .intro-link {
   pointer-events: none !important;
 }
@@ -22,6 +24,7 @@
   white-space: nowrap;
   cursor: pointer;
   vertical-align: baseline;
+  pointer-events: auto;
 }
 
 .wf-inline-link:focus-visible {
@@ -35,6 +38,7 @@ button.wf-tag {
   text-align: left;
   font-family: inherit;
   cursor: pointer;
+  pointer-events: auto;
 }
 
 button.wf-tag:focus-visible {
