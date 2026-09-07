@@ -195,14 +195,27 @@
   color:#3a3a3a;
 }
 
-/* Figma 的錯誤狀態使用 Error token #EC464A。 */
 #s9-otp-error-screen .otp-code-input{border-color:#ec464a}
 #s9-otp-error-screen .otp-validation-error{color:#ec464a}
 
-/* 保持 Safari chrome / HomeBar 固定，不讓 OTP sheet 影響整頁捲動。 */
 #s9-otp-initial-screen,
 #s9-otp-error-screen{
   width:393px;
   height:852px;
   overflow:hidden;
 }
+
+/* Section 9 final / API outcome screens are rebuilt as HTML/CSS using the same
+   conversation shell as the other custom outcome states. */
+.s9o-mounted{
+  width:393px!important;
+  height:852px!important;
+  overflow:hidden!important;
+  background:#fff!important;
+}
+.s9o-mounted .s6o-user.api-error{top:205px}
+.s9o-mounted .s6o-alpha.api-error{top:305px}
+.s9o-copy{width:273px}
+.s9o-copy p{margin:0}
+.s9o-link-wrap{margin-top:22px}
+.s9o-mounted .s6o-inline-link{font-weight:500}
