@@ -1,0 +1,80 @@
+/* Section 6 batch 2 — close / recovery states. */
+#policy-reminder-screen .htmlized-screen {
+  z-index: 13;
+  pointer-events: auto;
+  background:#fff;
+  font-family:"PingFang TC","Noto Sans TC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+#policy-reminder-screen > :is(button,.screen-hotspot) { pointer-events:none !important; }
+
+.s6-reminder-thread {
+  position:absolute;
+  z-index:3;
+  top:111px;
+  left:0;
+  width:393px;
+  height:491px;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse 210px 170px at 8% 92%,rgba(222,216,255,.82),rgba(222,216,255,0) 72%),
+    radial-gradient(ellipse 210px 170px at 92% 90%,rgba(214,255,247,.78),rgba(214,255,247,0) 72%),
+    radial-gradient(ellipse 150px 120px at 50% 38%,rgba(255,240,211,.55),rgba(255,240,211,0) 72%),
+    #fff;
+}
+.s6-reminder-card-peek {
+  position:absolute;
+  top:-122px;
+  left:59px;
+  width:250px;
+  height:275px;
+  border-radius:0 0 12px 12px;
+  background:#fff;
+  box-shadow:0 2px 9px rgba(27,31,68,.08);
+}
+.s6-reminder-card-peek::before,
+.s6-reminder-card-peek::after {
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  height:46px;
+  border-top:2px solid #eaeaea;
+  color:#4f44c3;
+  text-align:center;
+  font-size:16px;
+  font-weight:500;
+  line-height:44px;
+}
+.s6-reminder-card-peek::before { bottom:46px; content:"加入國泰產險會員"; }
+.s6-reminder-card-peek::after { bottom:0; content:"稍後再說"; }
+.s6-reminder-user {
+  position:absolute;
+  top:214px;
+  right:16px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:8px;
+}
+.s6-reminder-alpha {
+  position:absolute;
+  top:313px;
+  left:16px;
+  display:flex;
+  align-items:flex-start;
+  gap:1px;
+}
+.s6-reminder-alpha .s3-alpha-body { padding-top:3px; }
+.s6-reminder-link {
+  display:block;
+  margin-top:18px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#009eff;
+  font:500 16px/22px "PingFang TC","Noto Sans TC",sans-serif;
+  letter-spacing:.3px;
+  text-align:left;
+  cursor:pointer;
+  pointer-events:auto;
+}
