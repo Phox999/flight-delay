@@ -1,0 +1,464 @@
+/* Section 1 fidelity pass — source: Figma Section 1: 聲明條款與注意事項 (4874:37701).
+   Runtime UI is HTML/CSS. Existing Figma screenshots are used only as local sprites
+   for original illustration/logo artwork on third-party pages. */
+
+#s01-ai-notice-screen .htmlized-screen,
+#s01-alert-terms-screen .htmlized-screen,
+#s01-alert-privacy-screen .htmlized-screen,
+#s01-alert-service-screen .htmlized-screen,
+#s01-ai-statement-screen .htmlized-screen,
+#s01-privacy-screen .htmlized-screen,
+#s01-terms-screen .htmlized-screen {
+  z-index: 5;
+}
+
+.s1-device {
+  position: absolute;
+  inset: 0;
+  width: 393px;
+  height: 852px;
+  overflow: hidden;
+  background: #fff;
+  color: #3a3a3a;
+  font-family: "PingFang TC", "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.s1-scrim {
+  position: absolute;
+  z-index: 20;
+  top: 43px;
+  left: 0;
+  width: 393px;
+  height: 741px;
+  background: rgba(0, 0, 0, .35);
+  backdrop-filter: blur(2.5px);
+  -webkit-backdrop-filter: blur(2.5px);
+}
+
+/* ---------- 01-05 注意事項 ---------- */
+.s1-notice-sheet {
+  position: absolute;
+  z-index: 30;
+  top: 145px;
+  left: 0;
+  width: 393px;
+  height: 683px;
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
+  background: #fff;
+}
+
+.s1-notice-head {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 393px;
+  height: 46px;
+  border-bottom: .5px solid #bfbfbf;
+  background: #fff;
+  color: #3a3a3a;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: .3px;
+}
+
+.s1-close {
+  position: absolute;
+  top: 13px;
+  right: 16px;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: url('./assets/close.png') center / 20px 20px no-repeat;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.s1-notice-body {
+  position: absolute;
+  top: 46px;
+  left: 0;
+  width: 393px;
+  height: 525px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  padding: 24px 24px 48px;
+  background: #fff;
+  color: #777;
+  pointer-events: auto;
+  scrollbar-color: #777 transparent;
+  scrollbar-width: thin;
+}
+.s1-notice-body::-webkit-scrollbar { width: 5px; }
+.s1-notice-body::-webkit-scrollbar-track { background: transparent; }
+.s1-notice-body::-webkit-scrollbar-thumb { border-radius: 10px; background: #777; }
+
+.s1-notice-list {
+  width: 345px;
+  margin: 0;
+  padding-left: 24px;
+  color: #777;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: .3px;
+}
+.s1-notice-list li { margin: 0; padding: 0; }
+
+/* ---------- 01-02 / 03 / 04 alerts ---------- */
+.s1-alert {
+  position: absolute;
+  z-index: 30;
+  left: 44px;
+  top: 267px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 304px;
+  padding: 24px 16px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 9px rgba(27, 31, 68, .08);
+  backdrop-filter: blur(27.5px);
+  -webkit-backdrop-filter: blur(27.5px);
+}
+.s1-alert.is-short { height: 240px; }
+.s1-alert.is-tall { height: 262px; }
+
+.s1-alert-avatar {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  background-image: url('./s01-welcome.png');
+  background-repeat: no-repeat;
+  background-size: 131px 284px;
+  background-position: -53.3px -82px;
+}
+
+.s1-alert-content {
+  width: 272px;
+  margin-top: 24px;
+  text-align: center;
+}
+.s1-alert-title {
+  margin: 0;
+  color: #3a3a3a;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 28px;
+}
+.s1-alert-copy {
+  margin: 16px 0 0;
+  color: #3a3a3a;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 22px;
+}
+.s1-alert-actions {
+  display: flex;
+  gap: 16px;
+  width: 272px;
+  height: 46px;
+  margin-top: 24px;
+}
+.s1-alert-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 128px;
+  height: 46px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #3a3a3a;
+  font: 500 16px/22px "PingFang TC", "Noto Sans TC", sans-serif;
+  letter-spacing: .3px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.s1-alert-button.primary { background: #9fc5fe; }
+
+/* ---------- Shared browser chrome ---------- */
+.s1-browser-scroll {
+  position: absolute;
+  z-index: 1;
+  top: 59px;
+  left: 0;
+  width: 393px;
+  height: 657px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  pointer-events: auto;
+  scrollbar-width: none;
+}
+.s1-browser-scroll::-webkit-scrollbar { display: none; }
+
+.s1-device > .wf-status,
+.s1-device > .wf-safari-address,
+.s1-device > .wf-safari-toolbar,
+.s1-device > .wf-home { z-index: 10; }
+
+/* ---------- 01-06 / 01-07 Google pages ---------- */
+.s1-google-page {
+  min-height: 940px;
+  background: #111;
+  color: #e8eaed;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.s1-google-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 393px;
+  height: 53px;
+  padding: 0 18px 0 22px;
+  border-bottom: 1px solid #242424;
+  background: #111;
+}
+.s1-google-menu {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  margin-right: 20px;
+}
+.s1-google-menu::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 0;
+  width: 16px;
+  height: 2px;
+  background: #bdc1c6;
+  box-shadow: 0 5px 0 #bdc1c6, 0 10px 0 #bdc1c6;
+}
+.s1-google-title {
+  flex: 1;
+  color: #e8eaed;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 28px;
+}
+.s1-google-apps {
+  display: grid;
+  grid-template-columns: repeat(3, 3px);
+  gap: 3px;
+  width: 15px;
+  height: 15px;
+  margin-right: 22px;
+}
+.s1-google-apps i { width: 3px; height: 3px; border-radius: 50%; background: #bdc1c6; }
+.s1-google-profile {
+  width: 38px;
+  height: 38px;
+  overflow: hidden;
+  border: 2px solid #0f9d58;
+  border-radius: 50%;
+  background-image: url('./s01-privacy.png');
+  background-repeat: no-repeat;
+  background-size: 393px 852px;
+  background-position: -344px -68px;
+}
+
+.s1-google-hero {
+  position: relative;
+  width: 393px;
+  height: 250px;
+  overflow: hidden;
+  background: #111;
+}
+.s1-google-hero-sprite {
+  position: absolute;
+  left: 68px;
+  top: 58px;
+  width: 258px;
+  height: 155px;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  background-size: 393px 852px;
+}
+.s1-google-hero-sprite.terms {
+  background-image: url('./s01-terms.png');
+  background-position: -68px -170px;
+}
+.s1-google-hero-sprite.privacy {
+  background-image: url('./s01-privacy.png');
+  background-position: -68px -166px;
+}
+
+.s1-google-copy {
+  padding: 19px 23px 90px;
+  color: #e8eaed;
+}
+.s1-google-copy p { margin: 0; }
+.s1-google-meta {
+  margin-bottom: 17px !important;
+  color: #e8eaed;
+  font-size: 16px;
+  line-height: 24px;
+}
+.s1-google-link {
+  display: block;
+  margin: 0 0 30px;
+  color: #aecbfa;
+  font-size: 16px;
+  line-height: 24px;
+  text-decoration: underline;
+}
+.s1-google-heading {
+  margin: 68px 0 24px !important;
+  color: #e8eaed;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 34px;
+}
+.s1-google-heading.follow { margin-top: 22px !important; font-size: 28px; line-height: 38px; }
+.s1-google-body {
+  color: #e8eaed;
+  font-size: 17px;
+  line-height: 27px;
+}
+.s1-google-privacy-lead {
+  margin: 19px 0 28px !important;
+  color: #e8eaed;
+  font-size: 27px;
+  font-weight: 600;
+  line-height: 35px;
+  letter-spacing: -.25px;
+}
+.s1-google-privacy-body {
+  color: #e8eaed;
+  font-size: 16px;
+  line-height: 27px;
+}
+
+/* ---------- 01-08 Cathay AI disclosure ---------- */
+.s1-cathay-page {
+  min-height: 1080px;
+  background: #fff;
+  color: #444;
+  font-family: Arial, "Noto Sans TC", "PingFang TC", sans-serif;
+}
+.s1-cathay-hero {
+  position: relative;
+  width: 393px;
+  height: 235px;
+  overflow: hidden;
+  background: linear-gradient(132deg, #e8f8dc 0%, #d4f3e4 55%, #bdebd8 100%);
+}
+.s1-cathay-hero::after {
+  content: "";
+  position: absolute;
+  right: -42px;
+  top: 45px;
+  width: 150px;
+  height: 150px;
+  border: 18px solid rgba(255,255,255,.55);
+  border-radius: 48px;
+  transform: rotate(34deg);
+}
+.s1-cathay-menu {
+  position: absolute;
+  top: 14px;
+  left: 20px;
+  width: 28px;
+  height: 22px;
+  border-top: 1.5px solid #365342;
+  border-bottom: 1.5px solid #365342;
+}
+.s1-cathay-menu::after { content:""; position:absolute; top:9px; left:0; width:28px; border-top:1.5px solid #365342; }
+.s1-cathay-logo {
+  position: absolute;
+  top: 10px;
+  left: 112px;
+  width: 174px;
+  height: 28px;
+  overflow: hidden;
+  background-image: url('./s01-ai-statement.png');
+  background-repeat: no-repeat;
+  background-size: 393px 852px;
+  background-position: -112px -69px;
+}
+.s1-cathay-login {
+  position: absolute;
+  top: 10px;
+  right: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 30px;
+  border-radius: 6px;
+  background: #006b3f;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+}
+.s1-cathay-title {
+  position: absolute;
+  top: 84px;
+  left: 20px;
+  width: 353px;
+  margin: 0;
+  color: #2f3432;
+  text-align: center;
+  font-size: 29px;
+  font-weight: 700;
+  line-height: 45px;
+}
+.s1-cathay-content { padding: 20px 20px 100px; }
+.s1-cathay-breadcrumb {
+  margin: 0 0 13px;
+  color: #888;
+  font-size: 13px;
+  line-height: 22px;
+}
+.s1-cathay-heading {
+  margin: 36px 0 14px;
+  color: #006b3f;
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 32px;
+}
+.s1-cathay-paragraph {
+  margin: 0;
+  color: #4c4c4c;
+  font-size: 16px;
+  line-height: 26px;
+}
+.s1-cathay-subheading {
+  margin: 28px 0 10px;
+  color: #3c3c3c;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 30px;
+}
+.s1-cathay-helper {
+  position: absolute;
+  right: 14px;
+  bottom: 145px;
+  z-index: 8;
+  width: 148px;
+  padding: 10px 14px;
+  border-radius: 22px;
+  background: rgba(255,255,255,.96);
+  color: #4e6d5a;
+  font-size: 13px;
+  line-height: 18px;
+  box-shadow: 0 4px 22px rgba(0,0,0,.12);
+}
