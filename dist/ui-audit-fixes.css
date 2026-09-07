@@ -1,0 +1,192 @@
+/* Main-flow UI audit fixes.
+   Audited against the current Figma Flow 5 (4868:1540 / 4874:*).
+   This file intentionally loads last so shared fidelity fixes win over older section overrides. */
+
+/* ---------- Exact shared Figma icons ---------- */
+/* Section 8 and 9 were still drawing the close icon as the text ×. */
+.s8f-close,
+.s9f-close,
+.s9f-tooltip-close{
+  color:transparent !important;
+  font-size:0 !important;
+  background:transparent url('./assets/close.png') center / 20px 20px no-repeat !important;
+}
+.s9f-tooltip-close{
+  filter:brightness(0) invert(1);
+  background-size:18px 18px !important;
+}
+
+/* ic_mml_info is a real Library icon, not a hand-built circled i. */
+.s8f-info,
+.s9f-help-icon{
+  flex:0 0 16px !important;
+  width:16px !important;
+  height:16px !important;
+  border:0 !important;
+  border-radius:0 !important;
+  color:transparent !important;
+  font-size:0 !important;
+  background:transparent url('./assets/info.png') center / 16px 16px no-repeat !important;
+}
+
+/* Reuse the exact Figma ic/file/upload pixels already captured from the same Library component. */
+.s8f-upload-icon{
+  width:24px !important;
+  height:24px !important;
+  margin-bottom:4px !important;
+  background-image:url('./assets/boarding-pass-upload.png') !important;
+  background-repeat:no-repeat !important;
+  background-size:393px 852px !important;
+  background-position:-174px -465px !important;
+}
+.s8f-upload-icon::before,
+.s8f-upload-icon::after{display:none !important;content:none !important;}
+
+/* FileItem delete is the same Library trash icon used by the boarding-pass state. */
+.s8f-file-delete{
+  color:transparent !important;
+  font-size:0 !important;
+  background-image:url('./upload-valid.png') !important;
+  background-repeat:no-repeat !important;
+  background-size:393px 852px !important;
+  background-position:-320px -578px !important;
+}
+
+/* System/Loading: replace the text glyph with the four-point Figma-style star. */
+.s8f-loading-star,
+.s6-loading-star{
+  position:relative !important;
+  display:block !important;
+  width:20px !important;
+  height:20px !important;
+  color:transparent !important;
+  font-size:0 !important;
+}
+.s8f-loading-star::before,
+.s6-loading-star::before{
+  content:'' !important;
+  position:absolute;
+  inset:0;
+  display:block;
+  clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);
+  background:linear-gradient(145deg,#b9d8ff 8%,#77b4ff 54%,#9d8cff 100%);
+  filter:drop-shadow(0 0 2px rgba(255,255,255,.95));
+}
+
+/* ---------- Section 8 / Native ActionSheet ---------- */
+/* Figma uses one 300×250 glass container with four 272×48 pills. */
+#s8-source-options-screen .s8f-scrim{
+  top:0 !important;
+  bottom:0 !important;
+  height:852px !important;
+  background:rgba(0,0,0,.34) !important;
+  backdrop-filter:blur(4px) !important;
+  -webkit-backdrop-filter:blur(4px) !important;
+}
+#s8-source-options-screen .s8f-source-actions::before{
+  content:'';
+  position:absolute;
+  left:47px;
+  top:322px;
+  width:300px;
+  height:250px;
+  border-radius:34px;
+  background:rgba(245,245,245,.60);
+  box-shadow:0 10px 30px rgba(0,0,0,.12);
+  backdrop-filter:blur(40px) saturate(135%);
+  -webkit-backdrop-filter:blur(40px) saturate(135%);
+  pointer-events:none;
+}
+#s8-source-options-screen .s8f-source-btn{
+  z-index:1;
+  left:61px !important;
+  width:272px !important;
+  height:48px !important;
+  border:0 !important;
+  border-radius:24px !important;
+  background:rgba(225,225,225,.82) !important;
+  box-shadow:none !important;
+  color:#000 !important;
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif !important;
+  font-size:17px !important;
+  font-weight:400 !important;
+  line-height:22px !important;
+  letter-spacing:-.43px !important;
+}
+#s8-source-options-screen .s8f-source-photo{top:336px !important;}
+#s8-source-options-screen .s8f-source-camera{top:394px !important;}
+#s8-source-options-screen .s8f-source-files{top:452px !important;}
+#s8-source-options-screen .s8f-source-cancel{top:510px !important;}
+
+/* ---------- Section 8 / Bank form ---------- */
+/* Dropdown uses the same 24px Library arrow footprint instead of a custom 10px CSS chevron. */
+.s8f-bank-select::after{
+  content:'' !important;
+  position:absolute !important;
+  right:12px !important;
+  top:12px !important;
+  width:24px !important;
+  height:24px !important;
+  border:0 !important;
+  background:transparent url('./assets/ic-arrow-black-left-s.svg') center / 24px 24px no-repeat !important;
+  transform:rotate(-90deg) !important;
+}
+.s8f-bank-select.is-open::after{
+  top:12px !important;
+  transform:rotate(90deg) !important;
+}
+
+/* ---------- Section 9 / OTP ---------- */
+/* Figma uses the actual Library info icon and close icon. Keep the measured layout unchanged. */
+.s9f-help{gap:8px !important;}
+.s9f-close{right:16px !important;top:13px !important;width:20px !important;height:20px !important;}
+
+/* ---------- External-link icon ---------- */
+/* Replace the fallback ↗ character anywhere the main flow uses an external-link treatment. */
+.s6o-external::after{
+  content:'' !important;
+  display:inline-block !important;
+  width:12.42px !important;
+  height:12.43px !important;
+  margin-left:6px !important;
+  vertical-align:-1px;
+  background-image:url('./s9-success.png') !important;
+  background-repeat:no-repeat !important;
+  background-size:393px 852px !important;
+  background-position:-181px -530px !important;
+  transform:none !important;
+}
+
+/* ---------- Native file pickers ---------- */
+/* Use the same raster status-bar source as the approved shared header; do not redraw signal/Wi-Fi/battery. */
+.s6-files-device .wf-status,
+.s8f-files-status{
+  display:block !important;
+  background:#f9f9f9 url('./assets/shared-header.svg') 0 0 / 393px 111px no-repeat !important;
+}
+.s6-files-device .wf-status > *,
+.s8f-files-status > *{visibility:hidden !important;}
+
+/* Replace the text search glyph with a proper magnifier shape. */
+.s8f-files-search::before{
+  content:'' !important;
+  width:13px;
+  height:13px;
+  margin-right:9px;
+  border:1.7px solid #8e8e93;
+  border-radius:50%;
+  box-sizing:border-box;
+  transform:translateY(-1px);
+}
+.s8f-files-search::after{
+  content:'';
+  position:absolute;
+  left:23px;
+  top:22px;
+  width:6px;
+  height:1.7px;
+  border-radius:2px;
+  background:#8e8e93;
+  transform:rotate(45deg);
+  transform-origin:left center;
+}
