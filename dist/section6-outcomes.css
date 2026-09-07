@@ -1,0 +1,171 @@
+/* Section 6 outcome states — no matching policy, not eligible, OCR failure.
+   These are full conversation states; popup-only states continue to reuse the previous background. */
+
+.s6o-screen {
+  position: absolute;
+  inset: 0;
+  width: 393px;
+  height: 852px;
+  overflow: hidden;
+  background: #fff;
+  color: #3a3a3a;
+  font-family: "PingFang TC", "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+.s6o-screen[hidden] { display: none !important; }
+.s6o-screen button { font-family: inherit; }
+
+.s6o-device {
+  position: absolute;
+  inset: 0;
+  width: 393px;
+  height: 852px;
+  overflow: hidden;
+  background: #fff;
+}
+.s6o-device .wf-status,
+.s6o-device .wf-safari-address,
+.s6o-device .wf-safari-toolbar,
+.s6o-device .wf-home { z-index: 50; }
+
+.s6o-canvas {
+  position: absolute;
+  z-index: 2;
+  top: 111px;
+  left: 0;
+  width: 393px;
+  height: 491px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 205px 165px at 92% 86%, rgba(214,255,247,.78), rgba(214,255,247,0) 72%),
+    radial-gradient(ellipse 215px 170px at 7% 90%, rgba(222,216,255,.82), rgba(222,216,255,0) 72%),
+    radial-gradient(ellipse 155px 125px at 49% 48%, rgba(255,240,211,.55), rgba(255,240,211,0) 72%),
+    #fff;
+}
+
+.s6o-user {
+  position: absolute;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 305px;
+}
+.s6o-user.no-policy { top: 93px; }
+.s6o-user.not-eligible { top: 161px; }
+
+.s6o-user-bubble {
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #9fc5fe;
+  box-shadow: 0 2px 9px rgba(27,31,68,.12);
+  font-size: 16px;
+  line-height: 22px;
+  letter-spacing: .3px;
+  white-space: nowrap;
+}
+.s6o-time {
+  color: #777;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: .3px;
+  white-space: nowrap;
+}
+
+.s6o-alpha {
+  position: absolute;
+  left: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 1px;
+  width: 361px;
+}
+.s6o-alpha.no-policy { top: 189px; }
+.s6o-alpha.not-eligible { top: 257px; }
+.s6o-alpha.ocr-first { top: 24px; }
+.s6o-alpha.ocr-second { top: 170px; }
+
+.s6o-avatar {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  border-radius: 50%;
+  background-image: url('./s03-documents.png');
+  background-size: 393px 852px;
+  background-position: -16px -143px;
+}
+.s6o-alpha-body {
+  width: 325px;
+  padding: 3px 10px 10px;
+}
+.s6o-alpha-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+.s6o-alpha-bubble {
+  max-width: 305px;
+  padding: 12px 16px;
+  border: 1px solid rgba(224,224,224,.08);
+  border-radius: 10px;
+  background: linear-gradient(137deg,#fff 8%,rgba(255,255,255,.68) 96%);
+  box-shadow: 0 2px 9px rgba(27,31,68,.08);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: .3px;
+}
+.s6o-alpha-bubble p { margin: 0; }
+.s6o-alpha-bubble ol { margin: 0; padding-left: 24px; }
+.s6o-alpha-bubble .s6o-highlight { color: #4f44c3; font-weight: 500; }
+.s6o-alpha-bubble .s6o-link { color: #009eff; font-weight: 500; }
+
+.s6o-no-policy-copy { width: 305px; }
+.s6o-no-policy-copy .s6o-spacer { height: 22px; }
+.s6o-inline-link,
+.s6o-phone-link {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #009eff;
+  font: 500 16px/22px "PingFang TC", "Noto Sans TC", sans-serif;
+  letter-spacing: .3px;
+  cursor: pointer;
+  pointer-events: auto;
+  text-align: left;
+}
+.s6o-external::after {
+  content: "↗";
+  display: inline-block;
+  margin-left: 6px;
+  color: #009eff;
+  font-size: 14px;
+  transform: translateY(-1px);
+}
+
+.s6o-noteligible-copy { width: 305px; }
+.s6o-noteligible-copy .s6o-contact { margin-top: 22px; }
+
+.s6o-ocr-copy { width: 305px; }
+.s6o-reupload {
+  height: 38px;
+  margin-top: 4px;
+  padding: 8px 24px;
+  border: 1px solid rgba(224,224,224,.08);
+  border-radius: 22px;
+  background: linear-gradient(142deg,#fff 11%,rgba(255,255,255,.58) 92%);
+  box-shadow: 0 2px 9px rgba(27,31,68,.08);
+  color: #3a3a3a;
+  font-size: 16px;
+  line-height: 22px;
+  letter-spacing: .3px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* Make common chrome interactive in the custom screens. */
+.s6o-screen .s3-back { pointer-events: auto; }
+.s6o-screen .s3-message-bar { pointer-events: none; }
