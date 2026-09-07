@@ -6,6 +6,7 @@
   z-index: 8;
   background: #fff;
   font-family: "PingFang TC", "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  pointer-events: auto;
 }
 
 #s03-claim-input-screen > .intro-link,
@@ -45,6 +46,7 @@
   border: 0;
   background: transparent;
   cursor: pointer;
+  pointer-events: auto;
 }
 .s3-back img { display:block; width:24px; height:24px; }
 .s3-title-group {
@@ -105,6 +107,7 @@
   -webkit-overflow-scrolling:touch;
   touch-action:pan-y;
   scrollbar-width:none;
+  pointer-events:auto;
 }
 .s3-scroll::-webkit-scrollbar { display:none; }
 .s3-scroll.is-plain { height:491px; }
@@ -201,6 +204,7 @@
   letter-spacing:.3px;
   white-space:nowrap;
   cursor:pointer;
+  pointer-events:auto;
 }
 
 .s3-card {
@@ -237,6 +241,7 @@
   font-weight:500;
   letter-spacing:.3px;
   cursor:pointer;
+  pointer-events:auto;
 }
 .s3-card-action:first-of-type { border-top:2px solid #eaeaea; }
 
