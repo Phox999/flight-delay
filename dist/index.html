@@ -21,7 +21,7 @@
         if (!response.ok) throw new Error('legacy.html ' + response.status);
         let html = await response.text();
         html = html.replace('</head>', '<link rel="stylesheet" href="./htmlize.css?v=3"><link rel="stylesheet" href="./fidelity.css?v=1"><link rel="stylesheet" href="./icon-overrides.css?v=1"><link rel="stylesheet" href="./section1-fidelity.css?v=1"><link rel="stylesheet" href="./section1-runtime.css?v=1"><link rel="stylesheet" href="./welcome-interactions.css?v=2"><link rel="stylesheet" href="./section3-fidelity.css?v=2"><link rel="stylesheet" href="./section5-fidelity.css?v=1"><link rel="stylesheet" href="./section6-fidelity.css?v=1"></head>');
-        html = html.replace('</body>', '<script src="./htmlize.js?v=3"><' + '/script><script src="./fidelity.js?v=3"><' + '/script><script src="./section1-fidelity.js?v=1"><' + '/script><script src="./section3-fidelity.js?v=1"><' + '/script><script src="./section5-fidelity.js?v=1"><' + '/script><script src="./section6-fidelity.js?v=1"><' + '/script></body>');
+        html = html.replace('</body>', '<script src="./htmlize.js?v=3"><' + '/script><script src="./fidelity.js?v=3"><' + '/script><script src="./section1-fidelity.js?v=1"><' + '/script><script src="./section3-fidelity.js?v=1"><' + '/script><script src="./section5-fidelity.js?v=1"><' + '/script><script src="./section6-fidelity.js?v=1"><' + '/script><script src="./section6-sync.js?v=1"><' + '/script></body>');
         document.open();
         document.write(html);
         document.close();
