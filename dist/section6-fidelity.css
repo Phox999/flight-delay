@@ -1,0 +1,637 @@
+/* Section 6 fidelity — Figma Section 6: 選擇保單 / 上傳登機證 (4874:38652).
+   Batch 1: policy selector + boarding pass upload + native file picker. */
+
+#selection-screen .htmlized-screen,
+#upload-screen .htmlized-screen,
+#upload-source-screen .htmlized-screen,
+#file-picker-screen .htmlized-screen,
+#upload-loading-screen .htmlized-screen,
+#upload-valid-screen .htmlized-screen,
+#upload-size-error-screen .htmlized-screen,
+#upload-format-error-screen .htmlized-screen {
+  z-index: 12;
+  pointer-events: auto;
+  background: #fff;
+  font-family: "PingFang TC", "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Once a screen is HTMLized, legacy transparent hotspots remain callable by JS but never intercept taps. */
+#selection-screen > :is(button,.screen-hotspot),
+#upload-screen > :is(button,.screen-hotspot),
+#upload-source-screen > :is(button,.screen-hotspot),
+#file-picker-screen > :is(button,.screen-hotspot),
+#upload-loading-screen > :is(button,.screen-hotspot),
+#upload-valid-screen > :is(button,.screen-hotspot),
+#upload-size-error-screen > :is(button,.screen-hotspot),
+#upload-format-error-screen > :is(button,.screen-hotspot) {
+  pointer-events: none !important;
+}
+
+.s6-device {
+  position: absolute;
+  inset: 0;
+  width: 393px;
+  height: 852px;
+  overflow: hidden;
+  background: #fff;
+  color: #3a3a3a;
+}
+
+.s6-device button { font-family: inherit; }
+
+/* Reuse established native chrome from Section 1/3, but force it above sheets where Figma does. */
+.s6-device .wf-status { z-index: 60; }
+.s6-device .wf-safari-address,
+.s6-device .wf-safari-toolbar,
+.s6-device .wf-home { z-index: 60; }
+
+.s6-chat-bg {
+  position: absolute;
+  z-index: 1;
+  top: 111px;
+  left: 0;
+  width: 393px;
+  height: 491px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 205px 160px at 92% 83%, rgba(214,255,247,.78), rgba(214,255,247,0) 72%),
+    radial-gradient(ellipse 210px 170px at 8% 92%, rgba(222,216,255,.82), rgba(222,216,255,0) 72%),
+    radial-gradient(ellipse 150px 120px at 48% 55%, rgba(255,240,211,.54), rgba(255,240,211,0) 72%),
+    #fff;
+}
+
+.s6-chat-thread {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  justify-content: flex-end;
+  padding: 24px 0;
+  opacity: .92;
+}
+
+.s6-chat-thread .s3-turn-user,
+.s6-chat-thread .s3-turn-alpha { flex: 0 0 auto; }
+
+.s6-scrim {
+  position: absolute;
+  z-index: 24;
+  top: 59px;
+  left: 0;
+  width: 393px;
+  height: 657px;
+  background: rgba(0,0,0,.34);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* ---------- Policy selector ---------- */
+.s6-policy-sheet {
+  position: absolute;
+  z-index: 32;
+  top: 156px;
+  left: 0;
+  width: 393px;
+  height: 564px;
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
+  background: #fff;
+}
+
+.s6-sheet-header {
+  position: absolute;
+  z-index: 5;
+  top: 0;
+  left: 0;
+  width: 393px;
+  height: 46px;
+  border-bottom: .5px solid #bfbfbf;
+  border-radius: 12px 12px 0 0;
+  background: #fff;
+}
+
+.s6-sheet-title {
+  position: absolute;
+  top: 12px;
+  left: 60px;
+  width: 281px;
+  margin: 0;
+  color: #3a3a3a;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: .3px;
+  text-align: center;
+}
+
+.s6-close {
+  position: absolute;
+  z-index: 8;
+  top: 13px;
+  left: 357px;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.s6-close img { display:block; width:20px; height:20px; object-fit:contain; }
+
+.s6-policy-scroll {
+  position: absolute;
+  z-index: 2;
+  top: 46px;
+  left: 0;
+  width: 393px;
+  height: 440px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  scrollbar-width: none;
+  background: #fff;
+  pointer-events: auto;
+}
+.s6-policy-scroll::-webkit-scrollbar { display:none; }
+
+.s6-policy-content {
+  width: 393px;
+  min-height: 562px;
+  padding: 24px 24px 24px;
+}
+
+.s6-policy-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 20px;
+  margin-bottom: 16px;
+  color: #3a3a3a;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: .3px;
+}
+.s6-policy-note img { width:16px; height:16px; display:block; }
+
+.s6-policy-card {
+  position: relative;
+  display: block;
+  width: 345px;
+  min-height: 134px;
+  margin: 0 0 16px;
+  padding: 16px;
+  border: 1.5px solid transparent;
+  border-radius: 16px;
+  background: #fff;
+  color: #3a3a3a;
+  text-align: left;
+  box-shadow: 0 4px 18px rgba(32,35,70,.08);
+  cursor: pointer;
+  pointer-events: auto;
+}
+.s6-policy-card.tall { height:156px; }
+.s6-policy-card.short { height:134px; }
+.s6-policy-card.is-selected {
+  border-color: #9fc5fe;
+  background: #f4f8ff;
+  box-shadow: 0 4px 18px rgba(32,35,70,.08);
+}
+
+.s6-policy-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 313px;
+}
+.s6-policy-radio { flex:0 0 24px; width:24px; height:24px; margin-top:0; }
+.s6-policy-radio img { display:block; width:24px; height:24px; }
+.s6-policy-heading { flex:1; min-width:0; }
+.s6-policy-name {
+  margin: 0;
+  color:#3a3a3a;
+  font-size:16px;
+  font-weight:500;
+  line-height:22px;
+  letter-spacing:.3px;
+}
+.s6-policy-type {
+  margin: 4px 0 0;
+  color:#777;
+  font-size:14px;
+  font-weight:500;
+  line-height:20px;
+  letter-spacing:.3px;
+}
+.s6-policy-meta {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:8px;
+  color:#3a3a3a;
+  font-size:14px;
+  line-height:20px;
+  letter-spacing:.3px;
+  white-space:nowrap;
+}
+.s6-policy-meta-label { color:#777; }
+
+.s6-policy-footer,
+.s6-upload-footer {
+  position:absolute;
+  z-index:6;
+  left:0;
+  width:393px;
+  height:78px;
+  padding:16px 24px;
+  background:#fff;
+  box-shadow:0 -8px 24px rgba(68,68,68,.08);
+}
+.s6-policy-footer { top:486px; }
+
+.s6-primary,
+.s6-disabled {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:345px;
+  height:46px;
+  margin:0;
+  padding:0 16px;
+  border:0;
+  border-radius:6px;
+  font-size:16px;
+  font-weight:500;
+  line-height:22px;
+  letter-spacing:.3px;
+  text-align:center;
+}
+.s6-primary { background:#9fc5fe; color:#3a3a3a; cursor:pointer; pointer-events:auto; }
+.s6-disabled { background:#eaeaea; color:#fff; cursor:default; }
+.s6-loading-cta { background:#bfbfbf; }
+
+.s6-policy-thumb {
+  position:absolute;
+  z-index:9;
+  top:53px;
+  right:12px;
+  width:6px;
+  height:151px;
+  border-radius:12px;
+  background:#777;
+  pointer-events:none;
+  will-change:transform;
+}
+
+/* ---------- Boarding pass upload sheet ---------- */
+.s6-upload-sheet {
+  position:absolute;
+  z-index:32;
+  left:0;
+  width:393px;
+  overflow:hidden;
+  border-radius:12px 12px 0 0;
+  background:#fff;
+}
+.s6-upload-sheet.initial { top:353px; height:380px; }
+.s6-upload-sheet.error { top:298px; height:428px; }
+.s6-upload-sheet.selected { top:496px; height:220px; }
+.s6-upload-sheet.loading { top:498px; height:218px; }
+
+.s6-upload-body {
+  position:absolute;
+  top:46px;
+  left:0;
+  width:393px;
+  background:#fff;
+}
+.s6-upload-sheet.initial .s6-upload-body { height:256px; padding:24px; }
+.s6-upload-sheet.error .s6-upload-body { height:304px; padding:24px; }
+.s6-upload-sheet.selected .s6-upload-body { height:96px; padding:24px; }
+.s6-upload-sheet.loading .s6-upload-body { height:94px; padding:24px; }
+.s6-upload-sheet.initial .s6-upload-footer { top:302px; }
+.s6-upload-sheet.error .s6-upload-footer { top:350px; }
+.s6-upload-sheet.selected .s6-upload-footer { top:142px; }
+.s6-upload-sheet.loading .s6-upload-footer { top:140px; }
+
+.s6-upload-trigger {
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  width:345px;
+  height:136px;
+  margin:0;
+  padding:0;
+  border:1px dashed #bfbfbf;
+  border-radius:10px;
+  background:#fff;
+  color:#000;
+  cursor:pointer;
+  pointer-events:auto;
+}
+.s6-upload-glyph {
+  position:relative;
+  width:24px;
+  height:24px;
+  margin-bottom:4px;
+  color:#3a3a3a;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI Symbol",sans-serif;
+  font-size:22px;
+  line-height:24px;
+  text-align:center;
+}
+.s6-upload-label { font-size:14px; line-height:20px; letter-spacing:.3px; }
+.s6-upload-helper {
+  margin:12px 0 0;
+  padding-left:21px;
+  color:#777;
+  font-size:14px;
+  line-height:20px;
+  letter-spacing:.3px;
+}
+.s6-upload-helper li { margin:0; }
+
+.s6-error-banner {
+  display:flex;
+  align-items:center;
+  width:345px;
+  height:36px;
+  margin:0 0 12px;
+  padding:8px 16px;
+  border:1.5px solid #f4dddd;
+  border-radius:6px;
+  background:#fdf1eb;
+  color:#ec464a;
+  font-size:14px;
+  font-weight:500;
+  line-height:20px;
+  letter-spacing:.3px;
+}
+.s6-upload-sheet.error .s6-upload-trigger { margin-bottom:0; }
+
+.s6-file-row-selected {
+  display:flex;
+  align-items:center;
+  width:327px;
+  height:48px;
+  padding:12px 16px;
+  border:1.5px solid #eaeaea;
+  border-radius:6px;
+  background:#fff;
+  color:#3a3a3a;
+  font-size:16px;
+  line-height:22px;
+}
+.s6-file-row-selected.is-uploading { opacity:.6; }
+.s6-file-name { flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.s6-file-delete {
+  width:24px;
+  height:24px;
+  margin:0;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#777;
+  font-size:22px;
+  line-height:24px;
+  cursor:pointer;
+  pointer-events:auto;
+}
+
+.s6-loading-scrim {
+  position:absolute;
+  z-index:44;
+  top:60px;
+  left:0;
+  width:393px;
+  height:656px;
+  background:rgba(0,0,0,.38);
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+}
+.s6-loading-card {
+  position:absolute;
+  z-index:48;
+  top:352px;
+  left:142px;
+  width:114px;
+  height:82px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  border:1px solid rgba(224,224,224,.08);
+  border-radius:16px;
+  background:linear-gradient(119deg,#fff 8%,rgba(255,255,255,.7) 96%);
+  box-shadow:0 2px 9px rgba(27,31,68,.08);
+  backdrop-filter:blur(27.5px);
+  color:#3a3a3a;
+  font-size:16px;
+  line-height:22px;
+}
+.s6-loading-star { color:#7aa9ff; font-size:20px; line-height:20px; }
+
+/* ---------- Native iOS Action Sheet ---------- */
+.s6-action-scrim {
+  position:absolute;
+  z-index:44;
+  inset:0;
+  background:rgba(0,0,0,.24);
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+}
+.s6-action-sheet {
+  position:absolute;
+  z-index:50;
+  top:322px;
+  left:44px;
+  width:300px;
+  height:250px;
+  padding:14px;
+  border-radius:32px;
+  background:rgba(248,248,248,.68);
+  backdrop-filter:blur(26px) saturate(140%);
+  -webkit-backdrop-filter:blur(26px) saturate(140%);
+}
+.s6-action-button {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:272px;
+  height:48px;
+  margin:0 0 10px;
+  padding:0;
+  border:0;
+  border-radius:24px;
+  background:rgba(255,255,255,.88);
+  color:#3a3a3a;
+  font-size:17px;
+  font-weight:400;
+  cursor:pointer;
+  pointer-events:auto;
+}
+.s6-action-button:last-child { margin-bottom:0; }
+
+/* ---------- iOS Files picker ---------- */
+.s6-files-device {
+  position:absolute;
+  inset:0;
+  width:393px;
+  height:852px;
+  overflow:hidden;
+  border-radius:32px;
+  background:#f9f9f9;
+  color:#111;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang TC",sans-serif;
+}
+.s6-files-device .wf-status { z-index:10; background:#f9f9f9; }
+.s6-files-nav {
+  position:absolute;
+  z-index:5;
+  top:59px;
+  left:0;
+  width:393px;
+  height:52px;
+  display:grid;
+  grid-template-columns:90px 150px 90px;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 16px;
+  background:#f9f9f9;
+}
+.s6-files-nav button {
+  height:52px;
+  margin:0;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#007aff;
+  font-size:17px;
+  line-height:21px;
+  cursor:pointer;
+  pointer-events:auto;
+}
+.s6-files-back { text-align:left; }
+.s6-files-cancel { text-align:right; }
+.s6-files-nav-title { text-align:center; font-size:17px; line-height:21px; font-weight:600; }
+.s6-files-search {
+  position:absolute;
+  top:119px;
+  left:16px;
+  width:361px;
+  height:36px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:0 12px;
+  border-radius:10px;
+  background:#e9e9ee;
+  color:#8e8e93;
+  font-size:16px;
+}
+.s6-files-search-icon {
+  position:relative;
+  width:16px;
+  height:16px;
+  border:2px solid #8e8e93;
+  border-radius:50%;
+  opacity:.85;
+}
+.s6-files-search-icon::after {
+  content:"";
+  position:absolute;
+  right:-4px;
+  bottom:-2px;
+  width:6px;
+  height:2px;
+  border-radius:1px;
+  background:#8e8e93;
+  transform:rotate(45deg);
+}
+.s6-files-heading {
+  position:absolute;
+  top:176px;
+  left:20px;
+  margin:0;
+  font-size:28px;
+  line-height:34px;
+  font-weight:600;
+}
+.s6-files-list {
+  position:absolute;
+  top:222px;
+  left:0;
+  width:393px;
+  background:#fff;
+}
+.s6-files-row {
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:393px;
+  height:88px;
+  padding:0 16px 0 20px;
+  border:0;
+  border-bottom:.5px solid #d1d1d6;
+  background:#fff;
+  color:#111;
+  text-align:left;
+  cursor:pointer;
+  pointer-events:auto;
+}
+.s6-files-row:last-child { border-bottom:0; }
+.s6-file-iconbox { position:relative; width:42px; height:52px; flex:0 0 42px; }
+.s6-file-paper {
+  position:absolute;
+  top:4px;
+  left:4px;
+  width:34px;
+  height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  padding-left:4px;
+  border:1px solid #d1d1d6;
+  border-radius:4px;
+  background:#fff;
+  font-size:9px;
+  font-weight:600;
+}
+.s6-file-paper.pdf { color:#ff3b30; }
+.s6-file-paper.jpg,.s6-file-paper.xyz { color:#007aff; }
+.s6-files-info { width:270px; height:52px; display:flex; flex-direction:column; gap:4px; overflow:hidden; }
+.s6-files-name { font-size:16px; line-height:19px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.s6-files-sub { color:#8e8e93; font-size:13px; line-height:16px; white-space:nowrap; }
+.s6-files-more { margin-left:auto; color:#8e8e93; font-size:15px; font-weight:600; letter-spacing:1px; }
+.s6-files-home {
+  position:absolute;
+  bottom:0;
+  left:0;
+  width:393px;
+  height:34px;
+  background:#f9f9f9;
+}
+.s6-files-home::after {
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:8px;
+  width:139px;
+  height:5px;
+  border-radius:100px;
+  background:#000;
+  transform:translateX(-50%);
+}
+
+@media (max-width:393px),(max-height:852px) {
+  .s6-policy-scroll { -webkit-overflow-scrolling:touch; }
+}
