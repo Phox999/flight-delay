@@ -1,0 +1,180 @@
+/* Shared component alignment — source: Next-Chatbot Library
+   Input/MessageBar 21224:2707, Send 21587:1449, Native/ActionSheet 27107:73,
+   Button/Tag 21437:981, Input/FileUpload 27230:1272, Input/Dropdown 25523:594. */
+
+/* Message bar: 393×114, 24px side padding, 297×44 text field + 40×40 send. */
+.wf-message-bar,
+.s3-message-bar{
+  width:393px!important;
+  height:114px!important;
+  padding:12px 24px!important;
+}
+.wf-message-row,
+.s3-message-row{width:345px!important;height:44px!important;}
+.wf-message-input,
+.s3-message-input{
+  width:297px!important;
+  height:44px!important;
+  padding:0 24px!important;
+  border-radius:24px!important;
+  color:#a0a0a0!important;
+  font-size:16px!important;
+  line-height:22px!important;
+  letter-spacing:.3px!important;
+}
+.wf-message-note,
+.s3-message-note{
+  width:345px!important;
+  margin:12px 0 0!important;
+  color:#777!important;
+  text-align:center!important;
+  font-size:12px!important;
+  line-height:17px!important;
+  font-weight:400!important;
+}
+
+/* Reuse the Figma-derived send glyph already present in the welcome artwork instead of a hand-drawn arrow. */
+.s3-send{
+  top:2px!important;
+  right:0!important;
+  width:40px!important;
+  height:40px!important;
+  overflow:hidden!important;
+  border-radius:50%!important;
+  background-image:url('./s01-welcome.png')!important;
+  background-repeat:no-repeat!important;
+  background-size:393px 852px!important;
+  background-position:-329px -616px!important;
+}
+.s3-send::after{display:none!important;}
+.s3-message-bar.is-paused .s3-send{
+  background-image:none!important;
+  background:radial-gradient(circle at 28% 25%,#cceeff 0 20%,#b9c9ff 55%,#baa8ef 100%)!important;
+  opacity:.5!important;
+}
+.s3-message-bar.is-paused .s3-send::after{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  left:14px!important;
+  top:14px!important;
+  width:12px!important;
+  height:12px!important;
+  border:0!important;
+  border-radius:2px!important;
+  background:#3a3a3a!important;
+  transform:none!important;
+}
+
+/* Button/Tag */
+.wf-tag{
+  max-width:345px!important;
+  min-height:40px!important;
+  gap:8px!important;
+  padding:8px 8px 8px 16px!important;
+  border:2px solid rgba(255,255,255,.08)!important;
+  border-radius:10px!important;
+  background:linear-gradient(99.6deg,#fff 0%,rgba(255,255,255,.5) 100%)!important;
+  box-shadow:0 2px 15px rgba(27,31,68,.08)!important;
+  backdrop-filter:blur(27.5px)!important;
+  -webkit-backdrop-filter:blur(27.5px)!important;
+}
+.wf-tag-arrow{
+  width:24px!important;
+  height:24px!important;
+  flex:0 0 24px!important;
+  background:url('./assets/ic-arrow-grey-right-s.svg') center/24px 24px no-repeat!important;
+}
+.wf-tag-arrow::before,.wf-tag-arrow::after{display:none!important;}
+
+/* Card/InfoConfirm geometry used by the claim-preparation card. */
+.s3-card{width:250px!important;height:280px!important;border-radius:12px!important;}
+.s3-card-content{
+  width:250px!important;
+  height:142px!important;
+  padding:16px!important;
+  font-size:16px!important;
+  line-height:22px!important;
+  letter-spacing:.3px!important;
+  overflow:hidden!important;
+}
+.s3-card-action{
+  width:250px!important;
+  height:46px!important;
+  min-height:46px!important;
+  padding:12px 10px!important;
+  border-top:2px solid #eaeaea!important;
+  font-size:16px!important;
+  line-height:22px!important;
+}
+
+/* Native ActionSheet: one glass container, with 272×48 actions inside a 300px shell. */
+.s8f-source-actions::before{
+  content:"";
+  position:absolute;
+  left:46.5px;
+  top:320px;
+  width:300px;
+  height:250px;
+  border-radius:34px;
+  background:rgba(245,245,245,.72);
+  box-shadow:0 10px 30px rgba(0,0,0,.12);
+  backdrop-filter:blur(40px);
+  -webkit-backdrop-filter:blur(40px);
+}
+.s8f-source-btn{
+  left:61px!important;
+  width:272px!important;
+  height:48px!important;
+  border-radius:24px!important;
+  background:rgba(225,225,225,.82)!important;
+  box-shadow:none!important;
+  color:#000!important;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif!important;
+  font-size:17px!important;
+  letter-spacing:-.43px!important;
+}
+.s8f-source-photo{top:334px!important;}
+.s8f-source-camera{top:392px!important;}
+.s8f-source-files{top:450px!important;}
+.s8f-source-cancel{top:508px!important;}
+
+/* FileUpload / FileItem */
+.s8f-upload-empty{
+  width:325px!important;
+  height:136px!important;
+  margin-left:10px!important;
+  border:1px dashed #bfbfbf!important;
+  border-radius:10px!important;
+  background:#fff!important;
+}
+.s8f-upload-label{font-size:14px!important;line-height:20px!important;font-weight:500!important;letter-spacing:.3px!important;}
+.s8f-file-row{
+  width:327px!important;
+  min-height:48px!important;
+  margin-left:9px!important;
+  padding:12px 16px!important;
+  border:1.5px solid #eaeaea!important;
+  border-radius:6px!important;
+}
+.s8f-error-message{font-size:14px!important;line-height:20px!important;letter-spacing:.3px!important;}
+
+/* Dropdown / input fields */
+.s7-input,.s7-dropdown,.s8f-bank-input,.s8f-bank-select{
+  width:345px!important;
+  height:48px!important;
+  padding:0 14.5px!important;
+  border:1.5px solid #bfbfbf!important;
+  border-radius:6px!important;
+  background:#fff!important;
+  color:#3a3a3a!important;
+  font:300 16px/22px "PingFang TC","Noto Sans TC",sans-serif!important;
+  letter-spacing:.3px!important;
+}
+.s7-input:focus,.s7-dropdown:focus,.s7-dropdown.is-open,
+.s8f-bank-input:focus,.s8f-bank-select:focus,.s8f-bank-select.is-open{border-color:#9fc5fe!important;}
+.s7-input::placeholder,.s8f-bank-input::placeholder{color:#a0a0a0!important;opacity:1!important;}
+.s8f-bank-select.is-placeholder{color:#a0a0a0!important;}
+
+/* The scroll thumb belongs to the top of the scrollable body, not halfway down the sheet. */
+.s8f-bank-thumb{top:53px!important;width:6px!important;height:151px!important;right:12px!important;}
