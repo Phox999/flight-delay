@@ -1,0 +1,35 @@
+/* Small interaction/stacking layer for Section 1 fidelity screens. */
+
+#s01-ai-notice-screen .s1-base .wf-status,
+#s01-ai-notice-screen .s1-base .wf-safari-address,
+#s01-ai-notice-screen .s1-base .wf-safari-toolbar,
+#s01-ai-notice-screen .s1-base .wf-home,
+#s01-alert-terms-screen .s1-base .wf-status,
+#s01-alert-terms-screen .s1-base .wf-safari-address,
+#s01-alert-terms-screen .s1-base .wf-safari-toolbar,
+#s01-alert-terms-screen .s1-base .wf-home,
+#s01-alert-privacy-screen .s1-base .wf-status,
+#s01-alert-privacy-screen .s1-base .wf-safari-address,
+#s01-alert-privacy-screen .s1-base .wf-safari-toolbar,
+#s01-alert-privacy-screen .s1-base .wf-home,
+#s01-alert-service-screen .s1-base .wf-status,
+#s01-alert-service-screen .s1-base .wf-safari-address,
+#s01-alert-service-screen .s1-base .wf-safari-toolbar,
+#s01-alert-service-screen .s1-base .wf-home {
+  z-index: 60;
+}
+
+.s1-browser-back {
+  position: absolute;
+  z-index: 20;
+  top: 776px;
+  left: 17px;
+  width: 42px;
+  height: 39px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+}
