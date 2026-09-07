@@ -1,5 +1,9 @@
 /* Small interaction/stacking layer for Section 1 fidelity screens. */
 
+.htmlized-screen.s1-interactive {
+  pointer-events: auto !important;
+}
+
 #s01-ai-notice-screen .s1-base .wf-status,
 #s01-ai-notice-screen .s1-base .wf-safari-address,
 #s01-ai-notice-screen .s1-base .wf-safari-toolbar,
