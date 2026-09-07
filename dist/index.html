@@ -1,0 +1,2315 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#ffffff">
+  <title>阿發－班機延誤理賠｜原定班機時間</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "PingFang TC", "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --brand-primary: #9fc5fe;
+      --content-primary: #3a3a3a;
+      --content-secondary: #777777;
+      --content-tertiary: #bfbfbf;
+      --bg-selected: #f4f8ff;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #ececec;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .phone {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 393px;
+      height: 852px;
+      overflow: hidden;
+      border-radius: 32px;
+      background: #ffffff;
+      transform: translate(-50%, -50%) scale(var(--prototype-scale, 1));
+      transform-origin: center;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.16);
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      width: 393px;
+      height: 852px;
+      overflow: hidden;
+    }
+
+    .screen-reference {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 393px;
+      height: 852px;
+      object-fit: cover;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .screen-hotspot {
+      position: absolute;
+      z-index: 4;
+      display: block;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .screen-hotspot:focus-visible {
+      outline: 2px solid #1677ff;
+      outline-offset: 2px;
+    }
+
+    .intro-link {
+      position: absolute;
+      z-index: 4;
+      display: block;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .welcome-claim {
+      top: 448px;
+      left: 36px;
+      width: 219px;
+      height: 40px;
+      border-radius: 12px;
+    }
+
+    .welcome-advice {
+      top: 504px;
+      left: 35px;
+      width: 284px;
+      height: 40px;
+      border-radius: 12px;
+    }
+
+    .welcome-ai-statement { top: 136px; left: 108px; width: 59px; height: 17px; }
+    .welcome-notice { top: 136px; left: 179px; width: 48px; height: 17px; }
+    .welcome-privacy { top: 153px; left: 133px; width: 100px; height: 17px; }
+    .welcome-terms { top: 153px; left: 247px; width: 48px; height: 17px; }
+    .intro-close { top: 156px; left: 352px; width: 30px; height: 30px; border-radius: 50%; }
+    .intro-alert-close { top: 345px; left: 24px; width: 345px; height: 280px; }
+    .claim-back { top: 68px; left: 4px; width: 42px; height: 40px; }
+    .documents-confirm { top: 462px; left: 59px; width: 275px; height: 43px; }
+    .documents-join { top: 506px; left: 59px; width: 275px; height: 43px; }
+    .documents-later { top: 550px; left: 59px; width: 275px; height: 43px; }
+    .other-claim-open { top: 390px; left: 56px; width: 282px; height: 72px; }
+    .official-site-return { top: 64px; left: 8px; width: 46px; height: 44px; }
+    .consent-close { top: 384px; left: 352px; width: 30px; height: 30px; border-radius: 50%; }
+    .consent-credit-top { top: 438px; left: 250px; width: 128px; height: 31px; }
+    .consent-credit-bottom { top: 463px; left: 14px; width: 105px; height: 31px; }
+    .consent-agree { top: 654px; left: 24px; width: 346px; height: 46px; border-radius: 6px; }
+    .consent-return { top: 536px; left: 76px; width: 202px; height: 30px; }
+
+    .credit-scroll {
+      position: absolute;
+      top: 150px;
+      left: 0;
+      z-index: 3;
+      width: 393px;
+      height: 504px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+      background: #ffffff;
+      scrollbar-width: none;
+    }
+
+    .credit-scroll::-webkit-scrollbar { display: none; }
+
+    .credit-scroll-content {
+      width: 393px;
+      min-height: 1640px;
+      padding: 24px 20px 38px;
+      color: var(--content-primary);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 22px;
+      letter-spacing: 0.3px;
+    }
+
+    .credit-scroll-content p {
+      margin: 0 0 10px;
+    }
+
+    .credit-scroll-content .credit-heading {
+      margin-top: 12px;
+      font-weight: 500;
+    }
+
+    .credit-scrollbar-thumb {
+      position: absolute;
+      top: 158px;
+      left: 380px;
+      z-index: 5;
+      width: 5px;
+      height: 151px;
+      border-radius: 10px;
+      background: #777;
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    .credit-return {
+      position: absolute;
+      top: 654px;
+      left: 24px;
+      z-index: 5;
+      width: 346px;
+      height: 46px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .upload-trigger {
+      top: 423px;
+      left: 24px;
+      width: 345px;
+      height: 137px;
+      border-radius: 10px;
+    }
+
+    .source-action {
+      left: 58px;
+      width: 272px;
+      height: 48px;
+      border-radius: 24px;
+    }
+
+    .source-photo {
+      top: 336px;
+    }
+
+    .source-camera {
+      top: 394px;
+    }
+
+    .source-files {
+      top: 452px;
+    }
+
+    .source-cancel {
+      top: 510px;
+    }
+
+    .policy-close-hotspot {
+      top: 169px;
+      left: 357px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+    }
+
+    .policy-reminder-return {
+      top: 424px;
+      left: 59px;
+      width: 305px;
+      height: 112px;
+      border-radius: 10px;
+    }
+
+    .upload-close-hotspot {
+      top: 366px;
+      left: 357px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+    }
+
+    .upload-error-trigger {
+      top: 416px;
+      left: 24px;
+      width: 345px;
+      height: 136px;
+      border-radius: 10px;
+    }
+
+    .upload-valid-close {
+      top: 509px;
+      left: 357px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+    }
+
+    .upload-valid-delete {
+      top: 578px;
+      left: 311px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+    }
+
+    .upload-valid-confirm {
+      top: 654px;
+      left: 24px;
+      width: 345px;
+      height: 46px;
+      border-radius: 6px;
+    }
+
+    .file-picker-nav-back {
+      top: 59px;
+      left: 16px;
+      width: 90px;
+      height: 52px;
+    }
+
+    .file-picker-cancel {
+      top: 59px;
+      left: 287px;
+      width: 90px;
+      height: 52px;
+    }
+
+    .file-picker-row {
+      left: 0;
+      width: 393px;
+      height: 88px;
+    }
+
+    .file-picker-size {
+      top: 222px;
+    }
+
+    .file-picker-valid {
+      top: 310.5px;
+    }
+
+    .file-picker-unsupported {
+      top: 487px;
+    }
+
+    .date-reminder-return {
+      top: 419px;
+      left: 59px;
+      width: 305px;
+      height: 112px;
+      border-radius: 10px;
+    }
+
+    .ocr-scroll {
+      position: absolute;
+      top: 111px;
+      left: 0;
+      z-index: 3;
+      width: 393px;
+      height: 491px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+      background:
+        radial-gradient(circle at 88% 84%, rgba(220, 255, 247, 0.72) 0, rgba(220, 255, 247, 0) 43%),
+        radial-gradient(circle at 6% 92%, rgba(226, 218, 255, 0.8) 0, rgba(226, 218, 255, 0) 42%),
+        radial-gradient(circle at 48% 76%, rgba(255, 244, 222, 0.6) 0, rgba(255, 244, 222, 0) 45%),
+        #ffffff;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .ocr-scroll-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      width: 393px;
+      min-height: 812px;
+      padding: 24px 0;
+    }
+
+    .ocr-user-block {
+      display: flex;
+      flex: 0 0 72px;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      width: 393px;
+      height: 72px;
+      padding: 0 16px;
+    }
+
+    .ocr-user-bubble {
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: var(--brand-primary);
+      color: var(--content-primary);
+      font-size: 16px;
+      line-height: 22px;
+      letter-spacing: 0.3px;
+      box-shadow: 0 2px 9px rgba(27, 31, 68, 0.12);
+    }
+
+    .ocr-time {
+      height: 18px;
+      margin-top: 8px;
+      color: var(--content-secondary);
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 18px;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    .ocr-response-row {
+      display: flex;
+      align-items: flex-start;
+      width: 393px;
+      padding: 0 16px;
+    }
+
+    .ocr-avatar {
+      display: block;
+      flex: 0 0 32px;
+      width: 32px;
+      height: 32px;
+    }
+
+    .ocr-response-body {
+      width: 325px;
+      padding: 3px 10px 0;
+    }
+
+    .ocr-response-bubble {
+      width: 305px;
+      padding: 12px 16px;
+      border: 1px solid rgba(224, 224, 224, 0.08);
+      border-radius: 10px;
+      background: linear-gradient(137deg, #ffffff 8%, rgba(255, 255, 255, 0.72) 96%);
+      color: var(--content-primary);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 22px;
+      letter-spacing: 0.3px;
+      box-shadow: 0 2px 9px rgba(27, 31, 68, 0.08);
+    }
+
+    .ocr-card {
+      width: 250px;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #ffffff;
+      color: var(--content-primary);
+      box-shadow: 0 2px 9px rgba(27, 31, 68, 0.08);
+    }
+
+    .ocr-card-title {
+      margin: 0;
+      padding: 16px 16px 0;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 22px;
+      letter-spacing: 0.3px;
+    }
+
+    .ocr-card-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 16px 16px;
+      font-size: 16px;
+      line-height: 22px;
+      letter-spacing: 0.3px;
+    }
+
+    .ocr-card-field:first-of-type {
+      padding-bottom: 8px;
+    }
+
+    .ocr-card-label,
+    .ocr-card-value {
+      margin: 0;
+    }
+
+    .ocr-card-label {
+      font-weight: 300;
+    }
+
+    .ocr-card-value {
+      font-weight: 500;
+    }
+
+    .ocr-route {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      height: 20px;
+      font-family: "Noto Sans TC", "PingFang TC", sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 20px;
+    }
+
+    .ocr-route-code {
+      width: 44px;
+    }
+
+    .ocr-route-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 18px;
+    }
+
+    .ocr-card-actions {
+      overflow: hidden;
+      border-radius: 0 0 12px 12px;
+    }
+
+    .ocr-card-action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 250px;
+      height: 46px;
+      margin: 0;
+      padding: 12px 10px;
+      border: 0;
+      border-top: 2px solid #eaeaea;
+      background: #ffffff;
+      color: #4f44c3;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 22px;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+    }
+
+    .date-sheet {
+      position: absolute;
+      bottom: 136px;
+      left: 0;
+      z-index: 3;
+      width: 393px;
+      height: 248px;
+      overflow: hidden;
+      border-radius: 12px 12px 0 0;
+      background: #ffffff;
+    }
+
+    .date-sheet.has-error {
+      height: 278px;
+    }
+
+    .date-sheet-header {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 393px;
+      height: 46px;
+      border-bottom: 0.5px solid var(--content-tertiary);
+      background: #ffffff;
+    }
+
+    .date-sheet-title {
+      margin: 0;
+      color: var(--content-primary);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 22px;
+      letter-spacing: 0.3px;
+      text-align: center;
+    }
+
+    .date-sheet-close {
+      position: absolute;
+      top: 13px;
+      right: 16px;
+      display: block;
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+    }
+
+    .date-close-hotspot {
+      top: 480px;
+      left: 357px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+    }
+
+    .date-form {
+      display: flex;
+      width: 393px;
+      height: 124px;
+      gap: 24px;
+      padding: 24px;
+      background: #ffffff;
+    }
+
+    .date-sheet.has-error .date-form {
+      height: 154px;
+    }
+
+    .date-field {
+      width: 160px;
+    }
+
+    .date-field:first-child,
+    .date-field:first-child .date-input {
+      width: 161px;
+    }
+
+    .date-label {
+      display: block;
+      height: 22px;
+      margin: 0 0 8px;
+      color: var(--content-primary);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 22px;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    .date-input {
+      display: block;
+      width: 160px;
+      height: 46px;
+      margin: 0;
+      padding: 11px 15px;
+      border: 1.5px solid var(--content-tertiary);
+      border-radius: 6px;
+      outline: 0;
+      background: #ffffff;
+      color: var(--content-primary);
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 22px;
+      letter-spacing: 0.3px;
+      appearance: none;
+    }
+
+    .date-input::placeholder {
+      color: #a0a0a0;
+      opacity: 1;
+    }
+
+    .date-input:focus {
+      border-color: #7fb2ff;
+    }
+
+    .date-input.is-invalid {
+      border-color: #ff3b30;
+    }
+
+    .date-error {
+      display: none;
+      height: 20px;
+      margin-top: 6px;
+      color: #ff3b30;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 20px;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    .date-input.is-invalid + .date-error {
+      display: block;
+    }
+
+    .date-sheet-footer {
+      display: flex;
+      align-items: flex-start;
+      width: 393px;
+      height: 78px;
+      padding: 16px 24px;
+      background: #ffffff;
+      box-shadow: 0 -8px 24px rgba(68, 68, 68, 0.08);
+    }
+
+    .date-confirm {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 345px;
+      height: 46px;
+      margin: 0;
+      padding: 12px 16px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--brand-primary);
+      color: var(--content-primary);
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 22px;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+    }
+
+    .date-confirm:disabled {
+      background: #e8e8e8;
+      color: #ffffff;
+      cursor: default;
+    }
+
+    .date-confirm:focus-visible {
+      outline: 2px solid #1677ff;
+      outline-offset: 2px;
+    }
+
+    .sheet-header {
+      position: absolute;
+      top: 156px;
+      left: 0;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 393px;
+      height: 46px;
+      border-bottom: 0.5px solid var(--content-tertiary);
+      border-radius: 12px 12px 0 0;
+      background: #ffffff;
+    }
+
+    .sheet-title {
+      width: 281px;
+      margin: 0;
+      color: var(--content-primary);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 22px;
+      letter-spacing: 0.3px;
+      text-align: center;
+    }
+
+    .sheet-close {
+      position: absolute;
+      top: 13px;
+      right: 16px;
+      display: block;
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+    }
+
+    .policy-scroll {
+      position: absolute;
+      top: 202px;
+      left: 0;
+      z-index: 2;
+      width: 393px;
+      height: 440px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 24px;
+      background: #ffffff;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .policy-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .policy-note {
+      display: flex;
+      align-items: center;
+      width: max-content;
+      height: 20px;
+      margin: 0 0 16px;
+      color: var(--content-primary);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 20px;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    .policy-note img {
+      display: block;
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+    }
+
+    .policy-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 345px;
+    }
+
+    .policy-card {
+      width: 345px;
+      margin: 0;
+      padding: 16px;
+      border: 1.5px solid transparent;
+      border-radius: 16px;
+      background: #ffffff;
+      color: var(--content-primary);
+      text-align: left;
+      box-shadow: 0 2px 9px rgba(27, 31, 68, 0.08);
+      cursor: pointer;
+    }
+
+    .policy-card.is-selected {
+      border-color: var(--brand-primary);
+      background: var(--bg-selected);
+    }
+
+    .policy-card:focus-visible {
+      outline: 2px solid #1677ff;
+      outline-offset: 2px;
+    }
+
+    .policy-card-title-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .policy-radio {
+      display: block;
+      flex: 0 0 auto;
+      width: 24px;
+      height: 24px;
+    }
+
+    .policy-heading {
+      display: flex;
+      min-width: 0;
+      flex: 1;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .policy-title {
+      margin: 0;
+      color: var(--content-primary);
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 22px;
+      letter-spacing: 0.3px;
+    }
+
+    .policy-type {
+      margin: 0;
+      color: var(--content-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 20px;
+      letter-spacing: 0.3px;
+    }
+
+    .policy-field {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      width: 100%;
+      margin-top: 8px;
+      font-size: 14px;
+      line-height: 20px;
+      letter-spacing: 0.3px;
+    }
+
+    .policy-label {
+      flex: 0 0 auto;
+      color: #8e8e93;
+      font-weight: 400;
+      white-space: nowrap;
+    }
+
+    .policy-value {
+      min-width: 0;
+      color: var(--content-primary);
+      font-weight: 500;
+    }
+
+    .policy-person .policy-value {
+      font-weight: 400;
+    }
+
+    .scroll-bottom-spacer {
+      width: 1px;
+      height: 24px;
+      opacity: 0;
+    }
+
+    .scrollbar-thumb {
+      position: absolute;
+      top: 209px;
+      left: 375px;
+      z-index: 5;
+      width: 6px;
+      height: 151px;
+      border-radius: 12px;
+      background: var(--content-secondary);
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    .sheet-cta {
+      position: absolute;
+      top: 642px;
+      left: 0;
+      z-index: 4;
+      width: 393px;
+      height: 74px;
+      padding: 16px 24px;
+      background: #ffffff;
+      box-shadow: 0 -8px 12px rgba(68, 68, 68, 0.08);
+    }
+
+    .confirm-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 345px;
+      height: 45px;
+      margin: 0;
+      padding: 12px 16px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--brand-primary);
+      color: var(--content-primary);
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 22px;
+      letter-spacing: 0.3px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .confirm-button:active {
+      filter: brightness(0.97);
+    }
+
+    .confirm-button:focus-visible {
+      outline: 2px solid #1677ff;
+      outline-offset: 2px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .screen[hidden] {
+      display: none;
+    }
+
+    .otp-sheet {
+      position: absolute;
+      top: 248px;
+      left: 0;
+      z-index: 5;
+      width: 393px;
+      height: 468px;
+      overflow: hidden;
+      border-radius: 12px 12px 0 0;
+      background: #ffffff;
+    }
+
+    .otp-sheet.is-error {
+      top: 218px;
+      height: 498px;
+    }
+
+    .otp-sheet-header {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 393px;
+      height: 46px;
+      border-bottom: 0.5px solid #bfbfbf;
+      background: #ffffff;
+    }
+
+    .otp-sheet-title {
+      margin: 0;
+      color: #3a3a3a;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 22px;
+      letter-spacing: .3px;
+    }
+
+    .otp-sheet-close {
+      position: absolute;
+      top: 9px;
+      right: 14px;
+      width: 24px;
+      height: 24px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #3a3a3a;
+      font: 300 28px/20px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      cursor: pointer;
+    }
+
+    .otp-sheet-body {
+      position: absolute;
+      top: 46px;
+      left: 0;
+      width: 393px;
+      height: 344px;
+      background: #ffffff;
+    }
+
+    .otp-sheet.is-error .otp-sheet-body { height: 374px; }
+
+    .otp-message,
+    .otp-expiry,
+    .otp-label,
+    .otp-resend,
+    .otp-help,
+    .otp-validation-error {
+      position: absolute;
+      left: 24px;
+      margin: 0;
+      color: #3a3a3a;
+      font-size: 16px;
+      font-weight: 400;
+      letter-spacing: .3px;
+    }
+
+    .otp-message {
+      top: 32px;
+      width: 345px;
+      line-height: 22px;
+      white-space: pre-line;
+    }
+
+    .otp-expiry {
+      top: 98px;
+      width: 345px;
+      color: #4f44c3;
+      line-height: 22px;
+    }
+
+    .otp-label {
+      top: 144px;
+      width: 345px;
+      line-height: 22px;
+    }
+
+    .otp-code-input {
+      position: absolute;
+      top: 174px;
+      left: 24px;
+      width: 345px;
+      height: 48px;
+      padding: 12px 14px;
+      border: 1.5px solid #bfbfbf;
+      border-radius: 6px;
+      outline: 0;
+      background: #ffffff;
+      color: #3a3a3a;
+      font: 400 16px/22px "PingFang TC", "Noto Sans TC", sans-serif;
+      letter-spacing: .3px;
+    }
+
+    .otp-code-input::placeholder { color: #a0a0a0; opacity: 1; }
+    .otp-code-input:focus { border-color: #7fb2ff; }
+    .otp-code-input.is-invalid { border-color: #ff3b30; }
+
+    .otp-validation-error {
+      top: 230px;
+      display: none;
+      color: #ff3b30;
+      line-height: 22px;
+    }
+
+    .otp-sheet.is-error .otp-validation-error { display: block; }
+
+    .otp-resend {
+      top: 238px;
+      width: 345px;
+      line-height: 22px;
+    }
+
+    .otp-sheet.is-error .otp-resend { top: 268px; }
+    .otp-resend-time { color: #4f44c3; }
+
+    .otp-help {
+      top: 292px;
+      width: 220px;
+      padding-left: 24px;
+      color: #5d5d5d;
+      line-height: 20px;
+      cursor: pointer;
+    }
+
+    .otp-sheet.is-error .otp-help { top: 322px; }
+
+    .otp-help::before {
+      position: absolute;
+      top: 1px;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border: 1.5px solid #0ea5e9;
+      border-radius: 50%;
+      color: #0ea5e9;
+      content: "i";
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 16px;
+    }
+
+    .otp-sheet-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      width: 393px;
+      height: 78px;
+      padding: 16px 24px;
+      background: #ffffff;
+      box-shadow: 0 -8px 12px rgba(68, 68, 68, 0.08);
+    }
+
+    .otp-submit {
+      width: 345px;
+      height: 46px;
+      border: 0;
+      border-radius: 6px;
+      background: #e8e8e8;
+      color: #ffffff;
+      font: 500 16px/22px "PingFang TC", "Noto Sans TC", sans-serif;
+      cursor: default;
+    }
+
+    .otp-submit.is-enabled {
+      background: #9fc5fe;
+      color: #3a3a3a;
+      cursor: pointer;
+    }
+
+    .bank-scroll {
+      position: absolute;
+      top: 222px;
+      left: 0;
+      z-index: 3;
+      width: 393px;
+      height: 416px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+      background: #ffffff;
+      scrollbar-width: none;
+    }
+
+    .bank-scroll::-webkit-scrollbar { display: none; }
+
+    .bank-form {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      width: 393px;
+      min-height: 766px;
+      padding: 24px;
+      padding-bottom: 40px;
+      background: #ffffff;
+    }
+
+    .bank-field {
+      display: flex;
+      flex: 0 0 auto;
+      flex-direction: column;
+      gap: 8px;
+      width: 345px;
+      min-height: 78px;
+    }
+
+    .bank-label {
+      color: #3a3a3a;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 22px;
+      letter-spacing: .3px;
+    }
+
+    .bank-input,
+    .bank-select {
+      width: 345px;
+      height: 46px;
+      padding: 11px 14px;
+      border: 1.5px solid #bfbfbf;
+      border-radius: 6px;
+      outline: 0;
+      background: #ffffff;
+      color: #3a3a3a;
+      font: 400 16px/22px "PingFang TC", "Noto Sans TC", sans-serif;
+      letter-spacing: .3px;
+    }
+
+    .bank-input[readonly] {
+      background: #ededed;
+      color: #5d5d5d;
+    }
+
+    .bank-input::placeholder { color: #a0a0a0; opacity: 1; }
+    .bank-input:focus,
+    .bank-select:focus { border-color: #7fb2ff; }
+
+    .bank-live-footer {
+      position: absolute;
+      top: 638px;
+      left: 0;
+      z-index: 5;
+      display: flex;
+      width: 393px;
+      height: 78px;
+      padding: 16px 24px;
+      background: #ffffff;
+      box-shadow: 0 -8px 12px rgba(68, 68, 68, 0.08);
+    }
+
+    .bank-confirm {
+      width: 345px;
+      height: 46px;
+      border: 0;
+      border-radius: 6px;
+      background: #e8e8e8;
+      color: #ffffff;
+      font: 500 16px/22px "PingFang TC", "Noto Sans TC", sans-serif;
+      cursor: default;
+    }
+
+    .bank-confirm.is-enabled {
+      background: #9fc5fe;
+      color: #3a3a3a;
+      cursor: pointer;
+    }
+
+    .bank-scrollbar-thumb {
+      position: absolute;
+      top: 276px;
+      left: 381px;
+      z-index: 6;
+      width: 5px;
+      height: 151px;
+      border-radius: 10px;
+      background: #777777;
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    @media (max-width: 393px), (max-height: 852px) {
+      .phone {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="phone" aria-label="阿發班機延誤理賠行動版 Prototype">
+    <section id="date-screen" class="screen" aria-label="輸入原定班機時間">
+      <img class="screen-reference" src="./assets/date-entry.png" alt="" aria-hidden="true">
+
+      <div id="date-sheet" class="date-sheet">
+        <header class="date-sheet-header">
+          <h1 class="date-sheet-title">原定班機時間</h1>
+          <img class="date-sheet-close" src="./assets/close.png" alt="" aria-hidden="true">
+        </header>
+
+        <div class="date-form">
+          <label class="date-field">
+            <span class="date-label">原定起飛日期</span>
+            <input id="departure-date" class="date-input" type="text" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="YYYY/MM/DD" aria-describedby="date-error">
+            <span id="date-error" class="date-error">請輸入正確的日期</span>
+          </label>
+
+          <label class="date-field">
+            <span class="date-label">原定起飛時間(24hr)</span>
+            <input id="departure-time" class="date-input" type="text" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="HH:MM" aria-describedby="time-error">
+            <span id="time-error" class="date-error">請輸入正確的時間</span>
+          </label>
+        </div>
+
+        <footer class="date-sheet-footer">
+          <button id="date-confirm" class="date-confirm" type="button" disabled>確認資訊</button>
+        </footer>
+      </div>
+      <button id="date-close" class="screen-hotspot date-close-hotspot" type="button" aria-label="關閉原定班機時間"></button>
+    </section>
+
+    <section id="selection-screen" class="screen" aria-label="選擇保單" hidden>
+      <img class="screen-reference" src="./assets/policy-selection.png" alt="" aria-hidden="true">
+
+      <header class="sheet-header">
+        <h1 class="sheet-title">請選擇想查看的保單</h1>
+        <img class="sheet-close" src="./assets/close.png" alt="" aria-hidden="true">
+      </header>
+
+      <div id="policy-scroll" class="policy-scroll" tabindex="0" aria-label="保單清單，可上下捲動">
+        <p class="policy-note">
+          <img src="./assets/info.png" alt="" aria-hidden="true">
+          明明有保單，為什麼查不到保單？
+        </p>
+
+        <div class="policy-stack" role="radiogroup" aria-label="選擇一張保單">
+          <button class="policy-card is-selected" type="button" role="radio" aria-checked="true" data-policy="0">
+            <span class="policy-card-title-row">
+              <img class="policy-radio" src="./assets/radio-selected.png" alt="">
+              <span class="policy-heading">
+                <span class="policy-title">奧地利、波赫、德國、西班牙、法國、德國、波多黎各之旅</span>
+                <span class="policy-type">旅遊綜合保險(國外)</span>
+              </span>
+            </span>
+            <span class="policy-field">
+              <span class="policy-label">保險期間</span>
+              <span class="policy-value">2026/09/11 - 2026/09/15</span>
+            </span>
+            <span class="policy-field policy-person">
+              <span class="policy-label">要/被保險人</span>
+              <span class="policy-value">星O雅</span>
+            </span>
+          </button>
+
+          <button class="policy-card" type="button" role="radio" aria-checked="false" data-policy="1">
+            <span class="policy-card-title-row">
+              <img class="policy-radio" src="./assets/radio-unselected.png" alt="">
+              <span class="policy-heading">
+                <span class="policy-title">日本(九州、四國)、日本(北海道)、日本(本州)、之旅</span>
+                <span class="policy-type">旅遊綜合保險(國外)</span>
+              </span>
+            </span>
+            <span class="policy-field">
+              <span class="policy-label">保險期間</span>
+              <span class="policy-value">2026/07/21 - 2026/07/31</span>
+            </span>
+            <span class="policy-field policy-person">
+              <span class="policy-label">要/被保險人</span>
+              <span class="policy-value">星O雅</span>
+            </span>
+          </button>
+
+          <button class="policy-card" type="button" role="radio" aria-checked="false" data-policy="2">
+            <span class="policy-card-title-row">
+              <img class="policy-radio" src="./assets/radio-unselected.png" alt="">
+              <span class="policy-heading">
+                <span class="policy-title">台東、花蓮之旅</span>
+                <span class="policy-type">旅遊綜合保險(國内)</span>
+              </span>
+            </span>
+            <span class="policy-field">
+              <span class="policy-label">保險期間</span>
+              <span class="policy-value">2025/02/21 - 2025/03/01</span>
+            </span>
+            <span class="policy-field policy-person">
+              <span class="policy-label">要/被保險人</span>
+              <span class="policy-value">星O雅</span>
+            </span>
+          </button>
+        </div>
+        <div class="scroll-bottom-spacer" aria-hidden="true"></div>
+      </div>
+
+      <div id="scrollbar-thumb" class="scrollbar-thumb" aria-hidden="true"></div>
+
+      <footer class="sheet-cta">
+        <button id="confirm-button" class="confirm-button" type="button">選擇保單</button>
+      </footer>
+      <button id="policy-close" class="screen-hotspot policy-close-hotspot" type="button" aria-label="關閉保單選擇"></button>
+      <p id="selection-status" class="visually-hidden" aria-live="polite">已選擇第 1 張保單</p>
+    </section>
+
+    <section id="policy-reminder-screen" class="screen" aria-label="未選擇保單提醒" hidden>
+      <img class="screen-reference" src="./policy-missing-after-close.png" alt="沒有選擇保單，不能申請班機延誤理賠">
+      <button id="policy-reminder-return" class="screen-hotspot policy-reminder-return" type="button" aria-label="返回繼續選擇保單"></button>
+    </section>
+
+    <section id="upload-screen" class="screen" aria-label="登機證上傳" hidden>
+      <img class="screen-reference" src="./assets/boarding-pass-upload.png" alt="登機證上傳畫面">
+      <button id="upload-trigger" class="screen-hotspot upload-trigger" type="button" aria-label="點擊上傳登機證"></button>
+      <button id="upload-close" class="screen-hotspot upload-close-hotspot" type="button" aria-label="關閉登機證上傳"></button>
+    </section>
+
+    <section id="upload-source-screen" class="screen" aria-label="選擇登機證來源" hidden>
+      <img class="screen-reference" src="./assets/upload-source-options.png" alt="選擇登機證來源：照片圖庫、拍照、選擇檔案或取消">
+      <button class="screen-hotspot source-action source-photo" type="button" data-upload-source="photo" aria-label="照片圖庫"></button>
+      <button class="screen-hotspot source-action source-camera" type="button" data-upload-source="camera" aria-label="拍照"></button>
+      <button class="screen-hotspot source-action source-files" type="button" data-upload-source="files" aria-label="選擇檔案"></button>
+      <button id="source-cancel" class="screen-hotspot source-action source-cancel" type="button" aria-label="取消"></button>
+    </section>
+
+    <section id="file-picker-screen" class="screen" aria-label="選擇檔案" hidden>
+      <img class="screen-reference" src="./native-file-picker.png" alt="iOS 最近項目檔案選擇器">
+      <button class="screen-hotspot file-picker-nav-back" type="button" data-return-to-source aria-label="返回瀏覽"></button>
+      <button class="screen-hotspot file-picker-cancel" type="button" data-return-to-source aria-label="取消選擇檔案"></button>
+      <button id="file-size-error" class="screen-hotspot file-picker-row file-picker-size" type="button" aria-label="選擇超過 20 MB 的 boarding-pass.pdf"></button>
+      <button id="file-valid" class="screen-hotspot file-picker-row file-picker-valid" type="button" aria-label="選擇有效檔案 IMG_8241.JPG"></button>
+      <button id="file-unsupported" class="screen-hotspot file-picker-row file-picker-unsupported" type="button" aria-label="選擇不支援格式 mystery_file.xyz"></button>
+    </section>
+
+    <section id="upload-loading-screen" class="screen" aria-label="登機證上傳中" hidden>
+      <img class="screen-reference" src="./upload-loading.png" alt="檔案上傳中">
+    </section>
+
+    <section id="upload-valid-screen" class="screen" aria-label="登機證已選擇" hidden>
+      <img class="screen-reference" src="./upload-valid.png" alt="已選擇 boarding_pass.jpg">
+      <button id="upload-valid-close" class="screen-hotspot upload-valid-close" type="button" aria-label="關閉上傳視窗"></button>
+      <button id="upload-valid-delete" class="screen-hotspot upload-valid-delete" type="button" aria-label="刪除已選檔案"></button>
+      <button id="upload-valid-confirm" class="screen-hotspot upload-valid-confirm" type="button" aria-label="確認上傳"></button>
+    </section>
+
+    <section id="upload-size-error-screen" class="screen" aria-label="檔案過大" hidden>
+      <img class="screen-reference" src="./upload-size-error.png" alt="檔案大小超過 20 MB，請重新上傳">
+      <button class="screen-hotspot upload-error-trigger" type="button" data-retry-upload aria-label="重新上傳檔案"></button>
+    </section>
+
+    <section id="upload-format-error-screen" class="screen" aria-label="檔案格式錯誤" hidden>
+      <img class="screen-reference" src="./upload-format-error.png" alt="檔案格式錯誤，請重新上傳">
+      <button class="screen-hotspot upload-error-trigger" type="button" data-retry-upload aria-label="重新上傳檔案"></button>
+    </section>
+
+    <section id="date-missing-upload-screen" class="screen" aria-label="未填寫原航班日期時間提醒" hidden>
+      <img class="screen-reference" src="./date-missing-after-close.png" alt="沒有填寫原航班的登機日期及時間，不能申請班機延誤理賠">
+      <button id="date-missing-upload-return" class="screen-hotspot date-reminder-return" type="button" aria-label="返回填寫航班資訊"></button>
+    </section>
+
+    <section id="date-missing-valid-screen" class="screen" aria-label="未填寫原航班日期時間提醒" hidden>
+      <img class="screen-reference" src="./date-missing-reminder.png" alt="沒有填寫原航班的登機日期及時間，不能申請班機延誤理賠">
+      <button id="date-missing-valid-return" class="screen-hotspot date-reminder-return" type="button" aria-label="返回填寫航班資訊"></button>
+    </section>
+
+    <section id="upload-close-initial-screen" class="screen" aria-label="關閉登機證上傳提醒" hidden>
+      <img class="screen-reference" src="./upload-close-initial.png" alt="沒有填寫原航班的登機日期及時間，不能申請班機延誤理賠">
+      <button id="upload-close-initial-return" class="screen-hotspot date-reminder-return" type="button" aria-label="返回登機證上傳"></button>
+    </section>
+
+    <section id="upload-close-selected-screen" class="screen" aria-label="關閉已選登機證提醒" hidden>
+      <img class="screen-reference" src="./upload-close-selected.png" alt="沒有填寫原航班的登機日期及時間，不能申請班機延誤理賠">
+      <button id="upload-close-selected-return" class="screen-hotspot date-reminder-return" type="button" aria-label="返回登機證上傳"></button>
+    </section>
+
+    <section id="date-close-empty-screen" class="screen" aria-label="未填原定班機日期時間提醒" hidden>
+      <img class="screen-reference" src="./date-close-empty.png" alt="沒有填寫原航班的登機日期及時間，不能申請班機延誤理賠">
+      <button id="date-close-empty-return" class="screen-hotspot date-reminder-return" type="button" aria-label="返回填寫原定班機時間"></button>
+    </section>
+
+    <section id="date-close-partial-screen" class="screen" aria-label="未完成原定班機日期時間提醒" hidden>
+      <img class="screen-reference" src="./date-close-partial.png" alt="沒有填寫原航班的登機日期及時間，不能申請班機延誤理賠">
+      <button id="date-close-partial-return" class="screen-hotspot date-reminder-return" type="button" aria-label="返回填寫原定班機時間"></button>
+    </section>
+
+    <section id="date-close-complete-screen" class="screen" aria-label="關閉原定班機時間提醒" hidden>
+      <img class="screen-reference" src="./date-close-complete.png" alt="沒有填寫原航班的登機日期及時間，不能申請班機延誤理賠">
+      <button id="date-close-complete-return" class="screen-hotspot date-reminder-return" type="button" aria-label="返回填寫原定班機時間"></button>
+    </section>
+
+    <section id="ocr-confirm-screen" class="screen" aria-label="登機證 OCR 辨識結果確認" hidden>
+      <img class="screen-reference" src="./ocr-confirm.png" alt="" aria-hidden="true">
+      <div id="ocr-scroll" class="ocr-scroll" tabindex="0" aria-label="登機證 OCR 辨識結果，可上下捲動">
+        <div class="ocr-scroll-content">
+          <div class="ocr-user-block">
+            <div class="ocr-user-bubble">上傳成功</div>
+            <div class="ocr-time">10:07 PM 送出</div>
+          </div>
+
+          <div class="ocr-response-row">
+            <img class="ocr-avatar" src="./ocr-avatar.png" alt="" aria-hidden="true">
+            <div class="ocr-response-body">
+              <div class="ocr-response-bubble">已收到你上傳的登機證，請確認下列資訊是否正確?</div>
+              <div class="ocr-time">10:07 PM 送出</div>
+            </div>
+          </div>
+
+          <div class="ocr-card">
+            <h2 class="ocr-card-title">班機延誤證明資訊</h2>
+
+            <div class="ocr-card-field">
+              <p class="ocr-card-label">文件識別</p>
+              <p class="ocr-card-value">登機證</p>
+            </div>
+
+            <div class="ocr-card-field">
+              <p class="ocr-card-label">乘客姓名</p>
+              <p class="ocr-card-value">星見雅</p>
+            </div>
+
+            <div class="ocr-card-field">
+              <p class="ocr-card-label">航班編號</p>
+              <p class="ocr-card-value">EK-366</p>
+            </div>
+
+            <div class="ocr-card-field">
+              <p class="ocr-card-label">出發地 / 目的地</p>
+              <div class="ocr-route">
+                <span class="ocr-route-code">DXB</span>
+                <span class="ocr-route-arrow" aria-hidden="true">→</span>
+                <span class="ocr-route-code">TPE</span>
+              </div>
+            </div>
+
+            <div class="ocr-card-field">
+              <p class="ocr-card-label">起飛時間</p>
+              <p class="ocr-card-value">預計 2026/03/30 03:45</p>
+              <p class="ocr-card-value">實際 2026/03/31 03:45</p>
+            </div>
+
+            <div class="ocr-card-actions">
+              <button class="ocr-card-action" type="button">確認送出</button>
+              <button class="ocr-card-action" type="button">資料有誤</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="welcome-screen" class="screen" aria-label="阿發歡迎頁" hidden>
+      <img class="screen-reference" src="./s01-welcome.png" alt="" aria-hidden="true">
+      <button class="intro-link welcome-ai-statement" type="button" data-goto="s01-alert-terms" aria-label="AI 告知聲明"></button>
+      <button class="intro-link welcome-notice" type="button" data-goto="s01-ai-notice" aria-label="注意事項"></button>
+      <button class="intro-link welcome-privacy" type="button" data-goto="s01-alert-privacy" aria-label="Google 隱私權政策"></button>
+      <button class="intro-link welcome-terms" type="button" data-goto="s01-alert-service" aria-label="服務條款"></button>
+      <button class="intro-link welcome-claim" type="button" data-goto="s03-documents" aria-label="我想申請班機延誤理賠"></button>
+      <button class="intro-link welcome-advice" type="button" data-goto="s03-claim-input" aria-label="我想詢問班機延誤保險相關問題"></button>
+    </section>
+
+    <section id="s01-ai-notice-screen" class="screen" aria-label="生成式 AI 服務告知" hidden>
+      <img class="screen-reference" src="./s01-ai-notice.png" alt="" aria-hidden="true">
+      <button class="intro-link intro-close" type="button" data-goto="welcome" aria-label="關閉"></button>
+    </section>
+    <section id="s01-ai-statement-screen" class="screen" aria-label="AI 使用聲明" hidden>
+      <img class="screen-reference" src="./s01-ai-statement.png" alt="" aria-hidden="true">
+      <button class="intro-link intro-close" type="button" data-goto="welcome" aria-label="關閉"></button>
+    </section>
+    <section id="s01-privacy-screen" class="screen" aria-label="隱私權聲明" hidden>
+      <img class="screen-reference" src="./s01-privacy.png" alt="" aria-hidden="true">
+      <button class="intro-link intro-close" type="button" data-goto="welcome" aria-label="關閉"></button>
+    </section>
+    <section id="s01-terms-screen" class="screen" aria-label="服務條款" hidden>
+      <img class="screen-reference" src="./s01-terms.png" alt="" aria-hidden="true">
+      <button class="intro-link intro-close" type="button" data-goto="welcome" aria-label="關閉"></button>
+    </section>
+    <section id="s01-alert-terms-screen" class="screen" aria-label="前往官網查看條款提醒" hidden>
+      <img class="screen-reference" src="./s01-alert-terms.png" alt="" aria-hidden="true">
+      <button class="intro-link intro-alert-close" type="button" data-goto="welcome" aria-label="返回歡迎頁"></button>
+    </section>
+    <section id="s01-alert-privacy-screen" class="screen" aria-label="前往外部網站隱私權提醒" hidden>
+      <img class="screen-reference" src="./s01-alert-privacy.png" alt="" aria-hidden="true">
+      <button class="intro-link intro-alert-close" type="button" data-goto="welcome" aria-label="返回歡迎頁"></button>
+    </section>
+    <section id="s01-alert-service-screen" class="screen" aria-label="前往外部網站服務條款提醒" hidden>
+      <img class="screen-reference" src="./s01-alert-service.png" alt="" aria-hidden="true">
+      <button class="intro-link intro-alert-close" type="button" data-goto="welcome" aria-label="返回歡迎頁"></button>
+    </section>
+
+    <section id="s03-documents-screen" class="screen" aria-label="班機延誤文件需求說明" hidden>
+      <img class="screen-reference" src="./s03-documents.png" alt="" aria-hidden="true">
+      <button class="intro-link claim-back" type="button" data-goto="welcome" aria-label="返回"></button>
+      <button class="intro-link documents-confirm" type="button" data-goto="s02-login" aria-label="確認申請"></button>
+      <button class="intro-link documents-join" type="button" data-goto="s02-login" aria-label="加入國泰產險會員"></button>
+      <button class="intro-link documents-later" type="button" data-goto="s03-later" aria-label="稍後再說"></button>
+    </section>
+    <section id="s03-later-screen" class="screen" aria-label="稍後再說" hidden>
+      <img class="screen-reference" src="./s03-later.png" alt="" aria-hidden="true">
+      <button class="intro-link claim-back" type="button" data-goto="welcome" aria-label="返回"></button>
+    </section>
+    <section id="s03-claim-input-screen" class="screen" aria-label="理賠諮詢" hidden>
+      <img class="screen-reference" src="./s03-claim-input.png" alt="" aria-hidden="true">
+      <button class="intro-link claim-back" type="button" data-goto="welcome" aria-label="返回"></button>
+    </section>
+    <section id="s03-intent-question-screen" class="screen" aria-label="理賠諮詢意圖追問" hidden>
+      <img class="screen-reference" src="./s03-intent-question.png" alt="" aria-hidden="true">
+      <button class="intro-link claim-back" type="button" data-goto="welcome" aria-label="返回"></button>
+    </section>
+    <section id="s03-other-claim-screen" class="screen" aria-label="其他理賠導向官網" hidden>
+      <img class="screen-reference" src="./s03-other-claim.png" alt="" aria-hidden="true">
+      <button class="intro-link other-claim-open" type="button" data-goto="s03-official-site" aria-label="前往國泰產險理賠頁面"></button>
+    </section>
+    <section id="s03-out-of-scope-screen" class="screen" aria-label="非服務範圍提示" hidden>
+      <img class="screen-reference" src="./s03-out-of-scope.png" alt="" aria-hidden="true">
+      <button class="intro-link claim-back" type="button" data-goto="welcome" aria-label="返回"></button>
+    </section>
+    <section id="s03-official-site-screen" class="screen" aria-label="國泰產險理賠頁面" hidden>
+      <img class="screen-reference" src="./s03-official-site.png" alt="" aria-hidden="true">
+      <button class="intro-link official-site-return" type="button" data-goto="welcome" aria-label="返回"></button>
+    </section>
+    <section id="s02-login-screen" class="screen" aria-label="確認申請需先登入" hidden>
+      <img class="screen-reference" src="./s02-login.png" alt="" aria-hidden="true">
+    </section>
+
+    <section id="s05-consent-screen" class="screen" aria-label="個資聲明閱讀與同意" hidden>
+      <img class="screen-reference" src="./s05-consent.png" alt="" aria-hidden="true">
+      <button class="intro-link consent-close" type="button" data-goto="s05-not-consented" aria-label="關閉個資聲明"></button>
+      <button class="intro-link consent-credit-top" type="button" data-goto="s05-credit-notice" aria-label="查看個資法告知事項"></button>
+      <button class="intro-link consent-credit-bottom" type="button" data-goto="s05-credit-notice" aria-label="查看個資法告知事項"></button>
+      <button class="intro-link consent-agree" type="button" data-goto="date-entry" aria-label="同意"></button>
+    </section>
+    <section id="s05-not-consented-screen" class="screen" aria-label="未同意個資聲明" hidden>
+      <img class="screen-reference" src="./s05-not-consented.png" alt="" aria-hidden="true">
+      <button class="intro-link consent-return" type="button" data-goto="s05-consent" aria-label="返回查看個資聲明"></button>
+    </section>
+    <section id="s05-credit-notice-screen" class="screen" aria-label="個資法告知事項" hidden>
+      <img class="screen-reference" src="./s05-credit-notice.png" alt="" aria-hidden="true">
+      <div id="credit-scroll" class="credit-scroll" tabindex="0" aria-label="個資法告知事項，可上下捲動">
+        <div class="credit-scroll-content">
+          <p>本公司蒐集您的個人資料後，依個人資料保護法之規定，您可以向本公司行使下列各項權利：</p>
+          <p>(1) 查詢或請求閱覽您的個人資料<br>(2) 請求製給您的個人資料複製本<br>(3) 請求補充或更正您的個人資料<br>(4) 請求停止蒐集、處理或利用您的個人資料<br>(5) 請求刪除您的個人資料</p>
+          <p>您可以至各服務中心或與本公司客服專線（0800-212-880）聯繫，本公司將儘速依相關法令規定，處理與回覆您的請求。</p>
+          <p class="credit-heading">個人資料保護法應告知事項</p>
+          <p>親愛的客戶，您好：<br>國泰世紀產物保險股份有限公司（以下稱本公司）依據個人資料保護法（以下稱個資法）第八條及第九條規定，向台端告知下列事項，請台端詳閱：</p>
+          <p>一、蒐集之目的：辦理財產保險(093)、人身保險(001)、行銷(040)及其他合於營業登記項目或組織章程所定之業務(181)。</p>
+          <p>二、蒐集之個人資料類別：包括但不限於姓名、身分證統一編號、聯絡方式、本網站瀏覽或查詢時伺服器自行產生的相關紀錄（包括但不限於您使用設備的 IP 位址、使用的瀏覽器、使用時間、瀏覽及點選資料紀錄等）等，詳如要保書或相關業務申請書內容。</p>
+          <p>三、個人資料之來源（個人資料非由當事人提供間接蒐集之情形適用）：依法由政府機關、金融機構、與本公司有業務往來之第三人及其他合法來源取得。</p>
+          <p>四、個人資料利用之期間、對象、地區及方式：於蒐集之特定目的存續期間、相關法令規定或契約約定之保存期限內，以書面、電子、網際網路或其他適當方式利用。</p>
+          <p>五、依據個資法第三條規定，台端就本公司保有台端之個人資料得行使下列權利：向本公司查詢、請求閱覽或請求製給複製本；請求補充或更正；請求停止蒐集、處理或利用及請求刪除。</p>
+          <p>六、台端不提供個人資料所致權益之影響：台端若未能提供相關個人資料時，本公司將可能延後或無法進行必要之審核及處理作業，因此可能婉謝承保、遲延或無法提供台端完善的保險服務。</p>
+          <p>1. 上開告知事項已公告於本公司官網，如有問題歡迎洽詢本公司 0800-212-880，免付費客服專線。<br>2. 本告知事項內容若有更動，係以官網公告為準。</p>
+        </div>
+      </div>
+      <div id="credit-scrollbar-thumb" class="credit-scrollbar-thumb" aria-hidden="true"></div>
+      <button id="credit-return" class="credit-return" type="button" aria-label="返回上一頁"></button>
+      <button class="intro-link intro-close" type="button" data-goto="s05-not-consented" aria-label="關閉"></button>
+    </section>
+
+    <section id="s7-data-error-screen" class="screen" aria-label="班機延誤證明資料有誤" data-timeout-route="s7-flight-filled" hidden><img class="screen-reference" src="./s7-data-error.png" alt=""></section>
+    <section id="s7-flight-filled-screen" class="screen" aria-label="已填寫航班資訊" hidden>
+      <img class="screen-reference" src="./s7-flight-filled.png" alt="">
+      <button class="screen-hotspot" style="top:163px;left:357px;width:20px;height:20px" data-route="s7-close-result" aria-label="關閉"></button>
+      <button class="screen-hotspot" style="top:322px;left:24px;width:345px;height:78px" data-route="s7-airport-results" aria-label="選擇機場"></button>
+      <button class="screen-hotspot" style="top:638px;left:0;width:393px;height:78px" data-route="s7-airport-results" aria-label="下一步"></button>
+    </section>
+    <section id="s7-airport-results-screen" class="screen" aria-label="機場搜尋結果" hidden>
+      <img class="screen-reference" src="./s7-airport-results.png" alt="">
+      <button class="screen-hotspot" style="top:163px;left:357px;width:20px;height:20px" data-route="s7-close-result" aria-label="關閉"></button>
+      <button class="screen-hotspot" style="top:400px;left:24px;width:343px;height:336px" data-route="s7-destination-input" aria-label="搜尋目的地"></button>
+    </section>
+    <section id="s7-destination-input-screen" class="screen" aria-label="輸入目的地" hidden>
+      <img class="screen-reference" src="./s7-destination-input.png" alt="">
+      <button class="screen-hotspot" style="top:163px;left:357px;width:20px;height:20px" data-route="s7-close-result" aria-label="關閉"></button>
+      <button class="screen-hotspot" style="top:626px;left:24px;width:161px;height:76px" data-route="s7-flight-alternate" aria-label="選擇目的地"></button>
+    </section>
+    <section id="s7-flight-alternate-screen" class="screen" aria-label="航班資訊替代資料" hidden>
+      <img class="screen-reference" src="./s7-flight-alternate.png" alt="">
+      <button class="screen-hotspot" style="top:163px;left:357px;width:20px;height:20px" data-route="s7-close-result" aria-label="關閉"></button>
+      <button class="screen-hotspot" style="top:638px;left:0;width:393px;height:78px" data-route="s7-bank-prompt" aria-label="確認資訊"></button>
+    </section>
+    <section id="s7-close-result-screen" class="screen" aria-label="航班資訊關閉提示" hidden>
+      <img class="screen-reference" src="./s7-close-result.png" alt="">
+      <button class="screen-hotspot" style="top:552px;left:59px;width:81px;height:38px" data-route="ocr-confirm" aria-label="返回確認資訊"></button>
+      <button class="screen-hotspot" style="top:552px;left:156px;width:81px;height:38px" data-route="s7-flight-filled" aria-label="填寫航班資訊"></button>
+    </section>
+    <section id="s7-compact-confirm-screen" class="screen" aria-label="航班資訊確認" data-timeout-route="s8-upload-initial" hidden><img class="screen-reference" src="./s7-compact-confirm.png" alt=""></section>
+    <section id="s7-bank-prompt-screen" class="screen" aria-label="填寫匯款資料提示" data-timeout-route="s8-bank-initial" hidden><img class="screen-reference" src="./s7-bank-prompt.png" alt=""></section>
+    <section id="s7-validation-error-screen" class="screen" aria-label="航班資訊檢核錯誤" hidden>
+      <img class="screen-reference" src="./s7-validation-error.png" alt="">
+      <button class="screen-hotspot" style="top:466px;left:24px;width:161px;height:106px" data-route="s7-flight-alternate" aria-label="修正航班資訊"></button>
+      <button class="screen-hotspot" style="top:596px;left:209px;width:161px;height:106px" data-route="s7-flight-alternate" aria-label="修正目的地"></button>
+    </section>
+
+    <section id="s8-upload-initial-screen" class="screen" aria-label="延誤證明上傳" hidden>
+      <img class="screen-reference" src="./s8-upload-initial.png" alt="">
+      <button class="screen-hotspot" style="top:327px;left:357px;width:20px;height:20px" data-route="s8-confirm-compact" aria-label="關閉"></button>
+      <button class="screen-hotspot" style="top:384px;left:24px;width:167px;height:20px" data-route="s8-method-tip" aria-label="查看申請方式"></button>
+      <button class="screen-hotspot" style="top:416px;left:24px;width:345px;height:136px" data-route="s8-source-options" aria-label="上傳延誤證明"></button>
+    </section>
+    <section id="s8-upload-loading-screen" class="screen" aria-label="延誤證明上傳中" data-timeout-route="s8-upload-selected" hidden><img class="screen-reference" src="./s8-upload-loading.png" alt=""></section>
+    <section id="s8-upload-selected-screen" class="screen" aria-label="已選擇延誤證明" hidden>
+      <img class="screen-reference" src="./s8-upload-selected.png" alt="">
+      <button class="screen-hotspot" style="top:477px;left:357px;width:20px;height:20px" data-route="s8-confirm-compact-selected" aria-label="關閉"></button>
+      <button class="screen-hotspot" style="top:638px;left:0;width:393px;height:78px" data-route="s8-confirm-compact" aria-label="確認上傳"></button>
+    </section>
+    <section id="s8-method-tip-screen" class="screen" aria-label="延誤證明申請方式提示" hidden>
+      <img class="screen-reference" src="./s8-method-tip.png" alt="">
+      <button class="screen-hotspot" style="top:416px;left:24px;width:345px;height:136px" data-route="s8-source-options" aria-label="上傳延誤證明"></button>
+      <button class="screen-hotspot" style="top:327px;left:357px;width:20px;height:20px" data-route="s8-upload-initial" aria-label="關閉"></button>
+    </section>
+    <section id="s8-source-options-screen" class="screen" aria-label="選擇上傳來源" hidden>
+      <img class="screen-reference" src="./s8-source-options.png" alt="">
+      <button class="screen-hotspot" style="top:336px;left:61px;width:272px;height:48px" data-route="s8-upload-loading" aria-label="照片圖庫"></button>
+      <button class="screen-hotspot" style="top:394px;left:61px;width:272px;height:48px" data-route="s8-upload-loading" aria-label="拍照"></button>
+      <button class="screen-hotspot" style="top:452px;left:61px;width:272px;height:48px" data-route="s8-file-picker" aria-label="選擇檔案"></button>
+      <button class="screen-hotspot" style="top:510px;left:61px;width:272px;height:48px" data-route="s8-upload-initial" aria-label="取消"></button>
+    </section>
+    <section id="s8-file-picker-screen" class="screen" aria-label="選擇延誤證明檔案" hidden>
+      <img class="screen-reference" src="./s8-file-picker.png" alt="">
+      <button class="screen-hotspot" style="top:59px;left:16px;width:90px;height:52px" data-route="s8-source-options" aria-label="返回來源選擇"></button>
+      <button class="screen-hotspot" style="top:59px;left:287px;width:90px;height:52px" data-route="s8-source-options" aria-label="取消"></button>
+      <button class="screen-hotspot" style="top:222px;left:0;width:393px;height:88px" data-route="s8-upload-size" aria-label="選擇過大檔案"></button>
+      <button class="screen-hotspot" style="top:311px;left:0;width:393px;height:88px" data-route="s8-upload-loading" aria-label="選擇正常檔案"></button>
+      <button class="screen-hotspot" style="top:487px;left:0;width:393px;height:88px" data-route="s8-upload-format" aria-label="選擇不支援檔案"></button>
+    </section>
+    <section id="s8-upload-size-screen" class="screen" aria-label="延誤證明檔案過大" hidden><img class="screen-reference" src="./s8-upload-size.png" alt=""><button class="screen-hotspot" style="top:416px;left:24px;width:345px;height:136px" data-route="s8-source-options" aria-label="重新上傳"></button></section>
+    <section id="s8-upload-format-screen" class="screen" aria-label="延誤證明格式錯誤" hidden><img class="screen-reference" src="./s8-upload-format.png" alt=""><button class="screen-hotspot" style="top:416px;left:24px;width:345px;height:136px" data-route="s8-source-options" aria-label="重新上傳"></button></section>
+    <section id="s8-upload-api-error-screen" class="screen" aria-label="延誤證明 API 錯誤" hidden><img class="screen-reference" src="./s8-upload-api-error.png" alt=""><button class="screen-hotspot" style="top:528px;left:75px;width:160px;height:26px" data-route="s8-member-center" aria-label="前往會員中心"></button></section>
+    <section id="s8-recognition-error-a-screen" class="screen" aria-label="延誤證明辨識失敗" hidden><img class="screen-reference" src="./s8-recognition-error-a.png" alt=""><button class="screen-hotspot" style="top:343px;left:59px;width:113px;height:38px" data-route="s8-recognition-error-b" aria-label="重新辨識"></button></section>
+    <section id="s8-recognition-error-b-screen" class="screen" aria-label="延誤證明重新辨識" data-timeout-route="s8-upload-initial" hidden><img class="screen-reference" src="./s8-recognition-error-b.png" alt=""></section>
+    <section id="s8-confirm-compact-screen" class="screen" aria-label="延誤證明資訊確認" data-timeout-route="s8-bank-initial" hidden><img class="screen-reference" src="./s8-confirm-compact.png" alt=""></section>
+    <section id="s8-confirm-compact-selected-screen" class="screen" aria-label="延誤證明資訊確認" data-timeout-route="s8-bank-initial" hidden><img class="screen-reference" src="./s8-confirm-compact-selected.png" alt=""></section>
+    <section id="s8-bank-initial-screen" class="screen" aria-label="填寫匯款資料" hidden>
+      <img class="screen-reference" src="./s8-bank-initial.png" alt="">
+      <button class="screen-hotspot" style="top:189px;left:357px;width:20px;height:20px" data-route="s8-bank-close-result" aria-label="關閉"></button>
+      <div id="bank-scroll" class="bank-scroll" tabindex="0" aria-label="匯款資料表單，可上下捲動">
+        <form id="bank-form" class="bank-form">
+          <label class="bank-field">
+            <span class="bank-label">身分證字號</span>
+            <input class="bank-input" type="text" value="A403917978" readonly aria-readonly="true">
+          </label>
+          <label class="bank-field">
+            <span class="bank-label">會員姓名</span>
+            <input class="bank-input" type="text" value="星見雅" readonly aria-readonly="true">
+          </label>
+          <label class="bank-field">
+            <span class="bank-label">銀行代碼</span>
+            <select id="bank-code" class="bank-select" aria-label="銀行代碼">
+              <option value="">請選擇</option>
+              <option value="013">013 國泰世華銀行</option>
+              <option value="004">004 臺灣銀行</option>
+              <option value="812">812 台新銀行</option>
+            </select>
+          </label>
+          <label class="bank-field">
+            <span class="bank-label">分行別</span>
+            <select id="bank-branch" class="bank-select" aria-label="分行別" disabled>
+              <option value="">請選擇</option>
+              <option value="001">總行營業部</option>
+              <option value="101">敦南分行</option>
+              <option value="102">信義分行</option>
+            </select>
+          </label>
+          <label class="bank-field">
+            <span class="bank-label">匯款帳號</span>
+            <input id="bank-account" class="bank-input" type="tel" inputmode="numeric" autocomplete="off" maxlength="16" placeholder="請輸入匯款帳號" aria-label="匯款帳號">
+          </label>
+          <label class="bank-field">
+            <span class="bank-label">再次確認匯款帳號</span>
+            <input id="bank-account-confirm" class="bank-input" type="tel" inputmode="numeric" autocomplete="off" maxlength="16" placeholder="請再次輸入匯款帳號" aria-label="再次確認匯款帳號">
+          </label>
+        </form>
+      </div>
+      <div id="bank-scrollbar-thumb" class="bank-scrollbar-thumb" aria-hidden="true"></div>
+      <div class="bank-live-footer"><button id="bank-confirm" class="bank-confirm" type="button" disabled>確認資訊</button></div>
+    </section>
+    <section id="s8-account-picker-screen" class="screen" aria-label="選擇匯款帳戶" hidden><img class="screen-reference" src="./s8-account-picker.png" alt=""><button class="screen-hotspot" style="top:498px;left:25px;width:343px;height:96px" data-route="s8-bank-partial" aria-label="選擇帳戶"></button></section>
+    <section id="s8-bank-partial-screen" class="screen" aria-label="部分完成匯款資料" hidden>
+      <img class="screen-reference" src="./s8-bank-partial.png" alt="">
+      <button class="screen-hotspot" style="top:159px;left:357px;width:20px;height:20px" data-route="s8-bank-close-result-partial" aria-label="關閉"></button>
+      <button class="screen-hotspot" style="top:638px;left:0;width:393px;height:78px" data-route="s9-otp-initial" aria-label="確認資訊"></button>
+    </section>
+    <section id="s8-bank-incomplete-screen" class="screen" aria-label="匯款資料未完成" hidden><img class="screen-reference" src="./s8-bank-incomplete.png" alt=""><button class="screen-hotspot" style="top:638px;left:0;width:393px;height:78px" data-route="s8-bank-initial" aria-label="返回填寫"></button></section>
+    <section id="s8-bank-close-result-screen" class="screen" aria-label="匯款資料關閉提示" hidden><img class="screen-reference" src="./s8-bank-close-result.png" alt=""><button class="screen-hotspot" style="top:528px;left:70px;width:160px;height:28px" data-route="s8-bank-initial" aria-label="返回繼續填寫"></button></section>
+    <section id="s8-bank-close-result-partial-screen" class="screen" aria-label="匯款資料關閉提示" hidden><img class="screen-reference" src="./s8-bank-close-result-partial.png" alt=""><button class="screen-hotspot" style="top:528px;left:70px;width:160px;height:28px" data-route="s8-bank-partial" aria-label="返回繼續填寫"></button></section>
+    <section id="s8-member-center-screen" class="screen" aria-label="會員中心" hidden><img class="screen-reference" src="./s8-member-center.png" alt=""><button class="screen-hotspot" style="top:64px;left:8px;width:46px;height:44px" data-route="welcome" aria-label="返回"></button></section>
+
+    <section id="s9-otp-initial-screen" class="screen" aria-label="動態密碼驗證" hidden>
+      <img class="screen-reference" src="./s9-otp-resend-ready.png" alt="">
+      <section class="otp-sheet" aria-label="動態密碼驗證表單">
+        <header class="otp-sheet-header">
+          <h1 class="otp-sheet-title">動態密碼驗證</h1>
+          <button class="otp-sheet-close" type="button" data-route="s9-close-result-a" aria-label="關閉">×</button>
+        </header>
+        <div class="otp-sheet-body">
+          <p class="otp-message">動態密碼已發送至：<br>0963-****30<br>Cathay***@***il.com</p>
+          <p class="otp-expiry">動態密碼將在 5 分鐘後失效</p>
+          <label class="otp-label" for="otp-input">請輸入動態密碼</label>
+          <input id="otp-input" class="otp-code-input" type="tel" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="請輸入動態密碼" aria-label="動態密碼">
+          <p class="otp-resend"><span class="otp-resend-time">2:56</span> 後可以重新發送</p>
+          <button class="otp-help" type="button" data-route="s9-otp-resend-ready">收不到動態密碼簡訊？</button>
+        </div>
+        <footer class="otp-sheet-footer"><button id="otp-next" class="otp-submit" type="button" disabled>下一步</button></footer>
+      </section>
+    </section>
+    <section id="s9-otp-filled-screen" class="screen" aria-label="已輸入動態密碼" hidden>
+      <img class="screen-reference" src="./s9-otp-filled.png" alt="">
+      <button class="screen-hotspot" style="top:261px;left:357px;width:20px;height:20px" data-route="s9-close-result-b" aria-label="關閉"></button>
+      <button id="otp-filled-next" class="screen-hotspot" style="top:638px;left:0;width:393px;height:78px" aria-label="驗證動態密碼"></button>
+    </section>
+    <section id="s9-otp-complete-screen" class="screen" aria-label="動態密碼輸入完成" hidden><img class="screen-reference" src="./s9-otp-resend-ready.png" alt=""><button id="otp-complete-next" class="screen-hotspot" style="top:654px;left:24px;width:345px;height:46px" aria-label="驗證動態密碼"></button></section>
+    <section id="s9-otp-corrected-screen" class="screen" aria-label="已修正動態密碼" hidden><img class="screen-reference" src="./s9-otp-resend-ready.png" alt=""><button id="otp-corrected-next" class="screen-hotspot" style="top:654px;left:24px;width:345px;height:46px" aria-label="驗證動態密碼"></button></section>
+    <section id="s9-otp-validating-screen" class="screen" aria-label="動態密碼驗證中" data-timeout-route="s9-success" hidden><img class="screen-reference" src="./s9-otp-validating.png" alt=""></section>
+    <section id="s9-otp-error-screen" class="screen" aria-label="動態密碼輸入錯誤" hidden>
+      <img class="screen-reference" src="./s9-otp-resend-ready.png" alt="">
+      <section class="otp-sheet is-error" aria-label="動態密碼輸入錯誤">
+        <header class="otp-sheet-header">
+          <h1 class="otp-sheet-title">動態密碼驗證</h1>
+          <button class="otp-sheet-close" type="button" data-route="s9-close-result-a" aria-label="關閉">×</button>
+        </header>
+        <div class="otp-sheet-body">
+          <p class="otp-message">動態密碼已發送至：<br>0963-****30<br>Cathay***@***il.com</p>
+          <p class="otp-expiry">動態密碼將在 5 分鐘後失效</p>
+          <label class="otp-label" for="otp-error-input">請輸入動態密碼</label>
+          <input id="otp-error-input" class="otp-code-input is-invalid" type="tel" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="請輸入動態密碼" aria-label="動態密碼">
+          <p class="otp-validation-error">動態密碼輸入錯誤</p>
+          <p class="otp-resend"><span class="otp-resend-time">2:56</span> 後可以重新發送</p>
+          <button class="otp-help" type="button" data-route="s9-otp-resend-ready">收不到動態密碼簡訊？</button>
+        </div>
+        <footer class="otp-sheet-footer"><button id="otp-error-next" class="otp-submit" type="button" disabled>下一步</button></footer>
+      </section>
+    </section>
+    <section id="s9-otp-too-many-screen" class="screen" aria-label="動態密碼錯誤超過五次" hidden><img class="screen-reference" src="./s9-otp-too-many.png" alt=""><button class="screen-hotspot" style="top:532px;left:24px;width:345px;height:22px" data-route="s9-otp-resend" aria-label="重新發送"></button></section>
+    <section id="s9-otp-resend-screen" class="screen" aria-label="重新發送動態密碼" hidden>
+      <img class="screen-reference" src="./s9-otp-resend.png" alt="">
+      <button class="screen-hotspot" style="top:438px;left:24px;width:345px;height:78px" data-route="s9-otp-expired" aria-label="輸入舊密碼"></button>
+      <button class="screen-hotspot" style="top:532px;left:24px;width:345px;height:22px" data-route="s9-otp-api-error" aria-label="觸發 API 錯誤"></button>
+    </section>
+    <section id="s9-otp-expired-screen" class="screen" aria-label="動態密碼已失效" hidden><img class="screen-reference" src="./s9-otp-expired.png" alt=""><button class="screen-hotspot" style="top:532px;left:24px;width:345px;height:22px" data-route="s9-otp-resend-ready" aria-label="重新發送"></button></section>
+    <section id="s9-otp-resend-ready-screen" class="screen" aria-label="重新發送後動態密碼" hidden>
+      <img class="screen-reference" src="./s9-otp-resend-ready.png" alt="">
+      <button class="screen-hotspot" style="top:261px;left:357px;width:20px;height:20px" data-route="s9-close-result-a" aria-label="關閉"></button>
+      <button class="screen-hotspot" style="top:586px;left:24px;width:167px;height:20px" data-route="s9-otp-initial" aria-label="收不到動態密碼"></button>
+    </section>
+    <section id="s9-otp-api-error-screen" class="screen" aria-label="動態密碼 API 錯誤" hidden><img class="screen-reference" src="./s9-otp-api-error.png" alt=""><button class="screen-hotspot" style="top:528px;left:75px;width:160px;height:28px" data-route="s8-member-center" aria-label="前往會員中心"></button></section>
+    <section id="s9-close-result-a-screen" class="screen" aria-label="動態密碼關閉提示" hidden><img class="screen-reference" src="./s9-close-result-a.png" alt=""><button class="screen-hotspot" style="top:532px;left:70px;width:180px;height:30px" data-route="s9-otp-resend-ready" aria-label="返回填寫動態密碼"></button></section>
+    <section id="s9-close-result-b-screen" class="screen" aria-label="動態密碼關閉提示" hidden><img class="screen-reference" src="./s9-close-result-b.png" alt=""><button class="screen-hotspot" style="top:532px;left:70px;width:180px;height:30px" data-route="s9-otp-initial" aria-label="返回填寫動態密碼"></button></section>
+    <section id="s9-close-result-c-screen" class="screen" aria-label="動態密碼關閉提示" hidden><img class="screen-reference" src="./s9-close-result-c.png" alt=""><button class="screen-hotspot" style="top:532px;left:70px;width:180px;height:30px" data-route="s9-otp-initial" aria-label="返回填寫動態密碼"></button></section>
+    <section id="s9-success-screen" class="screen" aria-label="理賠申請完成" hidden><img class="screen-reference" src="./s9-success.png" alt=""><button class="screen-hotspot" style="top:525px;left:75px;width:166px;height:22px" data-route="s8-member-center" aria-label="前往會員中心"></button></section>
+  </main>
+
+  <script>
+    (() => {
+      const DESIGN_WIDTH = 393;
+      const DESIGN_HEIGHT = 852;
+      const scrollViewport = document.getElementById("policy-scroll");
+      const scrollbarThumb = document.getElementById("scrollbar-thumb");
+      const cards = Array.from(document.querySelectorAll(".policy-card"));
+      const dateScreen = document.getElementById("date-screen");
+      const dateSheet = document.getElementById("date-sheet");
+      const dateInput = document.getElementById("departure-date");
+      const timeInput = document.getElementById("departure-time");
+      const dateConfirm = document.getElementById("date-confirm");
+      const selectionStatus = document.getElementById("selection-status");
+      const selectionScreen = document.getElementById("selection-screen");
+      const policyReminderScreen = document.getElementById("policy-reminder-screen");
+      const uploadScreen = document.getElementById("upload-screen");
+      const uploadSourceScreen = document.getElementById("upload-source-screen");
+      const filePickerScreen = document.getElementById("file-picker-screen");
+      const uploadLoadingScreen = document.getElementById("upload-loading-screen");
+      const uploadValidScreen = document.getElementById("upload-valid-screen");
+      const uploadSizeErrorScreen = document.getElementById("upload-size-error-screen");
+      const uploadFormatErrorScreen = document.getElementById("upload-format-error-screen");
+      const dateMissingUploadScreen = document.getElementById("date-missing-upload-screen");
+      const dateMissingValidScreen = document.getElementById("date-missing-valid-screen");
+      const uploadCloseInitialScreen = document.getElementById("upload-close-initial-screen");
+      const uploadCloseSelectedScreen = document.getElementById("upload-close-selected-screen");
+      const dateCloseEmptyScreen = document.getElementById("date-close-empty-screen");
+      const dateClosePartialScreen = document.getElementById("date-close-partial-screen");
+      const dateCloseCompleteScreen = document.getElementById("date-close-complete-screen");
+      const ocrConfirmScreen = document.getElementById("ocr-confirm-screen");
+      const ocrScroll = document.getElementById("ocr-scroll");
+      const welcomeScreen = document.getElementById("welcome-screen");
+      const loginScreen = document.getElementById("s02-login-screen");
+      const consentScreen = document.getElementById("s05-consent-screen");
+      const creditNoticeScreen = document.getElementById("s05-credit-notice-screen");
+      const creditScroll = document.getElementById("credit-scroll");
+      const creditScrollbarThumb = document.getElementById("credit-scrollbar-thumb");
+      const bankInitialScreen = document.getElementById("s8-bank-initial-screen");
+      const bankScroll = document.getElementById("bank-scroll");
+      const bankScrollbarThumb = document.getElementById("bank-scrollbar-thumb");
+      const bankCode = document.getElementById("bank-code");
+      const bankBranch = document.getElementById("bank-branch");
+      const bankAccount = document.getElementById("bank-account");
+      const bankAccountConfirm = document.getElementById("bank-account-confirm");
+      const bankConfirm = document.getElementById("bank-confirm");
+      const uploadTrigger = document.getElementById("upload-trigger");
+      const sourceCancel = document.getElementById("source-cancel");
+      const confirmButton = document.getElementById("confirm-button");
+      const allScreens = Array.from(document.querySelectorAll(".screen"));
+      let uploadTimer = null;
+      let loginTimer = null;
+
+      function updateScale() {
+        const widthScale = window.innerWidth / DESIGN_WIDTH;
+        const scale = window.innerWidth <= 430
+          ? Math.min(1, widthScale)
+          : Math.min(1, widthScale, window.innerHeight / DESIGN_HEIGHT);
+        document.documentElement.style.setProperty("--prototype-scale", String(scale));
+      }
+
+      function formatDate(value) {
+        const digits = value.replace(/\D/g, "").slice(0, 8);
+        if (digits.length <= 4) return digits;
+        if (digits.length <= 6) return digits.slice(0, 4) + "/" + digits.slice(4);
+        return digits.slice(0, 4) + "/" + digits.slice(4, 6) + "/" + digits.slice(6);
+      }
+
+      function formatTime(value) {
+        const digits = value.replace(/\D/g, "").slice(0, 4);
+        if (digits.length <= 2) return digits;
+        return digits.slice(0, 2) + ":" + digits.slice(2);
+      }
+
+      function isValidDate(value) {
+        const match = /^(\d{4})\/(\d{2})\/(\d{2})$/.exec(value);
+        if (!match) return false;
+        const year = Number(match[1]);
+        const month = Number(match[2]);
+        const day = Number(match[3]);
+        const candidate = new Date(Date.UTC(year, month - 1, day));
+        return year >= 2000
+          && candidate.getUTCFullYear() === year
+          && candidate.getUTCMonth() === month - 1
+          && candidate.getUTCDate() === day;
+      }
+
+      function isValidTime(value) {
+        return /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value);
+      }
+
+      function renderDateState() {
+        const dateValid = isValidDate(dateInput.value);
+        const timeValid = isValidTime(timeInput.value);
+        const dateInvalid = dateInput.dataset.touched === "true" && dateInput.value !== "" && !dateValid;
+        const timeInvalid = timeInput.dataset.touched === "true" && timeInput.value !== "" && !timeValid;
+        dateInput.classList.toggle("is-invalid", dateInvalid);
+        timeInput.classList.toggle("is-invalid", timeInvalid);
+        dateInput.setAttribute("aria-invalid", String(dateInvalid));
+        timeInput.setAttribute("aria-invalid", String(timeInvalid));
+        dateSheet.classList.toggle("has-error", dateInvalid || timeInvalid);
+        dateConfirm.disabled = !(dateValid && timeValid);
+      }
+
+      function updateScrollbar() {
+        const maxScroll = Math.max(0, scrollViewport.scrollHeight - scrollViewport.clientHeight);
+        const progress = maxScroll === 0 ? 0 : scrollViewport.scrollTop / maxScroll;
+        const travel = 275;
+        scrollbarThumb.style.transform = `translateY(${Math.round(progress * travel)}px)`;
+      }
+
+      function updateCreditScrollbar() {
+        const maxScroll = Math.max(0, creditScroll.scrollHeight - creditScroll.clientHeight);
+        const progress = maxScroll === 0 ? 0 : creditScroll.scrollTop / maxScroll;
+        const travel = 330;
+        creditScrollbarThumb.style.transform = `translateY(${Math.round(progress * travel)}px)`;
+      }
+
+      function updateBankScrollbar() {
+        const maxScroll = Math.max(0, bankScroll.scrollHeight - bankScroll.clientHeight);
+        const progress = maxScroll === 0 ? 0 : bankScroll.scrollTop / maxScroll;
+        const travel = 140;
+        bankScrollbarThumb.style.transform = `translateY(${Math.round(progress * travel)}px)`;
+      }
+
+      function updateBankFormState() {
+        bankBranch.disabled = bankCode.value === "";
+        if (bankBranch.disabled) bankBranch.value = "";
+        bankAccount.value = bankAccount.value.replace(/\D/g, "").slice(0, 16);
+        bankAccountConfirm.value = bankAccountConfirm.value.replace(/\D/g, "").slice(0, 16);
+        const accountMatches = bankAccount.value.length >= 8 && bankAccount.value === bankAccountConfirm.value;
+        const valid = bankCode.value !== "" && bankBranch.value !== "" && accountMatches;
+        bankConfirm.disabled = !valid;
+        bankConfirm.classList.toggle("is-enabled", valid);
+      }
+
+      function selectPolicy(index) {
+        cards.forEach((card, cardIndex) => {
+          const selected = cardIndex === index;
+          card.classList.toggle("is-selected", selected);
+          card.setAttribute("aria-checked", String(selected));
+          const radio = card.querySelector(".policy-radio");
+          radio.src = selected ? "./assets/radio-selected.png" : "./assets/radio-unselected.png";
+        });
+        selectionStatus.textContent = `已選擇第 ${index + 1} 張保單`;
+      }
+
+      function showScreen(screen) {
+        if (uploadTimer !== null) {
+          clearTimeout(uploadTimer);
+          uploadTimer = null;
+        }
+        if (loginTimer !== null) {
+          clearTimeout(loginTimer);
+          loginTimer = null;
+        }
+        allScreens.forEach((item) => {
+          item.hidden = item !== screen;
+        });
+        if (screen === selectionScreen) {
+          requestAnimationFrame(updateScrollbar);
+        }
+        if (screen === ocrConfirmScreen) {
+          ocrScroll.scrollTop = 0;
+        }
+        if (screen === creditNoticeScreen) {
+          creditScroll.scrollTop = 0;
+          requestAnimationFrame(updateCreditScrollbar);
+        }
+        if (screen === bankInitialScreen) {
+          bankScroll.scrollTop = 0;
+          requestAnimationFrame(updateBankScrollbar);
+        }
+        if (screen === uploadLoadingScreen) {
+          uploadTimer = window.setTimeout(() => {
+            history.replaceState({ screen: "upload-valid" }, "", "#upload-valid");
+            showScreen(uploadValidScreen);
+          }, 800);
+        }
+        if (screen === loginScreen) {
+          loginTimer = window.setTimeout(() => {
+            navigate("#personal-consent", consentScreen, true);
+          }, 800);
+        }
+        const timeoutRoute = screen.dataset.timeoutRoute;
+        if (timeoutRoute) {
+          const timeoutScreen = document.getElementById(timeoutRoute + "-screen");
+          if (timeoutScreen) {
+            uploadTimer = window.setTimeout(() => {
+              navigate("#" + timeoutRoute, timeoutScreen, true);
+            }, Number(screen.dataset.timeoutMs || 800));
+          }
+        }
+      }
+
+      function navigate(hash, screen, replace = false) {
+        const state = { screen: hash.slice(1) };
+        if (replace) {
+          history.replaceState(state, "", hash);
+        } else {
+          history.pushState(state, "", hash);
+        }
+        showScreen(screen);
+      }
+
+      function routeFromHash() {
+        const directRoute = location.hash.replace(/^#/, "");
+        const directScreen = directRoute && document.getElementById(directRoute + "-screen");
+        if (directScreen) {
+          showScreen(directScreen);
+          return;
+        }
+        const routes = {
+          "#welcome": welcomeScreen,
+          "#s01-ai-notice": document.getElementById("s01-ai-notice-screen"),
+          "#s01-ai-statement": document.getElementById("s01-ai-statement-screen"),
+          "#s01-privacy": document.getElementById("s01-privacy-screen"),
+          "#s01-terms": document.getElementById("s01-terms-screen"),
+          "#s01-alert-terms": document.getElementById("s01-alert-terms-screen"),
+          "#s01-alert-privacy": document.getElementById("s01-alert-privacy-screen"),
+          "#s01-alert-service": document.getElementById("s01-alert-service-screen"),
+          "#s03-documents": document.getElementById("s03-documents-screen"),
+          "#s03-later": document.getElementById("s03-later-screen"),
+          "#s03-claim-input": document.getElementById("s03-claim-input-screen"),
+          "#s03-intent-question": document.getElementById("s03-intent-question-screen"),
+          "#s03-other-claim": document.getElementById("s03-other-claim-screen"),
+          "#s03-out-of-scope": document.getElementById("s03-out-of-scope-screen"),
+          "#s03-official-site": document.getElementById("s03-official-site-screen"),
+          "#s02-login": loginScreen,
+          "#personal-consent": consentScreen,
+          "#personal-not-consented": document.getElementById("s05-not-consented-screen"),
+          "#credit-notice": creditNoticeScreen,
+          "#date-entry": dateScreen,
+          "#policy-selection": selectionScreen,
+          "#policy-unselected": policyReminderScreen,
+          "#boarding-pass-upload": uploadScreen,
+          "#upload-source-options": uploadSourceScreen,
+          "#file-picker": filePickerScreen,
+          "#upload-loading": uploadLoadingScreen,
+          "#upload-valid": uploadValidScreen,
+          "#upload-size-error": uploadSizeErrorScreen,
+          "#upload-format-error": uploadFormatErrorScreen,
+          "#date-missing-upload": dateMissingUploadScreen,
+          "#date-missing-valid": dateMissingValidScreen,
+          "#upload-close-initial": uploadCloseInitialScreen,
+          "#upload-close-selected": uploadCloseSelectedScreen,
+          "#date-close-empty": dateCloseEmptyScreen,
+          "#date-close-partial": dateClosePartialScreen,
+          "#date-close-complete": dateCloseCompleteScreen,
+          "#ocr-confirm": ocrConfirmScreen
+        };
+        showScreen(routes[location.hash] || welcomeScreen);
+      }
+
+      function routeTo(route) {
+        const screen = document.getElementById(route + "-screen");
+        if (screen) navigate("#" + route, screen);
+      }
+
+      dateInput.addEventListener("input", () => {
+        dateInput.value = formatDate(dateInput.value);
+        renderDateState();
+      });
+
+      timeInput.addEventListener("input", () => {
+        timeInput.value = formatTime(timeInput.value);
+        renderDateState();
+      });
+
+      dateInput.addEventListener("blur", () => {
+        dateInput.dataset.touched = "true";
+        renderDateState();
+      });
+
+      timeInput.addEventListener("blur", () => {
+        timeInput.dataset.touched = "true";
+        renderDateState();
+      });
+
+      dateConfirm.addEventListener("click", () => {
+        if (dateConfirm.disabled) return;
+        navigate("#policy-selection", selectionScreen);
+      });
+
+      document.getElementById("date-close").addEventListener("click", () => {
+        const hasDate = dateInput.value.trim() !== "";
+        const hasTime = timeInput.value.trim() !== "";
+        if (!hasDate && !hasTime) {
+          navigate("#date-close-empty", dateCloseEmptyScreen);
+        } else if (hasDate && hasTime) {
+          navigate("#date-close-complete", dateCloseCompleteScreen);
+        } else {
+          navigate("#date-close-partial", dateClosePartialScreen);
+        }
+      });
+
+      cards.forEach((card, index) => {
+        card.addEventListener("click", () => selectPolicy(index));
+      });
+
+      scrollViewport.addEventListener("scroll", updateScrollbar, { passive: true });
+
+      confirmButton.addEventListener("click", () => {
+        navigate("#boarding-pass-upload", uploadScreen);
+      });
+
+      document.getElementById("policy-close").addEventListener("click", () => {
+        navigate("#policy-unselected", policyReminderScreen);
+      });
+
+      document.getElementById("policy-reminder-return").addEventListener("click", () => {
+        navigate("#policy-selection", selectionScreen);
+      });
+
+      uploadTrigger.addEventListener("click", () => {
+        navigate("#upload-source-options", uploadSourceScreen);
+      });
+
+      document.getElementById("upload-close").addEventListener("click", () => {
+        navigate("#upload-close-initial", uploadCloseInitialScreen);
+      });
+
+      document.querySelector('[data-upload-source="photo"]').addEventListener("click", () => {
+        navigate("#upload-loading", uploadLoadingScreen);
+      });
+
+      document.querySelector('[data-upload-source="camera"]').addEventListener("click", () => {
+        navigate("#upload-loading", uploadLoadingScreen);
+      });
+
+      document.querySelector('[data-upload-source="files"]').addEventListener("click", () => {
+        navigate("#file-picker", filePickerScreen);
+      });
+
+      sourceCancel.addEventListener("click", () => {
+        navigate("#boarding-pass-upload", uploadScreen);
+      });
+
+      document.querySelectorAll("[data-return-to-source]").forEach((button) => {
+        button.addEventListener("click", () => navigate("#upload-source-options", uploadSourceScreen));
+      });
+
+      document.getElementById("file-size-error").addEventListener("click", () => {
+        navigate("#upload-size-error", uploadSizeErrorScreen);
+      });
+
+      document.getElementById("file-valid").addEventListener("click", () => {
+        navigate("#upload-loading", uploadLoadingScreen);
+      });
+
+      document.getElementById("file-unsupported").addEventListener("click", () => {
+        navigate("#upload-format-error", uploadFormatErrorScreen);
+      });
+
+      document.querySelectorAll("[data-retry-upload]").forEach((button) => {
+        button.addEventListener("click", () => navigate("#upload-source-options", uploadSourceScreen));
+      });
+
+      document.getElementById("upload-valid-close").addEventListener("click", () => {
+        navigate("#upload-close-selected", uploadCloseSelectedScreen);
+      });
+
+      document.getElementById("upload-valid-delete").addEventListener("click", () => {
+        navigate("#boarding-pass-upload", uploadScreen);
+      });
+
+      document.getElementById("upload-valid-confirm").addEventListener("click", () => {
+        navigate("#ocr-confirm", ocrConfirmScreen);
+      });
+
+      document.querySelectorAll(".ocr-card-action")[0].addEventListener("click", () => {
+        routeTo("s7-bank-prompt");
+      });
+
+      document.querySelectorAll(".ocr-card-action")[1].addEventListener("click", () => {
+        routeTo("s7-data-error");
+      });
+
+      document.getElementById("date-missing-upload-return").addEventListener("click", () => {
+        navigate("#boarding-pass-upload", uploadScreen);
+      });
+
+      document.getElementById("date-missing-valid-return").addEventListener("click", () => {
+        navigate("#upload-valid", uploadValidScreen);
+      });
+
+      document.getElementById("upload-close-initial-return").addEventListener("click", () => {
+        navigate("#boarding-pass-upload", uploadScreen);
+      });
+
+      document.getElementById("upload-close-selected-return").addEventListener("click", () => {
+        navigate("#upload-valid", uploadValidScreen);
+      });
+
+      document.getElementById("date-close-empty-return").addEventListener("click", () => {
+        navigate("#date-entry", dateScreen);
+      });
+
+      document.getElementById("date-close-partial-return").addEventListener("click", () => {
+        navigate("#date-entry", dateScreen);
+      });
+
+      document.getElementById("date-close-complete-return").addEventListener("click", () => {
+        navigate("#date-entry", dateScreen);
+      });
+
+      const gotoTargets = {
+        "welcome": ["#welcome", welcomeScreen],
+        "date-entry": ["#date-entry", dateScreen],
+        "s01-ai-notice": ["#s01-ai-notice", document.getElementById("s01-ai-notice-screen")],
+        "s01-alert-terms": ["#s01-alert-terms", document.getElementById("s01-alert-terms-screen")],
+        "s01-alert-privacy": ["#s01-alert-privacy", document.getElementById("s01-alert-privacy-screen")],
+        "s01-alert-service": ["#s01-alert-service", document.getElementById("s01-alert-service-screen")],
+        "s03-documents": ["#s03-documents", document.getElementById("s03-documents-screen")],
+        "s03-later": ["#s03-later", document.getElementById("s03-later-screen")],
+        "s03-claim-input": ["#s03-claim-input", document.getElementById("s03-claim-input-screen")],
+        "s03-official-site": ["#s03-official-site", document.getElementById("s03-official-site-screen")],
+        "s02-login": ["#s02-login", loginScreen],
+        "s05-consent": ["#personal-consent", consentScreen],
+        "s05-not-consented": ["#personal-not-consented", document.getElementById("s05-not-consented-screen")],
+        "s05-credit-notice": ["#credit-notice", creditNoticeScreen]
+      };
+
+      document.querySelectorAll("[data-goto]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const target = gotoTargets[button.dataset.goto];
+          if (target) navigate(target[0], target[1]);
+        });
+      });
+
+      document.querySelectorAll("[data-route]").forEach((button) => {
+        button.addEventListener("click", () => routeTo(button.dataset.route));
+      });
+
+      bankCode.addEventListener("change", updateBankFormState);
+      bankBranch.addEventListener("change", updateBankFormState);
+      bankAccount.addEventListener("input", updateBankFormState);
+      bankAccountConfirm.addEventListener("input", updateBankFormState);
+      bankScroll.addEventListener("scroll", updateBankScrollbar, { passive: true });
+      bankConfirm.addEventListener("click", () => {
+        if (!bankConfirm.disabled) routeTo("s9-otp-initial");
+      });
+
+      let enteredOtp = "";
+      const otpInput = document.getElementById("otp-input");
+      const otpNext = document.getElementById("otp-next");
+      const otpErrorInput = document.getElementById("otp-error-input");
+      const otpErrorNext = document.getElementById("otp-error-next");
+
+      function validateOtp(code) {
+        if (code.length !== 6) return;
+        if (code === "123123") {
+          routeTo("s9-otp-validating");
+        } else {
+          otpErrorInput.value = "";
+          otpErrorNext.disabled = true;
+          otpErrorNext.classList.remove("is-enabled");
+          routeTo("s9-otp-error");
+        }
+      }
+
+      function bindOtpInput(input, button, isInitial) {
+        input.addEventListener("input", () => {
+          const code = input.value.replace(/\D/g, "").slice(0, 6);
+          input.value = code;
+          if (isInitial) enteredOtp = code;
+          const validLength = code.length === 6;
+          button.disabled = !validLength;
+          button.classList.toggle("is-enabled", validLength);
+        });
+        button.addEventListener("click", () => validateOtp(input.value));
+      }
+
+      bindOtpInput(otpInput, otpNext, true);
+      bindOtpInput(otpErrorInput, otpErrorNext, false);
+      document.getElementById("otp-filled-next").addEventListener("click", () => validateOtp(enteredOtp));
+      document.getElementById("otp-complete-next").addEventListener("click", () => routeTo("s9-otp-validating"));
+      document.getElementById("otp-corrected-next").addEventListener("click", () => routeTo("s9-otp-validating"));
+
+      creditScroll.addEventListener("scroll", updateCreditScrollbar, { passive: true });
+      document.getElementById("credit-return").addEventListener("click", () => {
+        navigate("#personal-consent", consentScreen);
+      });
+
+      window.addEventListener("popstate", () => {
+        routeFromHash();
+      });
+
+      window.addEventListener("resize", updateScale, { passive: true });
+      window.addEventListener("orientationchange", updateScale, { passive: true });
+
+      updateScale();
+      renderDateState();
+      scrollViewport.scrollTop = 0;
+      updateScrollbar();
+      updateCreditScrollbar();
+      updateBankFormState();
+      updateBankScrollbar();
+
+      routeFromHash();
+    })();
+  </script>
+</body>
+</html>
