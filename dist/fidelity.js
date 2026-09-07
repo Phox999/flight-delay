@@ -18,10 +18,10 @@
           </div>
         </div>
 
-        <p class="wf-notice">
+        <p class="wf-notice" style="left:36px;width:345px">
           本服務由生成式AI提供，請勿輸入個人資料（如身分證號碼），<br>
-          使用前請詳閱<a>AI告知聲明</a>與<a>注意事項</a>。本站受reCAPTCHA保護，<br>
-          詳參<a>Google隱私權政策</a>與<a>服務條款</a>。
+          使用前請詳閱<a style="white-space:nowrap">AI告知聲明</a>與<a style="white-space:nowrap">注意事項</a>。本站受reCAPTCHA保護，<br>
+          詳參<a style="white-space:nowrap">Google隱私權政策</a>與<a style="white-space:nowrap">服務條款</a>。
         </p>
 
         <div class="wf-glow"></div>
