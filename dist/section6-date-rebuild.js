@@ -29,24 +29,30 @@
   function dateGhost(value) {
     const d = String(value || '').replace(/\D/g, '');
     if (!d.length) return 'YYYY/MM/DD';
-    if (d.length < 4) return `${d}${'Y'.repeat(4-d.length)}/MM/DD`;
+    if (d.length < 4) return `${d}/MM/DD`;
     if (d.length === 4) return `${d}/MM/DD`;
-    if (d.length < 6) return `${d.slice(0,4)}/${d.slice(4)}${'M'.repeat(6-d.length)}/DD`;
+    if (d.length < 6) return `${d.slice(0,4)}/${d.slice(4)}/DD`;
     if (d.length === 6) return `${d.slice(0,4)}/${d.slice(4,6)}/DD`;
-    if (d.length < 8) return `${d.slice(0,4)}/${d.slice(4,6)}/${d.slice(6)}${'D'.repeat(8-d.length)}`;
     return formatDate(d);
   }
 
   function timeGhost(value) {
     const d = String(value || '').replace(/\D/g, '');
     if (!d.length) return 'HH:MM';
-    if (d.length < 2) return `${d}${'H'.repeat(2-d.length)}:MM`;
+    if (d.length < 2) return `${d}:MM`;
     if (d.length === 2) return `${d}:MM`;
-    if (d.length < 4) return `${d.slice(0,2)}:${d.slice(2)}${'M'.repeat(4-d.length)}`;
     return formatTime(d);
   }
 
+  function canonicalizeHash() {
+    const hash = location.hash.replace(/^#/, '');
+    if (hash === 'date-entry' || hash === 'date-close-partial') {
+      history.replaceState({ screen: 'date-screen' }, '', '#date-screen');
+    }
+  }
+
   function mount() {
+    canonicalizeHash();
     const screen = document.getElementById('date-screen');
     if (!screen || screen.dataset.dateV2Mounted === 'true') return;
     screen.dataset.dateV2Mounted = 'true';
@@ -55,13 +61,12 @@
     const legacyDate = document.getElementById('departure-date');
     const legacyTime = document.getElementById('departure-time');
     const legacyConfirm = document.getElementById('date-confirm');
-    const legacyClose = document.getElementById('date-close');
 
     const initialDate = legacyDate?.value || '';
     const initialTime = legacyTime?.value || '';
 
     legacySheet?.remove();
-    legacyClose?.remove();
+    document.getElementById('date-close')?.remove();
 
     const layer = document.createElement('div');
     layer.className = 'date-v2-layer';
@@ -127,7 +132,7 @@
         return;
       }
       const formatted = kind === 'date' ? formatDate(raw) : formatTime(raw);
-      let remainder = ghostText.slice(formatted.length);
+      const remainder = ghostText.slice(formatted.length);
       node.innerHTML = `${formatted}${focused ? '<span class="date-v2-caret"></span>' : ''}<span class="date-v2-ghost">${remainder}</span>`;
     }
 
@@ -199,7 +204,9 @@
 
     close.addEventListener('click', () => {
       syncLegacy();
-      legacyClose?.click();
+      const hasAnyValue = Boolean(date.value || time.value);
+      history.pushState({ screen: hasAnyValue ? 'date-missing-reminder' : 'selection-screen' }, '', `#${hasAnyValue ? 'date-missing-reminder' : 'selection-screen'}`);
+      window.dispatchEvent(new PopStateEvent('popstate', { state: history.state }));
     });
 
     render();
