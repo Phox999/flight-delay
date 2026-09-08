@@ -4,12 +4,31 @@
     window.dispatchEvent(new PopStateEvent('popstate', { state: history.state }));
   }
 
-  function dedupeHomeIndicators(root = document) {
-    root.querySelectorAll('.s3-device, .s5-device, .s6-device, .s6o-device, .s9f-root').forEach((device) => {
-      const indicators = Array.from(device.querySelectorAll('.wf-home, .home-bar'));
-      indicators.forEach((indicator, index) => {
-        if (index > 0) indicator.remove();
+  const HOME_SELECTOR = '.wf-home, .home-bar, .s6-files-home';
+
+  function removeDuplicateHomeIndicators(root = document) {
+    root.querySelectorAll('.screen').forEach((screen) => {
+      const indicators = Array.from(screen.querySelectorAll(HOME_SELECTOR));
+      if (indicators.length <= 1) return;
+
+      // Keep the screen's intended native indicator. File picker uses its own home bar;
+      // all chatbot screens use the shared wf-home. Legacy home-bar is fallback only.
+      const keep = screen.querySelector('.s6-files-home') ||
+        screen.querySelector('.htmlized-screen .wf-home') ||
+        screen.querySelector('.wf-home') ||
+        screen.querySelector('.home-bar') ||
+        indicators[0];
+
+      indicators.forEach((indicator) => {
+        if (indicator !== keep) indicator.remove();
       });
+    });
+
+    // Clean up any legacy indicator mounted directly under the phone shell rather than
+    // inside a screen. These are stale DOM nodes and are removed, not hidden.
+    root.querySelectorAll('.phone > .wf-home, .phone > .home-bar, .phone > .s6-files-home').forEach((indicator) => {
+      const visibleScreen = root.querySelector('.screen:not([hidden])');
+      if (visibleScreen?.querySelector(HOME_SELECTOR)) indicator.remove();
     });
   }
 
@@ -17,8 +36,6 @@
     const target = event.target.closest('button, [data-goto], [data-s5-action], [data-s6-action]');
     if (!target) return;
 
-    // Consent must go to policy selection first. The old route incorrectly jumped
-    // directly into the date flow.
     if (
       target.matches('[data-s5-action="agree"]') ||
       target.matches('#s05-consent-screen > [data-goto="date-entry"]')
@@ -29,8 +46,6 @@
       return;
     }
 
-    // After a policy is selected, continue to the rebuilt date/time sheet.
-    // The legacy handler used to skip this and jump straight to boarding-pass upload.
     if (
       target.matches('[data-s6-action="policy-confirm"]') ||
       target.matches('#selection-screen #confirm-button')
@@ -43,9 +58,15 @@
   }, true);
 
   function start() {
-    dedupeHomeIndicators();
-    const observer = new MutationObserver(() => dedupeHomeIndicators());
-    observer.observe(document.body, { childList: true, subtree: true });
+    removeDuplicateHomeIndicators();
+
+    const observer = new MutationObserver(() => removeDuplicateHomeIndicators());
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['hidden']
+    });
   }
 
   if (document.readyState === 'loading') {
