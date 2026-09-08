@@ -4,19 +4,34 @@
     window.dispatchEvent(new PopStateEvent('popstate', { state: history.state }));
   }
 
-  const HOME_SELECTOR = '.wf-home, .home-bar, .s6-files-home';
+  const HOME_SELECTOR = '.home-bar, .s6-files-home, .s8f-files-home, .s9f-home';
+
+  function normalizeWfHome(root = document) {
+    // wf-home is retired. Physically remove it when another indicator exists;
+    // otherwise convert the same DOM node into the single canonical home-bar.
+    root.querySelectorAll('.wf-home').forEach((indicator) => {
+      const scope = indicator.closest('.screen, .s1-device, .s3-device, .s5-device, .s6-device, .s6o-device, .s9f-root, .phone') || indicator.parentElement;
+      const existing = scope?.querySelector(HOME_SELECTOR);
+      if (existing && existing !== indicator) {
+        indicator.remove();
+      } else {
+        indicator.classList.remove('wf-home');
+        indicator.classList.add('home-bar');
+      }
+    });
+  }
 
   function removeDuplicateHomeIndicators(root = document) {
+    normalizeWfHome(root);
+
     root.querySelectorAll('.screen').forEach((screen) => {
       const indicators = Array.from(screen.querySelectorAll(HOME_SELECTOR));
       if (indicators.length <= 1) return;
 
-      // Keep the screen's intended native indicator. File picker uses its own home bar;
-      // all chatbot screens use the shared wf-home. Legacy home-bar is fallback only.
-      const keep = screen.querySelector('.s6-files-home') ||
-        screen.querySelector('.htmlized-screen .wf-home') ||
-        screen.querySelector('.wf-home') ||
+      const keep = screen.querySelector('.s6-files-home, .s8f-files-home') ||
+        screen.querySelector('.htmlized-screen .home-bar') ||
         screen.querySelector('.home-bar') ||
+        screen.querySelector('.s9f-home') ||
         indicators[0];
 
       indicators.forEach((indicator) => {
@@ -24,11 +39,14 @@
       });
     });
 
-    // Clean up any legacy indicator mounted directly under the phone shell rather than
-    // inside a screen. These are stale DOM nodes and are removed, not hidden.
-    root.querySelectorAll('.phone > .wf-home, .phone > .home-bar, .phone > .s6-files-home').forEach((indicator) => {
-      const visibleScreen = root.querySelector('.screen:not([hidden])');
-      if (visibleScreen?.querySelector(HOME_SELECTOR)) indicator.remove();
+    // Also dedupe inside phone/device shells that are not wrapped by .screen.
+    root.querySelectorAll('.phone, .s1-device, .s3-device, .s5-device, .s6-device, .s6o-device, .s9f-root').forEach((shell) => {
+      const indicators = Array.from(shell.querySelectorAll(HOME_SELECTOR));
+      if (indicators.length <= 1) return;
+      const keep = shell.querySelector('.s6-files-home, .s8f-files-home') || shell.querySelector('.home-bar') || indicators[0];
+      indicators.forEach((indicator) => {
+        if (indicator !== keep) indicator.remove();
+      });
     });
   }
 
