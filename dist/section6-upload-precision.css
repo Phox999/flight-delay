@@ -1,163 +1,40 @@
-/* Precision pass for Figma 06-05 / 06-06 / 06-08C.
-   Source: 4874:38918, 4874:39467, 4874:39005.
-   Full-screen PNGs are used only as icon sprites for the original Figma glyphs. */
+/* Small visual deltas from the shared Section 6 styles. */
 
-/* 06-05 — upload empty state */
-#upload-screen .s6-upload-trigger,
-#upload-source-screen .s6-upload-trigger{
-  width:345px;
-  height:136px;
-  border:1px dashed #bfbfbf;
-  border-radius:10px;
-  background:#fff;
-}
-
-/* Exact Figma ic/file/upload, cropped from the original 393×852 reference asset. */
-#upload-screen .s6-upload-glyph,
-#upload-source-screen .s6-upload-glyph{
-  width:24px;
-  height:24px;
-  margin:0 0 4px;
-  overflow:hidden;
-  color:transparent;
-  font-size:0;
-  line-height:0;
-  background-image:url('./assets/boarding-pass-upload.png');
-  background-repeat:no-repeat;
-  background-size:393px 852px;
-  background-position:-174px -465px;
-}
-
-/* The Figma copy is 「點擊上傳登機證」, not 「上傳登機證」. */
+/* Figma copy is 「點擊上傳登機證」. Keep source markup simple and only swap display copy here. */
 #upload-screen .s6-upload-label,
-#upload-source-screen .s6-upload-label{
-  font-size:0;
-  line-height:20px;
-  font-weight:400;
-  letter-spacing:.3px;
+#upload-source-screen .s6-upload-label {
+  font-size: 0;
 }
+
 #upload-screen .s6-upload-label::after,
-#upload-source-screen .s6-upload-label::after{
-  content:'點擊上傳登機證';
-  font-size:14px;
-  line-height:20px;
-  font-weight:400;
-  color:#000;
+#upload-source-screen .s6-upload-label::after {
+  content: '點擊上傳登機證';
+  color: #000;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: .3px;
 }
 
-#upload-screen .s6-upload-helper,
-#upload-source-screen .s6-upload-helper{
-  margin-top:12px;
-  padding-left:21px;
-  color:#777;
-  font-size:14px;
-  line-height:20px;
-  letter-spacing:.3px;
+/* Native ActionSheet fidelity adjustments not present in section6-fidelity.css. */
+#upload-source-screen .s6-action-sheet {
+  border: 0;
+  border-radius: 34px;
+  background: rgba(245,245,245,.60);
+  box-shadow: 0 10px 30px rgba(0,0,0,.12);
+  backdrop-filter: blur(40px) saturate(135%);
+  -webkit-backdrop-filter: blur(40px) saturate(135%);
 }
 
-/* Close icon uses the actual exported Figma asset already committed in /assets. */
-#upload-screen .s6-close,
-#upload-source-screen .s6-close,
-#upload-valid-screen .s6-close{
-  width:20px;
-  height:20px;
-  top:13px;
-  left:357px;
-}
-#upload-screen .s6-close img,
-#upload-source-screen .s6-close img,
-#upload-valid-screen .s6-close img{
-  display:block;
-  width:20px;
-  height:20px;
-  object-fit:contain;
-}
-
-/* 06-06 — Native/ActionSheet */
-#upload-source-screen .s6-action-sheet{
-  top:322px;
-  left:44px;
-  width:300px;
-  height:250px;
-  padding:14px;
-  border:0;
-  border-radius:34px;
-  background:rgba(245,245,245,.60);
-  box-shadow:0 10px 30px rgba(0,0,0,.12);
-  backdrop-filter:blur(40px) saturate(135%);
-  -webkit-backdrop-filter:blur(40px) saturate(135%);
-}
-#upload-source-screen .s6-action-button{
-  width:272px;
-  height:48px;
-  margin:0 0 10px;
-  border:0;
-  border-radius:24px;
-  background:rgba(225,225,225,.82);
-  box-shadow:none;
-  color:#000;
-  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;
-  font-size:17px;
-  font-weight:400;
-  line-height:22px;
-  letter-spacing:-.43px;
-}
-#upload-source-screen .s6-action-button:last-child{margin-bottom:0;}
-
-/* 06-08C — selected file state */
-#upload-valid-screen .s6-upload-sheet.selected{
-  top:496px;
-  height:220px;
-}
-#upload-valid-screen .s6-upload-body{
-  height:96px;
-  padding:24px;
-}
-#upload-valid-screen .s6-file-row-selected{
-  width:327px;
-  height:48px;
-  padding:12px 16px;
-  border:1.5px solid #eaeaea;
-  border-radius:6px;
-  background:#fff;
-  font-size:16px;
-  line-height:22px;
-  letter-spacing:0;
-}
-
-/* Exact Figma ic/file/delete, cropped from the original selected-state reference. */
-#upload-valid-screen .s6-file-delete{
-  flex:0 0 24px;
-  width:24px;
-  height:24px;
-  margin:0;
-  padding:0;
-  overflow:hidden;
-  border:0;
-  color:transparent;
-  font-size:0;
-  line-height:0;
-  background-image:url('./upload-valid.png');
-  background-repeat:no-repeat;
-  background-size:393px 852px;
-  background-position:-320px -578px;
-}
-
-#upload-valid-screen .s6-upload-footer{
-  top:142px;
-  height:78px;
-  padding:16px 24px;
-  background:#fff;
-  box-shadow:0 -8px 24px rgba(68,68,68,.08);
-}
-#upload-valid-screen .s6-primary{
-  width:345px;
-  height:46px;
-  border-radius:6px;
-  background:#9fc5fe;
-  color:#3a3a3a;
-  font-size:16px;
-  font-weight:500;
-  line-height:22px;
-  letter-spacing:.3px;
+#upload-source-screen .s6-action-button {
+  border: 0;
+  border-radius: 24px;
+  background: rgba(225,225,225,.82);
+  box-shadow: none;
+  color: #000;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: -.43px;
 }
