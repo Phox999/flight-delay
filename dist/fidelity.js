@@ -58,7 +58,6 @@
           <span class="wf-toolbar-item wf-book"></span>
           <span class="wf-toolbar-item wf-tabs"></span>
         </div>
-        <div class="wf-home" aria-hidden="true"></div>
       </div>`;
   }
 
