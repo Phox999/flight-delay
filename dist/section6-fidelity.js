@@ -113,7 +113,7 @@
   function uploadTrigger(errorMessage = '') {
     return `${errorMessage ? `<div class="s6-error-banner">${errorMessage}</div>` : ''}
       <button class="s6-upload-trigger" type="button" data-s6-action="upload-open-source">
-        <span class="s6-upload-glyph" aria-hidden="true">⇧</span><span class="s6-upload-label">上傳登機證</span>
+        <span class="s6-upload-glyph" aria-hidden="true">⇧</span><span class="s6-upload-label">點擊上傳登機證</span>
       </button>
       <ol class="s6-upload-helper"><li>支援 JPG、JPEG、PNG、HEIC，單檔上限 20 MB</li><li>支援檔案上傳及相機拍攝</li></ol>`;
   }
