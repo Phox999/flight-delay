@@ -1,9 +1,7 @@
-/* Shared raster header + external-link precision.
-   Header source: user-approved image aligned to Figma 5200:11703.
-   External-link source: Figma 4874:42134 / 4874:42048. */
+/* Shared header + external-link precision. */
 
-/* One raster header keeps time / Dynamic Island / signal / wifi / battery /
-   back / title / Beta in one fixed image so none of the icons drift. */
+/* One compact SVG header keeps time / Dynamic Island / signal / wifi / battery /
+   back / title / Beta aligned as a single asset. */
 .s3-header{
   top:0 !important;
   left:0 !important;
@@ -15,7 +13,7 @@
   z-index:49 !important;
 }
 
-/* Visual back icon is inside the image. Keep a transparent real button for routing. */
+/* Visual back icon is inside the header asset. Keep a transparent real button for routing. */
 .s3-back{
   top:69px !important;
   left:6px !important;
@@ -32,8 +30,7 @@
 .s3-back img{opacity:0 !important;}
 .s3-title-group{display:none !important;}
 
-/* Remove all separately-built status bars on chatbot shells that also render s3-header.
-   File-picker shells are intentionally NOT included because they have their own native UI. */
+/* Chatbot shells that use the shared header do not need a second status bar. */
 .s3-device > .wf-status,
 .s6-device > .wf-status,
 .s6o-device > .wf-status,
@@ -42,7 +39,7 @@
   display:none !important;
 }
 
-/* ----- Final result external link ----- */
+/* Final result external link. Draw the icon in CSS instead of cropping a full-screen PNG. */
 .s9o-link-wrap .s6o-external,
 .s9f-result-link{
   display:inline-flex !important;
@@ -54,15 +51,15 @@
 }
 .s9o-link-wrap .s6o-external::after,
 .s9f-result-link::after{
-  content:"" !important;
+  content:'↗' !important;
   display:block !important;
-  flex:0 0 12.42px !important;
-  width:12.42px !important;
-  height:12.43px !important;
+  flex:0 0 13px !important;
+  width:13px !important;
+  height:13px !important;
   margin-left:0 !important;
-  background-image:url('./s9-success.png') !important;
-  background-repeat:no-repeat !important;
-  background-size:393px 852px !important;
-  background-position:-181px -530px !important;
+  background:none !important;
+  color:#009eff !important;
+  font:500 14px/13px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif !important;
+  text-align:center !important;
   transform:none !important;
 }
