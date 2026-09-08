@@ -190,3 +190,49 @@
   transform:rotate(45deg);
   transform-origin:left center;
 }
+
+/* ---------- Date entry raster mode ---------- */
+/* The full-screen date-entry.png is now the visual source of truth. The legacy HTML
+   remains only as an interaction layer so typing / validation / routing still work. */
+#date-screen .date-sheet,
+#date-screen .date-sheet-header,
+#date-screen .date-form,
+#date-screen .date-sheet-footer{
+  background:transparent !important;
+  border-color:transparent !important;
+  box-shadow:none !important;
+}
+#date-screen .date-sheet-title,
+#date-screen .date-sheet-close,
+#date-screen .date-label{
+  visibility:hidden !important;
+}
+#date-screen .date-input{
+  background:transparent !important;
+  border-color:transparent !important;
+  box-shadow:none !important;
+  color:#3a3a3a !important;
+  caret-color:#3a3a3a !important;
+}
+#date-screen .date-input::placeholder{
+  color:transparent !important;
+}
+#date-screen .date-input:focus{
+  border-color:transparent !important;
+  outline:0 !important;
+}
+#date-screen .date-confirm:disabled{
+  background:transparent !important;
+  color:transparent !important;
+  box-shadow:none !important;
+}
+/* Only paint the HTML button after it becomes active; the disabled state comes from the raster. */
+#date-screen .date-confirm:not(:disabled){
+  background:#9fc5fe !important;
+  color:#3a3a3a !important;
+}
+/* Errors are dynamic, so they intentionally remain HTML above the raster. */
+#date-screen .date-error{
+  position:relative;
+  z-index:2;
+}
