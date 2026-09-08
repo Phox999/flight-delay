@@ -33,7 +33,7 @@
   font-weight:400!important;
 }
 
-/* Reuse the Figma-derived send glyph already present in the welcome artwork instead of a hand-drawn arrow. */
+/* Shared send button artwork. */
 .s3-send{
   top:2px!important;
   right:0!important;
@@ -108,38 +108,7 @@
   line-height:22px!important;
 }
 
-/* Native ActionSheet: one glass container, with 272×48 actions inside a 300px shell. */
-.s8f-source-actions::before{
-  content:"";
-  position:absolute;
-  left:46.5px;
-  top:320px;
-  width:300px;
-  height:250px;
-  border-radius:34px;
-  background:rgba(245,245,245,.72);
-  box-shadow:0 10px 30px rgba(0,0,0,.12);
-  backdrop-filter:blur(40px);
-  -webkit-backdrop-filter:blur(40px);
-}
-.s8f-source-btn{
-  left:61px!important;
-  width:272px!important;
-  height:48px!important;
-  border-radius:24px!important;
-  background:rgba(225,225,225,.82)!important;
-  box-shadow:none!important;
-  color:#000!important;
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif!important;
-  font-size:17px!important;
-  letter-spacing:-.43px!important;
-}
-.s8f-source-photo{top:334px!important;}
-.s8f-source-camera{top:392px!important;}
-.s8f-source-files{top:450px!important;}
-.s8f-source-cancel{top:508px!important;}
-
-/* Same Native/ActionSheet component in Section 6 boarding-pass upload. */
+/* Native ActionSheet used by Section 6 boarding-pass upload. */
 .s6-action-sheet{
   width:300px!important;
   height:250px!important;
@@ -201,5 +170,5 @@
 .s7-input::placeholder,.s8f-bank-input::placeholder{color:#a0a0a0!important;opacity:1!important;}
 .s8f-bank-select.is-placeholder{color:#a0a0a0!important;}
 
-/* The scroll thumb belongs to the top of the scrollable body, not halfway down the sheet. */
+/* The scroll thumb belongs to the top of the scrollable body. */
 .s8f-bank-thumb{top:53px!important;width:6px!important;height:151px!important;right:12px!important;}
