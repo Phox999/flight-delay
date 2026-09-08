@@ -1,0 +1,29 @@
+/* Section 6 date/time popup rebuilt from Figma 4874:39266, 39318, 39370, 39422. */
+#date-screen .date-v2-layer{position:absolute;inset:0;z-index:40;width:393px;height:852px;pointer-events:none;font-family:"PingFang TC","Noto Sans TC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#3a3a3a}
+#date-screen .date-v2-sheet{position:absolute;left:0;top:468px;width:393px;height:248px;overflow:hidden;border-radius:12px 12px 0 0;background:#fff;pointer-events:auto;box-sizing:border-box}
+#date-screen .date-v2-sheet.is-error{top:438px;height:278px}
+#date-screen .date-v2-header{position:relative;width:393px;height:46px;border-bottom:.5px solid #bfbfbf;background:#fff;box-sizing:border-box}
+#date-screen .date-v2-title{position:absolute;left:60px;top:12px;width:281px;margin:0;color:#3a3a3a;font-size:16px;font-weight:400;line-height:22px;letter-spacing:.3px;text-align:center}
+#date-screen .date-v2-close{position:absolute;right:16px;top:13px;width:20px;height:20px;margin:0;padding:0;border:0;background:transparent url('./assets/close.png') center/20px 20px no-repeat;cursor:pointer}
+#date-screen .date-v2-form{display:flex;gap:24px;width:393px;height:124px;padding:24px;background:#fff;box-sizing:border-box}
+#date-screen .date-v2-sheet.is-error .date-v2-form{height:154px}
+#date-screen .date-v2-field{position:relative;display:flex;flex-direction:column;gap:8px;width:160px;margin:0}
+#date-screen .date-v2-field:first-child{width:161px}
+#date-screen .date-v2-label{display:block;height:22px;color:#3a3a3a;font-size:16px;font-weight:400;line-height:22px;letter-spacing:.3px;white-space:nowrap}
+#date-screen .date-v2-input-wrap{position:relative;width:100%;height:48px;border:1.5px solid #bfbfbf;border-radius:6px;background:#fff;box-sizing:border-box;overflow:hidden}
+#date-screen .date-v2-input-wrap.is-focused{border-color:#9fc5fe}
+#date-screen .date-v2-input-wrap.is-invalid{border-color:#ec464a}
+#date-screen .date-v2-input{position:absolute;inset:0;z-index:2;width:100%;height:100%;margin:0;padding:0 15px;border:0;outline:0;background:transparent;color:transparent;caret-color:transparent;font:300 16px/22px "PingFang TC","Noto Sans TC",sans-serif;letter-spacing:.3px;box-sizing:border-box}
+#date-screen .date-v2-preview{position:absolute;z-index:1;left:15px;right:12px;top:12px;height:22px;display:flex;align-items:center;overflow:hidden;color:#3a3a3a;font-size:16px;font-weight:300;line-height:22px;letter-spacing:.3px;white-space:nowrap;pointer-events:none}
+#date-screen .date-v2-preview.is-placeholder{color:#a0a0a0}
+#date-screen .date-v2-ghost{color:#a0a0a0}
+#date-screen .date-v2-caret{display:inline-block;width:1px;height:20px;margin:0 1px;background:#3a3a3a;vertical-align:-4px;animation:dateV2Blink 1s steps(1,end) infinite}
+@keyframes dateV2Blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+#date-screen .date-v2-error{display:none;margin:0;color:#ec464a;font-size:15px;font-weight:400;line-height:22px;white-space:nowrap}
+#date-screen .date-v2-field.has-error .date-v2-error{display:block}
+#date-screen .date-v2-footer{position:absolute;left:0;bottom:0;width:393px;height:78px;padding:16px 24px;background:#fff;box-sizing:border-box;box-shadow:0 -8px 24px rgba(68,68,68,.08)}
+#date-screen .date-v2-confirm{display:flex;align-items:center;justify-content:center;width:345px;height:46px;margin:0;padding:0;border:0;border-radius:6px;background:#eaeaea;color:#fff;font:500 16px/22px "PingFang TC","Noto Sans TC",sans-serif;letter-spacing:.3px;text-align:center}
+#date-screen .date-v2-confirm.is-enabled{background:#9fc5fe;color:#3a3a3a;cursor:pointer}
+
+/* The legacy date popup is removed by JS. These selectors are a safety net before JS mounts. */
+#date-screen>#date-sheet,#date-screen>#date-close{visibility:hidden!important;pointer-events:none!important}
