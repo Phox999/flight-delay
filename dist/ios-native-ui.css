@@ -1,0 +1,56 @@
+/* Native iPhone/Safari chrome rebuilt from provided SVG assets. */
+.wf-status,.native-status{
+  position:absolute!important;
+  top:0!important;left:0!important;width:393px!important;height:59px!important;
+  background:#f9f9f9!important;
+}
+.wf-status::after,.native-status::after{
+  content:'';position:absolute;right:19px;top:23px;width:79px;height:13px;
+  background:url('./assets/ios-signal-wifi-battery.svg') center/79px 13px no-repeat;
+}
+.wf-signal,.wf-wifi,.wf-battery,.native-signals{display:none!important;}
+.wf-time,.native-time{display:block!important;}
+.wf-island,.native-island{display:block!important;}
+
+.wf-safari-address,.safari-address{
+  position:absolute!important;top:716px!important;left:0!important;width:393px!important;height:53px!important;
+  background:#f9f9f9!important;padding:7px 12px 10px!important;
+}
+.wf-address-pill,.safari-pill{
+  position:relative!important;width:369px!important;height:36px!important;border-radius:10px!important;
+  background:rgba(0,0,0,.08)!important;
+}
+.wf-site-settings,.safari-tabs{
+  position:absolute!important;left:12px!important;top:9px!important;width:15px!important;height:18px!important;
+  border:0!important;background:url('./assets/ios-site-settings.svg') center/15px 18px no-repeat!important;
+}
+.wf-site-settings::before,.wf-site-settings::after,.safari-tabs::after{display:none!important;content:none!important;}
+.wf-reload,.safari-refresh{
+  position:absolute!important;right:9px!important;top:9px!important;width:15px!important;height:18px!important;
+  border:0!important;font-size:0!important;background:url('./assets/ios-reload.svg') center/15px 18px no-repeat!important;
+}
+.wf-reload::after{display:none!important;content:none!important;}
+
+.wf-safari-toolbar,.safari-toolbar{
+  position:absolute!important;top:769px!important;left:0!important;width:393px!important;height:49px!important;
+  background:#f9f9f9!important;padding:5px 28px 0!important;display:flex!important;align-items:center!important;justify-content:space-between!important;
+}
+.wf-toolbar-item{width:24px!important;height:28px!important;background-position:center!important;background-repeat:no-repeat!important;}
+.wf-toolbar-item::before,.wf-toolbar-item::after{display:none!important;content:none!important;}
+.wf-chevron{background-image:url('./assets/ios-toolbar-back-disabled.svg')!important;background-size:11px 18px!important;}
+.wf-chevron.forward{background-image:url('./assets/ios-toolbar-forward.svg')!important;background-size:11px 18px!important;opacity:.22!important;transform:none!important;}
+.wf-share{background-image:url('./assets/ios-toolbar-share.svg')!important;background-size:19px 24px!important;}
+.wf-book{background-image:url('./assets/ios-toolbar-book.svg')!important;background-size:22px 19px!important;}
+.wf-tabs{background-image:url('./assets/ios-toolbar-tabs.svg')!important;background-size:23px 23px!important;}
+.wf-home,.home-bar{
+  position:absolute!important;left:127px!important;bottom:8px!important;width:139px!important;height:5px!important;border-radius:0!important;
+  background:url('./assets/ios-home-indicator.svg') center/139px 5px no-repeat!important;
+}
+
+/* File-picker native chrome */
+.s6-files-device .wf-status,.s8f-files-status{
+  background:#fff!important;
+}
+.s8f-files-status::after{content:'';position:absolute;right:19px;top:23px;width:79px;height:13px;background:url('./assets/ios-signal-wifi-battery.svg') center/79px 13px no-repeat;}
+.s8f-files-signal{display:none!important;}
+.s8f-files-home,.s6-files-home{left:127px!important;width:139px!important;height:5px!important;background:url('./assets/ios-home-indicator.svg') center/139px 5px no-repeat!important;border-radius:0!important;}
