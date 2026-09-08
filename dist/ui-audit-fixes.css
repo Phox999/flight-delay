@@ -112,14 +112,7 @@
 .s9f-close{right:16px !important;top:13px !important;width:20px !important;height:20px !important;}
 
 /* ---------- Native file pickers ---------- */
-.s6-files-device .wf-status,
-.s8f-files-status{
-  display:block !important;
-  background:#f9f9f9 url('./assets/shared-header.svg') 0 0 / 393px 111px no-repeat !important;
-}
-.s6-files-device .wf-status > *,
-.s8f-files-status > *{visibility:hidden !important;}
-
+/* Status bar / Home Indicator are now handled by ios-native-ui.css using the supplied SVG assets. */
 .s8f-files-search::before{
   content:'' !important;
   width:13px;
