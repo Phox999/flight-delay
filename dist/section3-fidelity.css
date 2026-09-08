@@ -225,6 +225,10 @@
 .s3-card-content p { margin:0; }
 .s3-card-content ol { margin:0; padding-left:24px; }
 .s3-card-content ul { margin:0; padding-left:24px; }
+#s03-documents-screen .s3-card-content li,
+#s03-documents-screen .s3-card-content li .s3-highlight {
+  color:#4f44c3 !important;
+}
 .s3-card-action {
   width:250px;
   min-height:46px;
