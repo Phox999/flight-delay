@@ -1,9 +1,6 @@
-/* Main-flow UI audit fixes.
-   Audited against the current Figma Flow 5 (4868:1540 / 4874:*).
-   This file intentionally loads last so shared fidelity fixes win over older section overrides. */
+/* Main-flow UI audit fixes that are still required after the HTML/CSS rebuild. */
 
-/* ---------- Exact shared Figma icons ---------- */
-/* Section 8 and 9 were still drawing the close icon as the text ×. */
+/* ---------- Shared Figma icons ---------- */
 .s8f-close,
 .s9f-close,
 .s9f-tooltip-close{
@@ -16,7 +13,6 @@
   background-size:18px 18px !important;
 }
 
-/* ic_mml_info is a real Library icon, not a hand-built circled i. */
 .s8f-info,
 .s9f-help-icon{
   flex:0 0 16px !important;
@@ -29,30 +25,7 @@
   background:transparent url('./assets/info.png') center / 16px 16px no-repeat !important;
 }
 
-/* Reuse the exact Figma ic/file/upload pixels already captured from the same Library component. */
-.s8f-upload-icon{
-  width:24px !important;
-  height:24px !important;
-  margin-bottom:4px !important;
-  background-image:url('./assets/boarding-pass-upload.png') !important;
-  background-repeat:no-repeat !important;
-  background-size:393px 852px !important;
-  background-position:-174px -465px !important;
-}
-.s8f-upload-icon::before,
-.s8f-upload-icon::after{display:none !important;content:none !important;}
-
-/* FileItem delete is the same Library trash icon used by the boarding-pass state. */
-.s8f-file-delete{
-  color:transparent !important;
-  font-size:0 !important;
-  background-image:url('./upload-valid.png') !important;
-  background-repeat:no-repeat !important;
-  background-size:393px 852px !important;
-  background-position:-320px -578px !important;
-}
-
-/* System/Loading: replace the text glyph with the four-point Figma-style star. */
+/* Loading indicator is pure CSS; no screenshot sprite is needed. */
 .s8f-loading-star,
 .s6-loading-star{
   position:relative !important;
@@ -74,7 +47,6 @@
 }
 
 /* ---------- Section 8 / Native ActionSheet ---------- */
-/* Figma uses one 300×250 glass container with four 272×48 pills. */
 #s8-source-options-screen .s8f-scrim{
   top:0 !important;
   bottom:0 !important;
@@ -119,7 +91,6 @@
 #s8-source-options-screen .s8f-source-cancel{top:510px !important;}
 
 /* ---------- Section 8 / Bank form ---------- */
-/* Dropdown uses the same 24px Library arrow footprint instead of a custom 10px CSS chevron. */
 .s8f-bank-select::after{
   content:'' !important;
   position:absolute !important;
@@ -137,28 +108,10 @@
 }
 
 /* ---------- Section 9 / OTP ---------- */
-/* Figma uses the actual Library info icon and close icon. Keep the measured layout unchanged. */
 .s9f-help{gap:8px !important;}
 .s9f-close{right:16px !important;top:13px !important;width:20px !important;height:20px !important;}
 
-/* ---------- External-link icon ---------- */
-/* Replace the fallback ↗ character anywhere the main flow uses an external-link treatment. */
-.s6o-external::after{
-  content:'' !important;
-  display:inline-block !important;
-  width:12.42px !important;
-  height:12.43px !important;
-  margin-left:6px !important;
-  vertical-align:-1px;
-  background-image:url('./s9-success.png') !important;
-  background-repeat:no-repeat !important;
-  background-size:393px 852px !important;
-  background-position:-181px -530px !important;
-  transform:none !important;
-}
-
 /* ---------- Native file pickers ---------- */
-/* Use the same raster status-bar source as the approved shared header; do not redraw signal/Wi-Fi/battery. */
 .s6-files-device .wf-status,
 .s8f-files-status{
   display:block !important;
@@ -167,7 +120,6 @@
 .s6-files-device .wf-status > *,
 .s8f-files-status > *{visibility:hidden !important;}
 
-/* Replace the text search glyph with a proper magnifier shape. */
 .s8f-files-search::before{
   content:'' !important;
   width:13px;
@@ -189,50 +141,4 @@
   background:#8e8e93;
   transform:rotate(45deg);
   transform-origin:left center;
-}
-
-/* ---------- Date entry raster mode ---------- */
-/* The full-screen date-entry.png is now the visual source of truth. The legacy HTML
-   remains only as an interaction layer so typing / validation / routing still work. */
-#date-screen .date-sheet,
-#date-screen .date-sheet-header,
-#date-screen .date-form,
-#date-screen .date-sheet-footer{
-  background:transparent !important;
-  border-color:transparent !important;
-  box-shadow:none !important;
-}
-#date-screen .date-sheet-title,
-#date-screen .date-sheet-close,
-#date-screen .date-label{
-  visibility:hidden !important;
-}
-#date-screen .date-input{
-  background:transparent !important;
-  border-color:transparent !important;
-  box-shadow:none !important;
-  color:#3a3a3a !important;
-  caret-color:#3a3a3a !important;
-}
-#date-screen .date-input::placeholder{
-  color:transparent !important;
-}
-#date-screen .date-input:focus{
-  border-color:transparent !important;
-  outline:0 !important;
-}
-#date-screen .date-confirm:disabled{
-  background:transparent !important;
-  color:transparent !important;
-  box-shadow:none !important;
-}
-/* Only paint the HTML button after it becomes active; the disabled state comes from the raster. */
-#date-screen .date-confirm:not(:disabled){
-  background:#9fc5fe !important;
-  color:#3a3a3a !important;
-}
-/* Errors are dynamic, so they intentionally remain HTML above the raster. */
-#date-screen .date-error{
-  position:relative;
-  z-index:2;
 }
