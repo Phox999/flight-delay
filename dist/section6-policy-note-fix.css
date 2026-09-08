@@ -1,0 +1,7 @@
+/* Policy info note interaction — source: Figma 4874:39556. */
+#selection-screen .s6-policy-note{cursor:pointer;pointer-events:auto}
+#selection-screen .s6-policy-tooltip{position:absolute;z-index:60;top:85px;left:12px;width:300px;padding:12px 36px 12px 12px;border-radius:8px;background:rgba(58,58,58,.9);color:#f2f5f7;font-family:"PingFang TC","Noto Sans TC",sans-serif;font-size:14px;font-weight:400;line-height:20px;letter-spacing:.3px;box-sizing:border-box;pointer-events:auto}
+#selection-screen .s6-policy-tooltip p{margin:0}
+#selection-screen .s6-policy-tooltip ol{margin:0;padding-left:20px}
+#selection-screen .s6-policy-tooltip-close{position:absolute;top:12px;right:12px;width:16px;height:16px;margin:0;padding:0;border:0;background:transparent url('./assets/close.png') center/16px 16px no-repeat;filter:brightness(0) invert(1);cursor:pointer}
+#selection-screen .s6-policy-tooltip::after{content:"";position:absolute;left:20px;bottom:-12px;border-left:8px solid transparent;border-right:8px solid transparent;border-top:12px solid rgba(58,58,58,.9)}
