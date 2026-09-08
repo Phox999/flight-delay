@@ -34,7 +34,8 @@
         'library-components.css?v=2',
         'header-link-precision.css?v=4',
         'ui-audit-fixes.css?v=2',
-        'section6-date-rebuild.css?v=1'
+        'section6-date-rebuild.css?v=1',
+        'ios-native-ui.css?v=1'
       ];
 
       const scripts = [
@@ -62,8 +63,6 @@
 
         let html = await response.text();
 
-        // Legacy screenshots are no longer rendered. Keep the marker nodes so htmlize.js
-        // can mount the HTML layer, but prevent the browser from requesting obsolete PNGs.
         html = html.replace(/<img\b[^>]*class="[^"]*\bscreen-reference\b[^"]*"[^>]*>/g, (tag) =>
           tag.replace(/\bsrc="[^"]*"/, `src="${transparentPixel}"`)
         );
