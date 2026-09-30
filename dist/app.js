@@ -1,4 +1,9 @@
 const app = document.querySelector(".app");
+const previewStage = document.querySelector("#preview-stage");
+const previewFullscreenButton = document.querySelector("#preview-fullscreen");
+const previewRestartButton = document.querySelector("#preview-restart");
+const previewFullscreenEnterIcon = previewFullscreenButton.querySelector("[data-fullscreen-enter]");
+const previewFullscreenExitIcon = previewFullscreenButton.querySelector("[data-fullscreen-exit]");
 const welcome = document.querySelector(".welcome");
 const chatScreen = document.querySelector("#chat-screen");
 const input = document.querySelector("#message-input");
@@ -22,6 +27,9 @@ const uploadSourceMenu = document.querySelector("#upload-source-menu");
 const uploadHelpWrap = document.querySelector("#upload-help-wrap");
 const uploadHelpTrigger = document.querySelector("#upload-help-trigger");
 const uploadHelpCopy = document.querySelector("#upload-help-copy");
+const uploadHelpClose = document.querySelector("#upload-help-close");
+const uploadSheet = uploadDialog.querySelector(".upload-sheet");
+const uploadBody = uploadDialog.querySelector(".upload-body");
 const uploadNotes = document.querySelector("#upload-notes");
 const uploadLoading = document.querySelector("#upload-loading");
 const filePickerScreen = document.querySelector("#file-picker-screen");
@@ -31,6 +39,91 @@ const boardingInfoDialog = document.querySelector("#boarding-info-dialog");
 const boardingInfoForm = document.querySelector("#boarding-info-form");
 const confirmInfoButton = document.querySelector("#confirm-info");
 const airportComboboxes = [...boardingInfoDialog.querySelectorAll("[data-airport]")];
+let boardingInfoValidationAttempted = false;
+let boardingInfoConfirmed = false;
+const bankInfoDialog = document.querySelector("#bank-info-dialog");
+const bankInfoForm = document.querySelector("#bank-info-form");
+const bankCombobox = document.querySelector("#bank-combobox");
+const bankComboboxInput = document.querySelector("#bank-combobox-input");
+const bankComboboxResults = document.querySelector("#bank-options");
+const branchCombobox = document.querySelector("#branch-combobox");
+const branchComboboxInput = document.querySelector("#branch-combobox-input");
+const branchComboboxResults = document.querySelector("#branch-options");
+const bankbookFileInput = document.querySelector("#bankbook-file-input");
+const bankbookDropzone = document.querySelector("#bankbook-dropzone");
+const bankbookSelected = document.querySelector("#bankbook-selected");
+const bankbookSelectedName = document.querySelector("#bankbook-selected-name");
+const bankbookRemove = document.querySelector("#bankbook-remove");
+const bankbookError = document.querySelector("#bankbook-error");
+const bankInfoLoading = document.querySelector("#bank-info-loading");
+const confirmBankInfoButton = document.querySelector("#confirm-bank-info");
+const otpDialog = document.querySelector("#otp-dialog");
+const otpForm = document.querySelector("#otp-form");
+const otpInput = document.querySelector("#otp-input");
+const otpField = document.querySelector("#otp-field");
+const otpError = document.querySelector("#otp-error");
+const otpCountdown = document.querySelector("#otp-countdown");
+const otpResend = document.querySelector("#otp-resend");
+const otpNext = document.querySelector("#otp-next");
+const otpHelpTrigger = document.querySelector("#otp-help-trigger");
+const otpHelpNote = document.querySelector("#otp-help-note");
+const otpHelpClose = document.querySelector("#otp-help-close");
+const authDialog = document.querySelector("#auth-dialog");
+const authSheet = document.querySelector("#auth-sheet");
+const authTitle = document.querySelector("#auth-title");
+const authTabs = document.querySelector("#auth-tabs");
+const authScroll = document.querySelector("#auth-scroll");
+const authPrimary = document.querySelector("#auth-primary");
+const authFooterPrompt = document.querySelector("#auth-footer-prompt");
+const authBack = document.querySelector("#auth-back");
+const signupStatementDialog = document.querySelector("#signup-statement-dialog");
+const signupStatementTitle = document.querySelector("#signup-statement-title");
+const signupStatementScroll = document.querySelector("#signup-statement-scroll");
+const signupStatementScrollButton = document.querySelector("#signup-statement-scroll-button");
+const signupStatementAgree = document.querySelector("#signup-statement-agree");
+const loginOtpHelpTrigger = document.querySelector("#login-otp-help-trigger");
+const loginOtpHelpNote = document.querySelector("#login-otp-help-note");
+const authViews = [...authDialog.querySelectorAll("[data-auth-view]")];
+let previousAuthFocus = null;
+let authOrigin = "claim";
+let authReturnToLogin = false;
+let authActiveView = "login-password";
+let authSignupProfile = {};
+let authPasswordAttempts = 0;
+let authPasswordLocked = false;
+let authOtpPurpose = "";
+let authOtpResendSeconds = 60;
+let authOtpExpirySeconds = 300;
+let authOtpAttemptCount = 0;
+let authOtpExpired = false;
+let authIsVerifying = false;
+let activeSignupStatement = "";
+let previousSignupStatementFocus = null;
+const signupStatementsRead = new Set();
+let authOtpInterval = null;
+let authVerifyTimer = null;
+let registeredMemberIds = new Set();
+let authCaptchaCode = "04WG";
+let authLoginOtpPhone = "0963-****30";
+let authLoginOtpEmail = "Cathay***@***il.com";
+const taiwanBankDirectory = window.taiwanBankDirectory ?? [];
+const bankDirectoryByCode = new Map(taiwanBankDirectory.map((bank) => [bank.code, bank]));
+const bankSearchAliases = {
+  "004": "台灣銀行 台灣銀行 Bank of Taiwan",
+  "013": "國泰世華 Cathay United Bank",
+  "700": "中華郵政 郵局 Chunghwa Post",
+  "812": "台新銀行 Taishin Bank",
+};
+let bankbookUploadTimer = null;
+let otpResendSeconds = 60;
+let otpExpirySeconds = 300;
+let otpAttemptCount = 0;
+let otpExpired = false;
+let otpIsVerifying = false;
+let otpInterval = null;
+let otpVerifyTimer = null;
+const simulatedOtpCode = "123123";
+const memberCenterUrl = "https://www.cathay-ins.com.tw/INSOCWeb/";
 const confirmDialog = document.querySelector("#confirm-dialog");
 const confirmCopy = document.querySelector("#confirm-copy");
 const confirmGo = document.querySelector("#confirm-go");
@@ -42,10 +135,46 @@ let previousUploadFocus = null;
 let selectedBoardingPass = null;
 let selectedDelayProofFiles = [];
 let uploadMode = "boarding-pass";
+let filePickerTarget = "upload";
 let networkErrorShown = false;
 let uploadTimer = null;
 let uploadFileSequence = 0;
 const uploadLoadingDurationMs = 2800;
+
+function updatePreviewFullscreenControl() {
+  const isFullscreen = document.fullscreenElement === previewStage || previewStage.classList.contains("is-fullscreen");
+  previewFullscreenButton.setAttribute("aria-pressed", String(isFullscreen));
+  previewFullscreenButton.setAttribute("aria-label", isFullscreen ? "退出全螢幕" : "進入全螢幕");
+  previewFullscreenButton.title = isFullscreen ? "退出全螢幕" : "全螢幕";
+  previewFullscreenEnterIcon.hidden = isFullscreen;
+  previewFullscreenExitIcon.hidden = !isFullscreen;
+}
+
+previewFullscreenButton.addEventListener("click", async () => {
+  const isFullscreen = document.fullscreenElement === previewStage || previewStage.classList.contains("is-fullscreen");
+  if (isFullscreen) {
+    if (document.fullscreenElement === previewStage && document.exitFullscreen) await document.exitFullscreen();
+    else previewStage.classList.remove("is-fullscreen");
+  } else if (previewStage.requestFullscreen) {
+    try {
+      await previewStage.requestFullscreen();
+    } catch {
+      previewStage.classList.add("is-fullscreen");
+    }
+  } else {
+    previewStage.classList.add("is-fullscreen");
+  }
+  updatePreviewFullscreenControl();
+});
+
+document.addEventListener("fullscreenchange", updatePreviewFullscreenControl);
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && previewStage.classList.contains("is-fullscreen")) {
+    previewStage.classList.remove("is-fullscreen");
+    updatePreviewFullscreenControl();
+  }
+});
+previewRestartButton.addEventListener("click", () => window.location.reload());
 
 // Common commercial airports. Search supports IATA code, Traditional Chinese city,
 // and English city/airport aliases; the first entries stay familiar in the menu.
@@ -501,7 +630,7 @@ function appendClaimDetails() {
   actions.className = "info-confirm-actions";
   actions.append(
     makeAction("確認申請", "claim-confirm"),
-    makeAction("加入國泰產險會員", "claim-member"),
+    makeAction("加入國泰產險會員", "claim-register"),
     makeAction("前往國泰產險官網", "claim-website"),
   );
   prep.append(prepTitle, prepList, actions);
@@ -539,10 +668,559 @@ function appendApplicationPrep() {
   scrollChatToBottom();
 }
 
-function beginPersonalDataConsent() {
-  appendUserMessage("確認申請");
-  appendAssistantMessage("請先同意個資聲明才能繼續流程喔。");
+function beginPersonalDataConsent({ appendUser = true } = {}) {
+  if (appendUser) appendUserMessage("確認申請");
+  const retry = appendConsentMessage("請先同意個資聲明才能繼續流程喔。");
   showPersonalDataNotice();
+  previousPersonalDataFocus = retry;
+  return retry;
+}
+
+function setAuthFieldError(inputId, message) {
+  const field = document.getElementById(inputId)?.closest(".auth-field");
+  const error = document.querySelector(`[data-auth-error-for="${inputId}"]`);
+  if (!field || !error) return;
+  const invalid = Boolean(message);
+  field.classList.toggle("is-invalid", invalid);
+  field.querySelector("input")?.setAttribute("aria-invalid", String(invalid));
+  error.hidden = !invalid;
+  if (invalid) error.textContent = message;
+}
+
+function setAuthOtpError(inputId, errorId, message) {
+  const inputElement = document.getElementById(inputId);
+  const error = document.getElementById(errorId);
+  const field = inputElement?.closest(".auth-field");
+  if (!inputElement || !error || !field) return;
+  field.classList.toggle("is-invalid", Boolean(message));
+  inputElement.setAttribute("aria-invalid", String(Boolean(message)));
+  error.hidden = !message;
+  if (message) error.textContent = message;
+}
+
+function clearAuthErrors(form) {
+  form.querySelectorAll("[data-auth-error-for]").forEach((error) => {
+    setAuthFieldError(error.dataset.authErrorFor, "");
+  });
+  form.querySelectorAll(".auth-field-error:not([data-auth-error-for])").forEach((error) => {
+    error.hidden = true;
+    error.textContent = "";
+    error.closest(".auth-field")?.classList.remove("is-invalid");
+  });
+  form.querySelectorAll("[aria-invalid='true']").forEach((inputElement) => inputElement.setAttribute("aria-invalid", "false"));
+}
+
+function isValidMemberId(value) {
+  const normalized = value.trim().toUpperCase();
+  return /^[A-Z][12]\d{8}$/.test(normalized) || /^[A-Z]{1,3}\d{8}$/.test(normalized);
+}
+
+function parseAuthBirthday(value) {
+  if (!/^\d{8}$/.test(value)) return null;
+  const year = Number(value.slice(0, 4));
+  const month = Number(value.slice(4, 6));
+  const day = Number(value.slice(6, 8));
+  const date = new Date(year, month - 1, day);
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return null;
+  return date;
+}
+
+function isAdultBirthday(value) {
+  const birthday = parseAuthBirthday(value);
+  if (!birthday) return false;
+  const today = new Date();
+  let age = today.getFullYear() - birthday.getFullYear();
+  if (today.getMonth() < birthday.getMonth() || (today.getMonth() === birthday.getMonth() && today.getDate() < birthday.getDate())) age -= 1;
+  return age >= 18 && birthday <= today;
+}
+
+const signupStatementLabels = {
+  privacy: "個人資料蒐集與告知事項",
+  terms: "國泰產險網站服務使用約定書",
+  "online-service": "網路保險服務聲明事項",
+  "online-insurance": "網路投保聲明暨同意書",
+};
+
+function openSignupStatement(key) {
+  const title = signupStatementLabels[key];
+  if (!title) return;
+  activeSignupStatement = key;
+  previousSignupStatementFocus = document.activeElement;
+  signupStatementTitle.textContent = title;
+  signupStatementScroll.scrollTop = 0;
+  const alreadyRead = signupStatementsRead.has(key);
+  signupStatementAgree.disabled = !alreadyRead;
+  signupStatementScrollButton.hidden = alreadyRead;
+  signupStatementDialog.hidden = false;
+  requestAnimationFrame(() => {
+    signupStatementScroll.focus({ preventScroll: true });
+    requestAnimationFrame(() => { signupStatementScroll.scrollTop = 0; });
+  });
+}
+
+function closeSignupStatement({ restoreFocus = true } = {}) {
+  if (signupStatementDialog.hidden) return;
+  signupStatementDialog.hidden = true;
+  activeSignupStatement = "";
+  if (restoreFocus) previousSignupStatementFocus?.focus?.({ preventScroll: true });
+  previousSignupStatementFocus = null;
+}
+
+function markSignupStatementRead() {
+  if (!activeSignupStatement) return;
+  signupStatementsRead.add(activeSignupStatement);
+  signupStatementAgree.disabled = false;
+  signupStatementScrollButton.hidden = true;
+}
+
+function isValidAuthPassword(value) {
+  const sequential = /(?:012|123|234|345|456|567|678|789|890|abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz)/i;
+  return value.length >= 8 && value.length <= 12 && /[A-Za-z]/.test(value) && /\d/.test(value) && /^[A-Za-z\d]+$/.test(value) && !sequential.test(value);
+}
+
+function setAuthView(view, { focus = "" } = {}) {
+  authActiveView = view;
+  if (loginOtpHelpNote) loginOtpHelpNote.hidden = true;
+  loginOtpHelpTrigger?.setAttribute("aria-expanded", "false");
+  authSheet.dataset.view = view;
+  authViews.forEach((panel) => { panel.hidden = panel.dataset.authView !== view; });
+  const isLogin = view.startsWith("login-");
+  const signupTitles = { "signup-1": "會員註冊", "signup-2": "聲明事項", "signup-3": "動態密碼驗證", "signup-4": "設定密碼" };
+  authTitle.textContent = signupTitles[view] || (view.startsWith("forgot-") ? "忘記密碼" : "登入");
+  authTabs.hidden = !isLogin;
+  authFooterPrompt.hidden = !isLogin;
+  authBack.hidden = !view.startsWith("forgot-");
+  authTabs.querySelectorAll("[data-auth-tab]").forEach((tab) => {
+    const selected = tab.dataset.authTab === (view === "login-password" ? "login-password" : isLogin ? "login-birthday" : "");
+    tab.setAttribute("aria-selected", String(selected));
+    if (tab.dataset.authTab === "login-birthday") tab.setAttribute("aria-controls", view === "login-code" ? "auth-view-login-code" : "auth-view-login-birthday");
+  });
+
+  const forms = {
+    "login-password": ["auth-password-form", "登入"],
+    "login-birthday": ["auth-birthday-form", "登入"],
+    "login-code": ["login-code-form", "下一步"],
+    "forgot-phone": ["forgot-phone-form", "下一步"],
+    "forgot-code": ["forgot-code-form", "下一步"],
+    "forgot-password": ["forgot-password-form", "確認修改"],
+    "signup-1": ["signup-basic-form", "確認資訊"],
+    "signup-2": ["signup-basic-form", "審閱完畢，確認送出"],
+    "signup-3": ["signup-otp-form", "下一步"],
+    "signup-4": ["signup-password-form", "完成註冊"],
+  };
+  const [formId] = forms[view];
+  authPrimary.setAttribute("form", formId);
+  if (view === "signup-2") authPrimary.removeAttribute("form");
+  if (view === "signup-2") authPrimary.type = "button";
+  else authPrimary.type = "submit";
+  authScroll.scrollTop = 0;
+  updateAuthPrimary();
+  if (focus) requestAnimationFrame(() => document.querySelector(focus)?.focus({ preventScroll: true }));
+}
+
+function updateAuthPrimary() {
+  const labels = {
+    "login-password": "登入", "login-birthday": "登入", "login-code": "下一步",
+    "forgot-phone": "下一步", "forgot-code": "下一步", "forgot-password": "確認修改",
+    "signup-1": "確認資訊", "signup-2": "審閱完畢，確認送出", "signup-3": "下一步", "signup-4": "完成註冊",
+  };
+  authPrimary.textContent = authIsVerifying ? "驗證中..." : labels[authActiveView];
+  const value = (selector) => document.querySelector(selector)?.value.trim() ?? "";
+  let ready = false;
+  if (authActiveView === "login-password") ready = Boolean(value("#login-id") && value("#login-password") && value("#login-captcha-input") && !authPasswordLocked);
+  else if (authActiveView === "login-birthday") ready = Boolean(value("#login-code-id") && value("#login-birthday"));
+  else if (authActiveView === "login-code") ready = value("#login-otp-input").length === 6 && document.querySelector("#login-otp-error").hidden && !authOtpExpired && authOtpAttemptCount < 5;
+  else if (authActiveView === "forgot-phone") ready = Boolean(value("#forgot-phone"));
+  else if (authActiveView === "forgot-code") ready = value("#forgot-otp-input").length === 6 && !authOtpExpired && authOtpAttemptCount < 5;
+  else if (authActiveView === "forgot-password") ready = Boolean(value("#forgot-new-password") && value("#forgot-confirm-password"));
+  else if (authActiveView === "signup-1") ready = Boolean(value("#signup-id") && value("#signup-birthday") && value("#signup-name") && value("#signup-phone") && value("#signup-email"));
+  else if (authActiveView === "signup-2") ready = [...authDialog.querySelectorAll("input[name='declaration']")].every((checkbox) => checkbox.checked) && document.querySelector("#signup-all-declarations").checked;
+  else if (authActiveView === "signup-3") ready = value("#signup-otp-input").length === 6 && !authOtpExpired && authOtpAttemptCount < 5;
+  else if (authActiveView === "signup-4") ready = Boolean(value("#signup-password") && value("#signup-confirm-password"));
+  authPrimary.disabled = !ready || authIsVerifying;
+}
+
+function syncSignupDeclarationMaster() {
+  const declarations = [...authDialog.querySelectorAll("input[name='declaration']")];
+  document.querySelector("#signup-all-declarations").checked = declarations.length > 0 && declarations.every((checkbox) => checkbox.checked);
+}
+
+function resetAuthFlow() {
+  authDialog.querySelectorAll("form").forEach((form) => {
+    form.reset();
+    form.querySelectorAll("input").forEach((inputElement) => { inputElement.disabled = false; });
+    clearAuthErrors(form);
+  });
+  authDialog.querySelectorAll("[data-toggle-password]").forEach((button) => {
+    const label = button.dataset.toggleLabel || "密碼";
+    button.setAttribute("aria-pressed", "false");
+    button.setAttribute("aria-label", `顯示${label}`);
+    button.querySelector("img").src = "assets/auth-eye-closed.svg";
+    document.getElementById(button.dataset.togglePassword).type = "password";
+  });
+  authDialog.querySelectorAll("input[name='declaration']").forEach((checkbox) => { checkbox.checked = false; });
+  document.querySelector("#signup-all-declarations").checked = false;
+  signupStatementsRead.clear();
+  signupStatementDialog.hidden = true;
+  activeSignupStatement = "";
+  previousSignupStatementFocus = null;
+  signupStatementAgree.disabled = true;
+  signupStatementScrollButton.hidden = false;
+  signupStatementScroll.scrollTop = 0;
+  document.querySelector("#auth-status")?.remove();
+  authSignupProfile = {};
+  authPasswordAttempts = 0;
+  authPasswordLocked = false;
+  authIsVerifying = false;
+  authOtpPurpose = "";
+  authOtpResendSeconds = 59;
+  authOtpExpirySeconds = 300;
+  authOtpAttemptCount = 0;
+  authOtpExpired = false;
+  clearAuthOtpTimers();
+  authPrimary.textContent = "登入";
+  authCaptchaCode = "04WG";
+  const captchaImage = document.querySelector("#auth-captcha-image");
+  captchaImage.classList.remove("is-generated");
+  captchaImage.src = "assets/login-captcha.png";
+  document.querySelector("#login-captcha-input").value = "";
+  captchaImage.alt = "圖形驗證碼";
+}
+
+function showAuthDialog({ origin = "claim", returnToLogin = false, returnFocus = document.activeElement } = {}) {
+  previousAuthFocus = returnFocus;
+  authOrigin = origin;
+  authReturnToLogin = returnToLogin;
+  authDialog.hidden = false;
+  resetAuthFlow();
+  setAuthView("login-password", { focus: "#login-id" });
+}
+
+function showSignupFlow({ returnToLogin = false } = {}) {
+  authReturnToLogin = returnToLogin;
+  authDialog.querySelectorAll("#signup-basic-form, #signup-otp-form, #signup-password-form").forEach((form) => {
+    form.reset();
+    form.querySelectorAll("input").forEach((inputElement) => { inputElement.disabled = false; });
+    clearAuthErrors(form);
+  });
+  authDialog.querySelectorAll("input[name='declaration']").forEach((checkbox) => { checkbox.checked = false; });
+  document.querySelector("#signup-all-declarations").checked = false;
+  signupStatementsRead.clear();
+  signupStatementDialog.hidden = true;
+  activeSignupStatement = "";
+  previousSignupStatementFocus = null;
+  signupStatementAgree.disabled = true;
+  signupStatementScrollButton.hidden = false;
+  signupStatementScroll.scrollTop = 0;
+  authDialog.querySelectorAll("[data-toggle-password]").forEach((button) => {
+    const inputElement = document.getElementById(button.dataset.togglePassword);
+    const label = button.dataset.toggleLabel || "密碼";
+    inputElement.type = "password";
+    button.setAttribute("aria-pressed", "false");
+    button.setAttribute("aria-label", `顯示${label}`);
+    button.querySelector("img").src = "assets/auth-eye-closed.svg";
+  });
+  authSignupProfile = {};
+  authIsVerifying = false;
+  authOtpPurpose = "";
+  clearAuthOtpTimers();
+  setAuthView("signup-1", { focus: "#signup-id" });
+}
+
+function appendLoginDeclinedMessage() {
+  const content = document.createElement("div");
+  const message = document.createElement("p");
+  message.textContent = "沒有進行登入，不能申請班機延誤理賠喔。";
+  const retry = document.createElement("button");
+  retry.type = "button";
+  retry.className = "chat-inline-action";
+  retry.textContent = "返回繼續登入";
+  retry.dataset.chatAction = "return-login";
+  content.append(message, retry);
+  appendAssistantMessage(content);
+  retry.focus({ preventScroll: true });
+  return retry;
+}
+
+function closeAuthDialog() {
+  if (authDialog.hidden) return;
+  if (authReturnToLogin && authActiveView.startsWith("signup-")) {
+    clearAuthOtpTimers();
+    authIsVerifying = false;
+    authReturnToLogin = false;
+    setAuthView("login-password", { focus: "#login-id" });
+    return;
+  }
+  authDialog.hidden = true;
+  clearAuthOtpTimers();
+  authIsVerifying = false;
+  if (authOrigin === "claim") appendLoginDeclinedMessage();
+  else previousAuthFocus?.focus?.({ preventScroll: true });
+}
+
+function openClaimLogin(returnFocus = document.activeElement) {
+  if (!authDialog.hidden) return;
+  showAuthDialog({ origin: "claim", returnFocus });
+  appendUserMessage("確認申請");
+}
+
+function openClaimSignup(returnFocus = document.activeElement) {
+  appendUserMessage("加入國泰產險會員");
+  showAuthDialog({ origin: "signup", returnFocus });
+  showSignupFlow();
+}
+
+function startAuthOtp(purpose) {
+  authOtpPurpose = purpose;
+  authOtpResendSeconds = 59;
+  authOtpExpirySeconds = 300;
+  authOtpAttemptCount = 0;
+  authOtpExpired = false;
+  authIsVerifying = false;
+  const purposeDetails = {
+    login: { view: "login-code", input: "#login-otp-input", phone: "#login-otp-phone", email: "#login-otp-email", maskedPhone: authLoginOtpPhone, maskedEmail: authLoginOtpEmail },
+    signup: { view: "signup-3", input: "#signup-otp-input", phone: "#signup-otp-phone", email: "#signup-otp-email" },
+    forgot: { view: "forgot-code", input: "#forgot-otp-input", phone: "#forgot-otp-phone" },
+  }[purpose];
+  if (!purposeDetails) return;
+  if (purpose === "signup") {
+    purposeDetails.maskedPhone = `${authSignupProfile.phone.slice(0, 4)}-****${authSignupProfile.phone.slice(-2)}`;
+    purposeDetails.maskedEmail = maskAuthEmail(authSignupProfile.email);
+  } else if (purpose === "forgot") {
+    purposeDetails.maskedPhone = `${authSignupProfile.recoveryPhone.slice(0, 4)}-****${authSignupProfile.recoveryPhone.slice(-2)}`;
+  }
+  document.querySelector(purposeDetails.input).value = "";
+  document.querySelector(purposeDetails.phone).textContent = purposeDetails.maskedPhone;
+  if (purposeDetails.email) document.querySelector(purposeDetails.email).textContent = purposeDetails.maskedEmail;
+  const errorId = { login: "login-otp-error", signup: "signup-otp-error", forgot: "forgot-otp-error" }[purpose];
+  setAuthOtpError(purposeDetails.input.slice(1), errorId, "");
+  setAuthView(purposeDetails.view, { focus: purposeDetails.input });
+  renderAuthOtpState();
+  startAuthOtpTimers();
+}
+
+function maskAuthEmail(email) {
+  const [name = "", domain = ""] = email.split("@");
+  return `${name.slice(0, 2)}***@***${domain.slice(-5)}`;
+}
+
+function authOtpControls() {
+  return {
+    login: { input: "#login-otp-input", error: "login-otp-error", countdown: "login-otp-countdown", resend: "login-otp-resend" },
+    signup: { input: "#signup-otp-input", error: "signup-otp-error", countdown: "signup-otp-countdown", resend: "signup-otp-resend" },
+    forgot: { input: "#forgot-otp-input", error: "forgot-otp-error", countdown: "forgot-otp-countdown", resend: "forgot-otp-resend" },
+  }[authOtpPurpose];
+}
+
+function renderAuthOtpState() {
+  if (!authOtpPurpose) return;
+  const controls = authOtpControls();
+  const countdown = document.getElementById(controls.countdown);
+  const resend = document.getElementById(controls.resend);
+  const inputElement = document.querySelector(controls.input);
+  const canResend = authOtpResendSeconds <= 0 || authOtpExpired || authOtpAttemptCount >= 5;
+  const formattedCountdown = authOtpPurpose === "signup"
+    ? `${Math.floor(authOtpResendSeconds / 60)}:${String(authOtpResendSeconds % 60).padStart(2, "0")}`
+    : `${String(Math.floor(authOtpResendSeconds / 60)).padStart(2, "0")}:${String(authOtpResendSeconds % 60).padStart(2, "0")} 後可以重新發送`;
+  if (authOtpPurpose === "signup") {
+    countdown.hidden = canResend;
+    countdown.querySelector("[data-countdown-time]").textContent = formattedCountdown;
+  } else {
+    countdown.textContent = canResend ? "" : formattedCountdown;
+  }
+  resend.hidden = !canResend;
+  inputElement.disabled = authOtpExpired || authOtpAttemptCount >= 5 || authIsVerifying;
+  updateAuthPrimary();
+}
+
+function clearAuthOtpTimers() {
+  window.clearInterval(authOtpInterval);
+  window.clearTimeout(authVerifyTimer);
+  authOtpInterval = null;
+  authVerifyTimer = null;
+}
+
+function startAuthOtpTimers() {
+  clearAuthOtpTimers();
+  authOtpInterval = window.setInterval(() => {
+    if (authOtpResendSeconds > 0) authOtpResendSeconds -= 1;
+    if (authOtpExpirySeconds > 0) authOtpExpirySeconds -= 1;
+    if (authOtpExpirySeconds <= 0) {
+      authOtpExpired = true;
+      const controls = authOtpControls();
+      setAuthOtpError(controls.input.slice(1), controls.error, "動態密碼已失效，請重新發送");
+    }
+    renderAuthOtpState();
+    if (authOtpResendSeconds <= 0 && authOtpExpirySeconds <= 0) window.clearInterval(authOtpInterval);
+  }, 1000);
+}
+
+function resendAuthOtp() {
+  authOtpResendSeconds = 59;
+  authOtpExpirySeconds = 300;
+  authOtpAttemptCount = 0;
+  authOtpExpired = false;
+  authIsVerifying = false;
+  const controls = authOtpControls();
+  document.querySelector(controls.input).value = "";
+  setAuthOtpError(controls.input.slice(1), controls.error, "");
+  startAuthOtpTimers();
+  renderAuthOtpState();
+}
+
+function finishAuthLogin() {
+  clearAuthOtpTimers();
+  authDialog.hidden = true;
+  authReturnToLogin = false;
+  const retry = beginPersonalDataConsent({ appendUser: false });
+  previousPersonalDataFocus = retry;
+}
+
+function finishSignup() {
+  registeredMemberIds.add(authSignupProfile.identity.toUpperCase());
+  clearAuthOtpTimers();
+  authDialog.hidden = true;
+  authReturnToLogin = false;
+  showUploadDialog("boarding-pass", previousAuthFocus);
+}
+
+function submitAuthForm(form) {
+  clearAuthErrors(form);
+  const value = (id) => document.getElementById(id).value.trim();
+  if (form.id === "auth-password-form") {
+    const identity = value("login-id").toUpperCase();
+    const password = document.querySelector("#login-password").value;
+    const captcha = value("login-captcha-input").toUpperCase();
+    let valid = true;
+    if (!isValidMemberId(identity)) { setAuthFieldError("login-id", "身分證號 / 居留證號格式錯誤"); valid = false; }
+    if (!password) { setAuthFieldError("login-password", "請輸入密碼"); valid = false; }
+    if (captcha !== authCaptchaCode) { setAuthFieldError("login-captcha-input", "驗證碼輸入錯誤"); valid = false; }
+    if (!valid) return;
+    if (password.trim().toLowerCase() === "wrong") {
+      authPasswordAttempts += 1;
+      setAuthFieldError("login-password", authPasswordAttempts >= 3
+        ? "密碼錯誤達 3 次，帳號已鎖定；請重新設定密碼或改用手機驗證登入。"
+        : "帳號或密碼有誤");
+      if (authPasswordAttempts >= 3) {
+        authPasswordLocked = true;
+        updateAuthPrimary();
+      }
+      return;
+    }
+    finishAuthLogin();
+    return;
+  }
+  if (form.id === "auth-birthday-form") {
+    const identity = value("login-code-id").toUpperCase();
+    // This is a front-end prototype without a member lookup; account existence is checked by the real service.
+    if (!identity) { setAuthFieldError("login-code-id", "請輸入身分證號 / 居留證號"); return; }
+    if (!parseAuthBirthday(value("login-birthday"))) { setAuthFieldError("login-birthday", "請輸入正確生日，格式為西元年月日"); return; }
+    startAuthOtp("login");
+    return;
+  }
+  if (form.id === "signup-basic-form") {
+    const identity = value("signup-id").toUpperCase();
+    let valid = true;
+    if (!isValidMemberId(identity)) { setAuthFieldError("signup-id", "身分證字號格式錯誤"); valid = false; }
+    if (!isAdultBirthday(value("signup-birthday"))) { setAuthFieldError("signup-birthday", "請輸入正確生日，需年滿 18 歲"); valid = false; }
+    if (!value("signup-name")) { setAuthFieldError("signup-name", "請輸入姓名"); valid = false; }
+    if (!/^09\d{8}$/.test(value("signup-phone"))) { setAuthFieldError("signup-phone", "請輸入正確的手機號碼"); valid = false; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value("signup-email"))) { setAuthFieldError("signup-email", "請輸入正確的 Email"); valid = false; }
+    if (value("signup-promo") && !/^[a-z\d]{4,20}$/i.test(value("signup-promo"))) { setAuthFieldError("signup-promo", "活動代碼格式錯誤"); valid = false; }
+    if (registeredMemberIds.has(identity)) { setAuthFieldError("signup-id", "此身分證字號已註冊，請直接登入"); valid = false; }
+    if (!valid) return;
+    authSignupProfile = {
+      identity,
+      birthday: value("signup-birthday"),
+      name: value("signup-name"),
+      phone: value("signup-phone"),
+      email: value("signup-email"),
+      promo: value("signup-promo"),
+    };
+    authIsVerifying = true;
+    form.querySelectorAll("input").forEach((inputElement) => { inputElement.disabled = true; });
+    updateAuthPrimary();
+    window.clearTimeout(authVerifyTimer);
+    authVerifyTimer = window.setTimeout(() => {
+      authIsVerifying = false;
+      form.querySelectorAll("input").forEach((inputElement) => { inputElement.disabled = false; });
+      if (registeredMemberIds.has(identity)) {
+        setAuthFieldError("signup-id", "此身分證字號已註冊，請直接登入");
+        updateAuthPrimary();
+        return;
+      }
+      setAuthView("signup-2");
+    }, 650);
+    return;
+  }
+  if (form.id === "signup-otp-form" || form.id === "login-code-form" || form.id === "forgot-code-form") {
+    submitAuthOtp();
+    return;
+  }
+  if (form.id === "forgot-phone-form") {
+    const phone = value("forgot-phone");
+    if (!/^09\d{8}$/.test(phone)) { setAuthFieldError("forgot-phone", "請輸入正確的手機號碼"); return; }
+    authSignupProfile.recoveryPhone = phone;
+    startAuthOtp("forgot");
+    return;
+  }
+  if (form.id === "forgot-password-form") {
+    const password = document.querySelector("#forgot-new-password").value;
+    const confirmation = document.querySelector("#forgot-confirm-password").value;
+    if (!isValidAuthPassword(password)) { setAuthFieldError("forgot-new-password", "請輸入 8-12 位英數混合密碼，且不得含連續 3 碼"); return; }
+    if (password !== confirmation) { setAuthFieldError("forgot-confirm-password", "兩次輸入的密碼不一致"); return; }
+    authPasswordAttempts = 0;
+    authPasswordLocked = false;
+    setAuthView("login-password", { focus: "#login-id" });
+    const status = document.createElement("p");
+    status.className = "auth-status";
+    status.id = "auth-status";
+    status.setAttribute("role", "status");
+    status.textContent = "密碼已更新，請重新登入。";
+    document.querySelector("#auth-password-form").prepend(status);
+    updateAuthPrimary();
+    return;
+  }
+  if (form.id === "signup-password-form") {
+    const password = document.querySelector("#signup-password").value;
+    const confirmation = document.querySelector("#signup-confirm-password").value;
+    if (!isValidAuthPassword(password)) { setAuthFieldError("signup-password", "請輸入 8-12 位英數混合密碼，且不得含連續 3 碼"); return; }
+    if (password !== confirmation) { setAuthFieldError("signup-confirm-password", "兩次輸入的密碼不一致"); return; }
+    finishSignup();
+  }
+}
+
+function submitAuthOtp() {
+  const controls = authOtpControls();
+  const inputElement = document.querySelector(controls.input);
+  const error = document.getElementById(controls.error);
+  if (authIsVerifying || authOtpExpired || authOtpAttemptCount >= 5 || inputElement.value.length !== 6) return;
+  authIsVerifying = true;
+  error.hidden = true;
+  renderAuthOtpState();
+  authVerifyTimer = window.setTimeout(() => {
+    authIsVerifying = false;
+    if (authOtpExpired || authOtpExpirySeconds <= 0) {
+      authOtpExpired = true;
+      setAuthOtpError(controls.input.slice(1), controls.error, "動態密碼已失效，請重新發送");
+      renderAuthOtpState();
+      return;
+    }
+    if (inputElement.value !== "123123") {
+      authOtpAttemptCount += 1;
+      setAuthOtpError(controls.input.slice(1), controls.error, authOtpAttemptCount >= 5 ? "輸入錯誤達 5 次，請重新發送驗證碼" : "動態密碼輸入錯誤");
+      renderAuthOtpState();
+      return;
+    }
+    if (authOtpPurpose === "login") finishAuthLogin();
+    else if (authOtpPurpose === "signup") {
+      clearAuthOtpTimers();
+      setAuthView("signup-4", { focus: "#signup-password" });
+    } else {
+      clearAuthOtpTimers();
+      setAuthView("forgot-password", { focus: "#forgot-new-password" });
+    }
+  }, 550);
 }
 
 function appendOtherClaimReply() {
@@ -677,10 +1355,10 @@ function showPersonalDataNotice() {
   requestAnimationFrame(updatePersonalDataScrollState);
 }
 
-function appendConsentDeclinedMessage() {
+function appendConsentMessage(text) {
   const content = document.createElement("div");
   const message = document.createElement("p");
-  message.textContent = "沒有點擊同意個資聲明，不能申請班機延誤理賠喔。";
+  message.textContent = text;
   const retry = document.createElement("button");
   retry.type = "button";
   retry.className = "chat-inline-action";
@@ -689,6 +1367,11 @@ function appendConsentDeclinedMessage() {
   content.append(message, retry);
   appendAssistantMessage(content);
   retry.focus({ preventScroll: true });
+  return retry;
+}
+
+function appendConsentDeclinedMessage() {
+  appendConsentMessage("沒有點擊同意個資聲明，不能申請班機延誤理賠喔。");
 }
 
 function closePersonalDataNotice({ agreed = false } = {}) {
@@ -757,6 +1440,7 @@ function updateDelayProofControls() {
 
 function showUploadDialog(mode = "boarding-pass", returnFocus = document.activeElement) {
   uploadMode = mode;
+  filePickerTarget = "upload";
   previousUploadFocus = returnFocus;
   uploadSourceMenu.hidden = true;
   filePickerScreen.hidden = true;
@@ -818,23 +1502,49 @@ function hideUploadSourceMenu() {
   uploadDropzone.focus({ preventScroll: true });
 }
 
-function showFilePicker() {
+function showFilePicker(target = "upload") {
+  filePickerTarget = target;
   uploadSourceMenu.hidden = true;
   filePickerSearch.value = "";
   filePickerList.querySelectorAll(".file-picker-row").forEach((row) => { row.hidden = false; });
+  filePickerList.querySelectorAll(".file-picker-group").forEach((group) => { group.hidden = false; });
   filePickerScreen.hidden = false;
   filePickerScreen.querySelector("[data-close-picker]").focus();
 }
 
 function hideFilePicker() {
   filePickerScreen.hidden = true;
-  uploadDropzone.focus({ preventScroll: true });
+  const target = filePickerTarget === "bankbook"
+    ? (bankbookSelected.hidden ? bankbookDropzone : bankbookRemove)
+    : uploadDropzone;
+  target.focus({ preventScroll: true });
 }
 
 function showUploadHelp() {
-  const willOpen = uploadHelpCopy.hidden;
-  uploadHelpCopy.hidden = !willOpen;
-  uploadHelpTrigger.setAttribute("aria-expanded", String(willOpen));
+  if (!uploadHelpCopy.hidden) {
+    hideUploadHelp();
+    return;
+  }
+  uploadHelpCopy.hidden = false;
+  positionUploadHelp();
+  uploadHelpTrigger.setAttribute("aria-expanded", "true");
+}
+
+function hideUploadHelp({ restoreFocus = false } = {}) {
+  uploadHelpCopy.hidden = true;
+  uploadHelpTrigger.setAttribute("aria-expanded", "false");
+  if (restoreFocus) uploadHelpTrigger.focus({ preventScroll: true });
+}
+
+function positionUploadHelp() {
+  const iconRect = uploadHelpTrigger.querySelector("img").getBoundingClientRect();
+  const sheetRect = uploadSheet.getBoundingClientRect();
+  const tooltipRect = uploadHelpCopy.getBoundingClientRect();
+  const tailCenterX = 20.5;
+  const left = iconRect.left + iconRect.width / 2 - tailCenterX - sheetRect.left;
+  const top = iconRect.top + iconRect.height / 2 - tooltipRect.height - sheetRect.top;
+  uploadHelpCopy.style.left = `${Math.max(12, Math.min(left, sheetRect.width - tooltipRect.width - 12))}px`;
+  uploadHelpCopy.style.top = `${Math.max(0, top)}px`;
 }
 
 function updateBoardingPass(file) {
@@ -966,8 +1676,13 @@ function appendDelayProofOutcome(outcome) {
     message.textContent = "系統出現異常，建議你可以到會員中心使用理賠申請服務。";
     content.append(message, makeAction("前往會員中心", "claim-member"));
   } else {
-    message.textContent = "班機延誤證明已上傳完成，謝謝你。";
-    content.append(message);
+    message.textContent = "班機延誤證明已上傳完成，接下來請填寫匯款資料。";
+    const fillBankInfo = document.createElement("button");
+    fillBankInfo.type = "button";
+    fillBankInfo.className = "chat-inline-action";
+    fillBankInfo.textContent = "填寫匯款資料";
+    fillBankInfo.dataset.chatAction = "fill-bank-info";
+    content.append(message, fillBankInfo);
   }
   appendAssistantMessage(content);
 }
@@ -989,15 +1704,284 @@ function finishDelayProofUpload() {
     return;
   }
 
-  uploadConfirm.disabled = true;
-  uploadConfirm.textContent = "上傳中，請稍後";
-  uploadLoading.hidden = false;
-  uploadTimer = window.setTimeout(() => {
-    uploadLoading.hidden = true;
-    closeUploadDialog({ restoreFocus: false, showNoProof: false });
-    appendUserMessage("上傳班機延誤證明");
-    appendDelayProofOutcome(outcome === "network-error" ? "success" : outcome);
+  closeUploadDialog({ restoreFocus: false, showNoProof: false });
+  appendUserMessage("上傳班機延誤證明");
+  const finalOutcome = outcome === "network-error" ? "success" : outcome;
+  appendDelayProofOutcome(finalOutcome);
+  if (finalOutcome === "success") openBankInfoDialog();
+}
+
+function updateBankInfoButton() {
+  const { bank, branch, account } = bankInfoForm.elements;
+  const accountIsValid = /^\d{6,16}$/.test(account.value.trim());
+  const menuIsOpen = bankCombobox.classList.contains("is-open") || branchCombobox.classList.contains("is-open");
+  confirmBankInfoButton.disabled = menuIsOpen || !(bank.value && branch.value && accountIsValid);
+}
+
+function updateBankBranches(selectedBranch = "") {
+  const { bank, branch } = bankInfoForm.elements;
+  const bankRecord = bankDirectoryByCode.get(bank.value);
+  const emptyOption = branchComboboxResults.querySelector(".airport-empty");
+  branchComboboxResults.replaceChildren(emptyOption);
+  branch.value = "";
+  branchComboboxInput.value = "";
+  branchComboboxInput.dataset.selectedLabel = "";
+  branchComboboxInput.disabled = !bankRecord;
+  branchComboboxInput.placeholder = bankRecord ? "請選擇分行別" : "請先選擇銀行";
+  branchComboboxInput.setAttribute("aria-expanded", "false");
+  branchComboboxInput.removeAttribute("aria-activedescendant");
+  branchCombobox.classList.remove("is-open");
+  branchComboboxResults.hidden = true;
+  branchCombobox.querySelector(".airport-state-icon img").src = "assets/Direction=down.svg";
+
+  (bankRecord?.branches ?? []).forEach(([code, name, address]) => {
+    const option = document.createElement("button");
+    option.className = "airport-option";
+    option.type = "button";
+    option.id = `branch-option-${code}`;
+    option.setAttribute("role", "option");
+    option.setAttribute("aria-selected", "false");
+    option.dataset.branchOption = "";
+    option.dataset.value = code;
+    option.dataset.label = name;
+    option.dataset.search = `${code} ${name} ${address}`;
+    option.textContent = name;
+    branchComboboxResults.append(option);
+  });
+
+  const selectedOption = [...branchCombobox.querySelectorAll("[data-branch-option]")]
+    .find((option) => option.dataset.value === selectedBranch || option.dataset.label === selectedBranch);
+  if (selectedOption) {
+    branch.value = selectedOption.dataset.value;
+    branchComboboxInput.value = selectedOption.dataset.label;
+    branchComboboxInput.dataset.selectedLabel = selectedOption.dataset.label;
+  }
+  updateBankInfoButton();
+}
+
+function renderBankOptions() {
+  bankCombobox.querySelectorAll("[data-bank-option]").forEach((option) => option.remove());
+  taiwanBankDirectory.forEach((bank) => {
+    const option = document.createElement("button");
+    const displayName = bank.code === "700" ? "中華郵政" : bank.name;
+    option.className = "airport-option";
+    option.type = "button";
+    option.id = `bank-option-${bank.code}`;
+    option.setAttribute("role", "option");
+    option.setAttribute("aria-selected", "false");
+    option.dataset.bankOption = "";
+    option.dataset.value = bank.code;
+    option.dataset.search = `${bank.name} ${bankSearchAliases[bank.code] ?? ""}`;
+    option.textContent = `${bank.code} ${displayName}`;
+    bankComboboxResults.append(option);
+  });
+}
+
+function setBankSelection(value) {
+  const option = bankCombobox.querySelector(`[data-bank-option][data-value="${value}"]`);
+  const bank = bankInfoForm.elements.bank;
+  bank.value = option?.dataset.value ?? "";
+  bankComboboxInput.value = option?.textContent.trim() ?? "";
+  bankComboboxInput.dataset.selectedLabel = bankComboboxInput.value;
+}
+
+function closeBankCombobox({ restoreSelection = true } = {}) {
+  if (!bankCombobox.classList.contains("is-open")) return;
+  const icon = bankCombobox.querySelector(".airport-state-icon img");
+  if (restoreSelection) bankComboboxInput.value = bankComboboxInput.dataset.selectedLabel ?? "";
+  bankComboboxInput.placeholder = bankInfoForm.elements.bank.value ? "" : "請選擇你的帳號";
+  bankComboboxInput.setCustomValidity("");
+  bankComboboxInput.setAttribute("aria-expanded", "false");
+  bankComboboxInput.removeAttribute("aria-activedescendant");
+  bankComboboxResults.hidden = true;
+  bankCombobox.classList.remove("is-open");
+  icon.src = "assets/Direction=down.svg";
+  updateBankInfoButton();
+}
+
+function filterBankOptions() {
+  const query = bankComboboxInput.value.trim().toLocaleLowerCase("zh-Hant");
+  const options = [...bankCombobox.querySelectorAll("[data-bank-option]")];
+  const matches = options.filter((option) => {
+    const searchableText = `${option.dataset.value} ${option.dataset.search} ${option.textContent}`.toLocaleLowerCase("zh-Hant");
+    const isMatch = searchableText.includes(query);
+    option.hidden = !isMatch;
+    option.classList.remove("is-active");
+    option.setAttribute("aria-selected", "false");
+    return isMatch;
+  });
+  bankCombobox.querySelector(".airport-empty").hidden = matches.length > 0;
+  bankCombobox.dataset.activeIndex = matches.length ? "0" : "-1";
+  if (matches[0]) {
+    matches[0].classList.add("is-active");
+    bankComboboxInput.setAttribute("aria-activedescendant", matches[0].id);
+  } else {
+    bankComboboxInput.removeAttribute("aria-activedescendant");
+  }
+}
+
+function openBankCombobox() {
+  if (bankCombobox.classList.contains("is-open")) return;
+  closeBranchCombobox();
+  bankComboboxInput.value = "";
+  bankComboboxInput.placeholder = "搜尋銀行";
+  bankComboboxInput.setCustomValidity("請從搜尋結果中選擇銀行。");
+  bankComboboxInput.setAttribute("aria-expanded", "true");
+  bankCombobox.classList.add("is-open");
+  bankComboboxResults.hidden = false;
+  bankCombobox.querySelector(".airport-state-icon img").src = "assets/airport-search.svg";
+  filterBankOptions();
+}
+
+function chooseBankOption(option) {
+  if (!option) return;
+  setBankSelection(option.dataset.value);
+  closeBankCombobox({ restoreSelection: false });
+  updateBankBranches();
+  bankComboboxInput.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
+function moveBankActiveOption(direction) {
+  const visibleOptions = [...bankCombobox.querySelectorAll("[data-bank-option]")].filter((option) => !option.hidden);
+  if (!visibleOptions.length) return;
+  const currentIndex = Number(bankCombobox.dataset.activeIndex ?? -1);
+  const nextIndex = (currentIndex + direction + visibleOptions.length) % visibleOptions.length;
+  visibleOptions.forEach((option, index) => {
+    const active = index === nextIndex;
+    option.classList.toggle("is-active", active);
+    option.setAttribute("aria-selected", String(active));
+  });
+  bankCombobox.dataset.activeIndex = String(nextIndex);
+  bankComboboxInput.setAttribute("aria-activedescendant", visibleOptions[nextIndex].id);
+  visibleOptions[nextIndex].scrollIntoView({ block: "nearest" });
+}
+
+function closeBranchCombobox({ restoreSelection = true } = {}) {
+  if (!branchCombobox.classList.contains("is-open")) return;
+  if (restoreSelection) branchComboboxInput.value = branchComboboxInput.dataset.selectedLabel ?? "";
+  branchComboboxInput.placeholder = bankInfoForm.elements.bank.value ? "請選擇分行別" : "請先選擇銀行";
+  branchComboboxInput.setCustomValidity("");
+  branchComboboxInput.setAttribute("aria-expanded", "false");
+  branchComboboxInput.removeAttribute("aria-activedescendant");
+  branchComboboxResults.hidden = true;
+  branchCombobox.classList.remove("is-open");
+  branchCombobox.querySelector(".airport-state-icon img").src = "assets/Direction=down.svg";
+  updateBankInfoButton();
+}
+
+function filterBranchOptions() {
+  const query = branchComboboxInput.value.trim().toLocaleLowerCase("zh-Hant");
+  const options = [...branchCombobox.querySelectorAll("[data-branch-option]")];
+  const matches = options.filter((option) => {
+    const searchableText = `${option.dataset.search} ${option.textContent}`.toLocaleLowerCase("zh-Hant");
+    const isMatch = searchableText.includes(query);
+    option.hidden = !isMatch;
+    option.classList.remove("is-active");
+    option.setAttribute("aria-selected", "false");
+    return isMatch;
+  });
+  const empty = branchComboboxResults.querySelector(".airport-empty");
+  empty.hidden = matches.length > 0;
+  branchCombobox.dataset.activeIndex = matches.length ? "0" : "-1";
+  if (matches[0]) {
+    matches[0].classList.add("is-active");
+    branchComboboxInput.setAttribute("aria-activedescendant", matches[0].id);
+  } else {
+    branchComboboxInput.removeAttribute("aria-activedescendant");
+  }
+}
+
+function openBranchCombobox() {
+  if (branchComboboxInput.disabled || branchCombobox.classList.contains("is-open")) return;
+  closeBankCombobox();
+  branchComboboxInput.value = "";
+  branchComboboxInput.placeholder = "搜尋分行";
+  branchComboboxInput.setCustomValidity("請從搜尋結果中選擇分行別。");
+  branchComboboxInput.setAttribute("aria-expanded", "true");
+  branchCombobox.classList.add("is-open");
+  branchComboboxResults.hidden = false;
+  branchCombobox.querySelector(".airport-state-icon img").src = "assets/airport-search.svg";
+  filterBranchOptions();
+  updateBankInfoButton();
+}
+
+function chooseBranchOption(option) {
+  if (!option) return;
+  bankInfoForm.elements.branch.value = option.dataset.value;
+  branchComboboxInput.value = option.dataset.label;
+  branchComboboxInput.dataset.selectedLabel = option.dataset.label;
+  closeBranchCombobox({ restoreSelection: false });
+  branchComboboxInput.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
+function moveBranchActiveOption(direction) {
+  const visibleOptions = [...branchCombobox.querySelectorAll("[data-branch-option]")].filter((option) => !option.hidden);
+  if (!visibleOptions.length) return;
+  const currentIndex = Number(branchCombobox.dataset.activeIndex ?? -1);
+  const nextIndex = (currentIndex + direction + visibleOptions.length) % visibleOptions.length;
+  visibleOptions.forEach((option, index) => {
+    const active = index === nextIndex;
+    option.classList.toggle("is-active", active);
+    option.setAttribute("aria-selected", String(active));
+  });
+  branchCombobox.dataset.activeIndex = String(nextIndex);
+  branchComboboxInput.setAttribute("aria-activedescendant", visibleOptions[nextIndex].id);
+  visibleOptions[nextIndex].scrollIntoView({ block: "nearest" });
+}
+
+function openBankInfoDialog() {
+  bankInfoDialog.hidden = false;
+  requestAnimationFrame(() => bankInfoDialog.focus({ preventScroll: true }));
+}
+
+function closeBankInfoDialog({ restoreFocus = true } = {}) {
+  if (bankInfoDialog.hidden) return;
+  closeBankCombobox();
+  closeBranchCombobox();
+  bankInfoDialog.hidden = true;
+  if (restoreFocus) {
+    chatScreen.querySelector('[data-chat-action="fill-bank-info"]')?.focus({ preventScroll: true });
+  }
+}
+
+function handleBankbookFile(file) {
+  if (!file) return;
+  const extension = file.name.split(".").pop().toLowerCase();
+  if (file.size > 10 * 1024 * 1024) {
+    bankbookFileInput.value = "";
+    bankbookError.textContent = "檔案大小超過 10 MB，請重新上傳。";
+    bankbookError.hidden = false;
+    return;
+  }
+  if (!["jpg", "jpeg", "png", "heic", "pdf"].includes(extension)) {
+    bankbookFileInput.value = "";
+    bankbookError.textContent = "檔案格式錯誤，請重新上傳。";
+    bankbookError.hidden = false;
+    return;
+  }
+
+  bankbookError.hidden = true;
+  bankbookSelectedName.textContent = file.name;
+  bankbookSelected.hidden = false;
+  bankbookDropzone.hidden = true;
+  bankInfoLoading.hidden = false;
+  window.clearTimeout(bankbookUploadTimer);
+  bankbookUploadTimer = window.setTimeout(() => {
+    bankInfoLoading.hidden = true;
+    setBankSelection("013");
+    updateBankBranches("敦南分行");
+    bankInfoForm.elements.account.value = "000190";
+    updateBankInfoButton();
   }, uploadLoadingDurationMs);
+}
+
+function removeBankbookFile() {
+  window.clearTimeout(bankbookUploadTimer);
+  bankInfoLoading.hidden = true;
+  bankbookFileInput.value = "";
+  bankbookSelected.hidden = true;
+  bankbookDropzone.hidden = false;
+  bankbookError.hidden = true;
 }
 
 function closeAirportCombobox(field, { restoreSelection = true } = {}) {
@@ -1005,6 +1989,7 @@ function closeAirportCombobox(field, { restoreSelection = true } = {}) {
   const input = field.querySelector(".airport-input");
   const results = field.querySelector(".airport-results");
   const icon = field.querySelector(".airport-state-icon img");
+  const previousValue = input.value;
   if (restoreSelection) input.value = input.dataset.selectedValue ?? "";
   input.setCustomValidity("");
   input.placeholder = "";
@@ -1013,6 +1998,7 @@ function closeAirportCombobox(field, { restoreSelection = true } = {}) {
   results.hidden = true;
   field.classList.remove("is-open");
   icon.src = "assets/Direction=down.svg";
+  if (restoreSelection && input.value !== previousValue) input.dispatchEvent(new Event("change", { bubbles: true }));
 }
 
 function filterAirportOptions(field) {
@@ -1068,6 +2054,7 @@ function chooseAirport(field, option) {
   input.dataset.selectedValue = option.dataset.value;
   input.setCustomValidity("");
   closeAirportCombobox(field, { restoreSelection: false });
+  input.dispatchEvent(new Event("change", { bubbles: true }));
   if (shouldRestoreFocus) {
     input.dataset.keepSelectionOnFocus = "true";
     input.focus({ preventScroll: true });
@@ -1107,20 +2094,248 @@ function closeBoardingInfoDialog() {
   appendAssistantMessage(content);
 }
 
-function selectSampleBoardingPass(type) {
+function selectSampleFile(type) {
   const samples = {
-    pdf: { name: "登機證_大檔案.pdf", size: 12.4 * 1024 * 1024, type: "application/pdf" },
-    zip: { name: "登機資料.zip", size: 684 * 1024, type: "application/zip" },
-    png: { name: "登機證.png", size: 1.88 * 1024 * 1024, type: "image/png" },
+    pdf: { name: "班機延誤證明_超過10MB.pdf", size: 12.4 * 1024 * 1024, type: "application/pdf" },
+    zip: { name: "航班資料_不支援格式.zip", size: 684 * 1024, type: "application/zip" },
+    png: { name: "班機延誤證明.png", size: 1.88 * 1024 * 1024, type: "image/png" },
     "proof-jpg": { name: "航班延誤證明.jpg", size: 2.16 * 1024 * 1024, type: "image/jpeg" },
     "proof-pdf": { name: "航空公司證明.pdf", size: 1.24 * 1024 * 1024, type: "application/pdf" },
     "network-error": { name: "連線異常測試.png", size: 1.42 * 1024 * 1024, type: "image/png", outcome: "network-error" },
     "recognition-error": { name: "辨識失敗測試.jpg", size: 1.36 * 1024 * 1024, type: "image/jpeg", outcome: "recognition-error" },
     "system-error": { name: "系統異常測試.png", size: 1.51 * 1024 * 1024, type: "image/png", outcome: "system-error" },
   };
+  const file = samples[type];
+  if (!file) return;
+  if (filePickerTarget === "bankbook") {
+    handleBankbookFile(file);
+    hideFilePicker();
+    return;
+  }
   hideFilePicker();
-  if (uploadMode === "delay-proof") addDelayProofFiles([samples[type]]);
-  else updateBoardingPass(samples[type]);
+  if (uploadMode === "delay-proof") addDelayProofFiles([file]);
+  else updateBoardingPass(file);
+}
+
+function renderOtpState() {
+  const canResend = otpResendSeconds <= 0 || otpAttemptCount >= 5 || otpExpired;
+  otpResend.hidden = !canResend;
+  otpCountdown.textContent = canResend
+    ? ""
+    : String(Math.floor(otpResendSeconds / 60)).padStart(2, "0") + ":" + String(otpResendSeconds % 60).padStart(2, "0") + " 後可以重新發送";
+  otpNext.disabled = otpInput.value.length !== 6 || otpExpired || otpAttemptCount >= 5 || otpIsVerifying;
+  otpInput.disabled = otpIsVerifying;
+}
+
+function showOtpError(message) {
+  otpError.textContent = message;
+  otpError.hidden = false;
+  otpField.classList.add("is-invalid");
+  otpInput.setAttribute("aria-invalid", "true");
+}
+
+function stopOtpTimers() {
+  window.clearInterval(otpInterval);
+  window.clearTimeout(otpVerifyTimer);
+  otpInterval = null;
+  otpVerifyTimer = null;
+}
+
+function startOtpTimers() {
+  window.clearInterval(otpInterval);
+  otpInterval = window.setInterval(() => {
+    if (otpResendSeconds > 0) otpResendSeconds -= 1;
+    if (otpExpirySeconds > 0) otpExpirySeconds -= 1;
+    if (otpExpirySeconds <= 0 && !otpExpired) {
+      otpExpired = true;
+      showOtpError("動態密碼已失效，請重新發送");
+    }
+    renderOtpState();
+    if (otpResendSeconds <= 0 && otpExpirySeconds <= 0) window.clearInterval(otpInterval);
+  }, 1000);
+}
+
+function openOtpDialog({ resetSession = false } = {}) {
+  if (resetSession) {
+    stopOtpTimers();
+    otpResendSeconds = 60;
+    otpExpirySeconds = 300;
+    otpAttemptCount = 0;
+    otpExpired = false;
+    otpIsVerifying = false;
+    otpInput.disabled = false;
+    otpNext.textContent = "下一步";
+    otpInput.value = "";
+    otpInput.setAttribute("aria-invalid", "false");
+    otpError.hidden = true;
+    otpField.classList.remove("is-invalid");
+    otpHelpNote.hidden = true;
+    otpHelpTrigger.setAttribute("aria-expanded", "false");
+  }
+  otpDialog.hidden = false;
+  renderOtpState();
+  startOtpTimers();
+  otpDialog.focus({ preventScroll: true });
+}
+
+function closeOtpDialog() {
+  if (otpDialog.hidden) return;
+  stopOtpTimers();
+  otpDialog.hidden = true;
+  otpIsVerifying = false;
+  otpInput.disabled = false;
+  otpNext.textContent = "下一步";
+  otpHelpNote.hidden = true;
+  otpHelpTrigger.setAttribute("aria-expanded", "false");
+  const content = document.createElement("div");
+  const message = document.createElement("p");
+  message.textContent = "尚未完成動態密碼驗證，完成驗證後即可送出匯款資料。";
+  const retry = document.createElement("button");
+  retry.type = "button";
+  retry.className = "chat-inline-action";
+  retry.textContent = "繼續驗證";
+  retry.addEventListener("click", () => openOtpDialog());
+  content.append(message, retry);
+  appendAssistantMessage(content);
+}
+
+function resendOtp() {
+  otpResendSeconds = 60;
+  otpExpirySeconds = 300;
+  otpAttemptCount = 0;
+  otpExpired = false;
+  otpIsVerifying = false;
+  otpInput.value = "";
+  otpInput.disabled = false;
+  otpNext.textContent = "下一步";
+  otpInput.setAttribute("aria-invalid", "false");
+  otpError.hidden = true;
+  otpField.classList.remove("is-invalid");
+  otpHelpNote.hidden = true;
+  otpHelpTrigger.setAttribute("aria-expanded", "false");
+  renderOtpState();
+  startOtpTimers();
+}
+
+function finishOtpVerification() {
+  stopOtpTimers();
+  otpIsVerifying = false;
+  otpInput.disabled = false;
+  otpNext.textContent = "下一步";
+  otpDialog.hidden = true;
+  const result = document.createElement("div");
+  const message = document.createElement("p");
+  message.textContent = "已收到你的匯款資料，案件編號 00910-HAC，可以隨時在會員中心查看理賠進度。";
+  const memberLink = document.createElement("a");
+  memberLink.className = "otp-member-link";
+  memberLink.href = memberCenterUrl;
+  memberLink.target = "_blank";
+  memberLink.rel = "noopener";
+  memberLink.textContent = "前往會員中心";
+  const externalIcon = document.createElement("img");
+  externalIcon.src = "assets/external-link.svg";
+  externalIcon.alt = "";
+  memberLink.append(externalIcon);
+  memberLink.addEventListener("click", (event) => {
+    event.preventDefault();
+    showOfficialConfirm("你即將離開阿發，前往國泰產險會員中心。", memberCenterUrl);
+  });
+  result.append(message, memberLink);
+
+  const feedback = createExperienceFeedback();
+  appendAssistantSequence([
+    { content: result },
+    { content: feedback, card: true, className: "message-feedback-shell" },
+  ]);
+}
+
+function createExperienceFeedback() {
+  const card = document.createElement("div");
+  card.className = "feedback-component";
+  card.dataset.state = "default";
+  card.setAttribute("role", "group");
+  card.setAttribute("aria-label", "體驗回饋");
+
+  const question = document.createElement("p");
+  question.className = "feedback-question";
+  question.textContent = "這次體驗，阿發有幫上忙嗎？";
+  const dismiss = document.createElement("button");
+  dismiss.type = "button";
+  dismiss.className = "feedback-dismiss";
+  dismiss.setAttribute("aria-label", "關閉回饋");
+  const closeIcon = document.createElement("img");
+  closeIcon.src = "assets/close.svg";
+  closeIcon.alt = "";
+  dismiss.append(closeIcon);
+
+  const choices = document.createElement("div");
+  choices.className = "feedback-choices";
+  [
+    ["很順利", "smooth"],
+    ["有點卡住", "stuck"],
+    ["沒幫上忙", "unhelpful"],
+  ].forEach(([label, value]) => {
+    const choice = document.createElement("button");
+    choice.type = "button";
+    choice.className = "feedback-choice";
+    choice.dataset.rating = value;
+    choice.setAttribute("aria-pressed", "false");
+    choice.textContent = label;
+    choices.append(choice);
+  });
+
+  const divider = document.createElement("div");
+  divider.className = "feedback-divider";
+  const reasonPanel = document.createElement("div");
+  reasonPanel.className = "feedback-reason-panel";
+  reasonPanel.hidden = true;
+  const reasonTitle = document.createElement("p");
+  reasonTitle.textContent = "最主要原因是什麼呢？";
+  const reasons = document.createElement("div");
+  reasons.className = "feedback-reason-options";
+  ["等太久", "步驟太多", "找不到下一步", "問好幾次才懂"].forEach((label) => {
+    const reason = document.createElement("button");
+    reason.type = "button";
+    reason.className = "feedback-reason-option";
+    reason.textContent = label;
+    reasons.append(reason);
+  });
+  reasonPanel.append(reasonTitle, reasons);
+  card.append(question, dismiss, choices, divider, reasonPanel);
+
+  dismiss.addEventListener("click", () => card.parentElement.remove());
+  choices.addEventListener("click", (event) => {
+    const choice = event.target.closest(".feedback-choice");
+    if (!choice) return;
+    choices.querySelectorAll(".feedback-choice").forEach((item) => {
+      const selected = item === choice;
+      item.classList.toggle("is-highlighted", selected);
+      item.setAttribute("aria-pressed", String(selected));
+    });
+    if (choice.dataset.rating === "smooth") {
+      completeExperienceFeedback(card);
+      return;
+    }
+    card.dataset.state = "expanded";
+    card.parentElement.dataset.state = "expanded";
+    reasonPanel.hidden = false;
+  });
+  reasons.addEventListener("click", (event) => {
+    if (event.target.closest(".feedback-reason-option")) completeExperienceFeedback(card);
+  });
+  return card;
+}
+
+function completeExperienceFeedback(card) {
+  card.dataset.state = "done";
+  card.parentElement.dataset.state = "done";
+  const check = document.createElement("span");
+  check.className = "feedback-check";
+  check.setAttribute("aria-hidden", "true");
+  const message = document.createElement("p");
+  message.className = "feedback-done-message";
+  message.textContent = "謝謝你的回饋，阿發會持續改善！";
+  card.replaceChildren(check, message);
 }
 
 function showOfficialConfirm(description = "您即將離開阿發，前往產險服務條款頁。", url = officialClaimUrl) {
@@ -1128,6 +2343,13 @@ function showOfficialConfirm(description = "您即將離開阿發，前往產險
   confirmGo.href = url;
   confirmDialog.showModal();
 }
+
+const aiDisclaimerLink = document.querySelector("#ai-disclaimer-link");
+aiDisclaimerLink.addEventListener("click", (event) => {
+  event.preventDefault();
+  showOfficialConfirm("你即將離開阿發，前往 AI 告知聲明頁。", aiDisclaimerLink.href);
+});
+confirmGo.addEventListener("click", () => confirmDialog.close());
 
 document.querySelectorAll("[data-prompt]").forEach((button) => {
   button.addEventListener("click", () => startChat(button.dataset.prompt));
@@ -1158,11 +2380,182 @@ document.querySelectorAll("[data-policy]").forEach((button) => {
   button.addEventListener("click", () => showPolicy(button.dataset.policy));
 });
 policyDialog.querySelectorAll("[data-close-policy]").forEach((button) => button.addEventListener("click", closePolicy));
+signupStatementScroll.addEventListener("scroll", () => {
+  const reachedBottom = signupStatementScroll.scrollTop + signupStatementScroll.clientHeight >= signupStatementScroll.scrollHeight - 2;
+  if (reachedBottom && signupStatementScroll.scrollHeight > signupStatementScroll.clientHeight + 2) markSignupStatementRead();
+});
+authDialog.addEventListener("submit", (event) => {
+  const form = event.target.closest("[data-auth-form]");
+  if (!form) return;
+  event.preventDefault();
+  submitAuthForm(form);
+});
+authPrimary.addEventListener("click", (event) => {
+  if (authActiveView !== "signup-2") return;
+  event.preventDefault();
+  if (authPrimary.disabled) return;
+  startAuthOtp("signup");
+});
+authDialog.addEventListener("input", (event) => {
+  const inputElement = event.target;
+  if (!(inputElement instanceof HTMLInputElement)) return;
+  if (["signup-id", "login-id", "login-code-id"].includes(inputElement.id)) inputElement.value = inputElement.value.toUpperCase();
+  if (["signup-birthday", "login-birthday", "signup-phone", "forgot-phone", "login-otp-input", "forgot-otp-input", "signup-otp-input"].includes(inputElement.id)) {
+    inputElement.value = inputElement.value.replace(/\D/g, "").slice(0, inputElement.id.includes("birthday") ? 8 : 10);
+  }
+  const error = authDialog.querySelector(`[data-auth-error-for="${inputElement.id}"]`);
+  if (error?.hidden === false) setAuthFieldError(inputElement.id, "");
+  const otpErrorIds = { "login-otp-input": "login-otp-error", "forgot-otp-input": "forgot-otp-error", "signup-otp-input": "signup-otp-error" };
+  if (otpErrorIds[inputElement.id]) setAuthOtpError(inputElement.id, otpErrorIds[inputElement.id], "");
+  updateAuthPrimary();
+});
+authDialog.addEventListener("change", (event) => {
+  if (event.target.id === "signup-all-declarations" && event.target.checked) {
+    const firstUnread = [...authDialog.querySelectorAll("input[name='declaration']")].find((checkbox) => !checkbox.checked);
+    if (firstUnread) {
+      event.target.checked = false;
+      openSignupStatement(firstUnread.value);
+      return;
+    }
+  } else if (event.target.matches("input[name='declaration']")) {
+    if (event.target.checked && !signupStatementsRead.has(event.target.value)) {
+      event.target.checked = false;
+      openSignupStatement(event.target.value);
+      updateAuthPrimary();
+      return;
+    }
+    syncSignupDeclarationMaster();
+  }
+  updateAuthPrimary();
+});
+authDialog.addEventListener("click", (event) => {
+  if (authActiveView === "login-birthday" && event.target.closest("#auth-primary")) {
+    event.preventDefault();
+    submitAuthForm(document.querySelector("#auth-birthday-form"));
+    return;
+  }
+  const statementLink = event.target.closest("[data-open-signup-statement]");
+  if (statementLink) { openSignupStatement(statementLink.dataset.openSignupStatement); return; }
+  if (event.target.closest("#signup-statement-close")) { closeSignupStatement(); return; }
+  if (event.target.closest("#signup-statement-scroll-button")) {
+    const hasOverflow = signupStatementScroll.scrollHeight > signupStatementScroll.clientHeight + 2;
+    signupStatementScroll.scrollTo({ top: signupStatementScroll.scrollHeight, behavior: "smooth" });
+    if (!hasOverflow) markSignupStatementRead();
+    return;
+  }
+  if (event.target.closest("#signup-statement-agree")) {
+    if (signupStatementAgree.disabled) return;
+    const checkbox = authDialog.querySelector(`input[name="declaration"][value="${activeSignupStatement}"]`);
+    if (checkbox) checkbox.checked = true;
+    closeSignupStatement({ restoreFocus: false });
+    syncSignupDeclarationMaster();
+    updateAuthPrimary();
+    checkbox?.focus({ preventScroll: true });
+    return;
+  }
+  if (event.target.closest("#login-otp-help-trigger")) {
+    loginOtpHelpNote.hidden = !loginOtpHelpNote.hidden;
+    loginOtpHelpTrigger.setAttribute("aria-expanded", String(!loginOtpHelpNote.hidden));
+    return;
+  }
+  if (event.target.closest("#login-otp-help-close")) {
+    loginOtpHelpNote.hidden = true;
+    loginOtpHelpTrigger.setAttribute("aria-expanded", "false");
+    return;
+  }
+  const closeButton = event.target.closest("[data-close-auth]");
+  if (closeButton) { closeAuthDialog(); return; }
+  const tab = event.target.closest("[data-auth-tab]");
+  if (tab) { setAuthView(tab.dataset.authTab, { focus: tab.dataset.authTab === "login-password" ? "#login-id" : "#login-code-id" }); return; }
+  if (event.target.closest("[data-auth-register]")) { showSignupFlow({ returnToLogin: true }); return; }
+  if (event.target.closest("#auth-back")) {
+    if (authActiveView.startsWith("signup-")) {
+      const step = Number(authActiveView.slice(-1));
+      if (step > 1) {
+        if (step === 4) startAuthOtpTimers();
+        if (step === 3) clearAuthOtpTimers();
+        const previousStep = step - 1;
+        setAuthView(`signup-${previousStep}`, { focus: previousStep === 1 ? "#signup-id" : previousStep === 3 ? "#signup-otp-input" : "#auth-primary" });
+      }
+      else if (authReturnToLogin) {
+        clearAuthOtpTimers();
+        authIsVerifying = false;
+        setAuthView("login-password", { focus: "#login-id" });
+      }
+      else closeAuthDialog();
+    } else if (authActiveView === "forgot-code") {
+      clearAuthOtpTimers();
+      setAuthView("forgot-phone", { focus: "#forgot-phone" });
+    } else if (authActiveView === "forgot-password") {
+      startAuthOtpTimers();
+      setAuthView("forgot-code", { focus: "#forgot-otp-input" });
+    }
+    else setAuthView("login-password", { focus: "#login-id" });
+    return;
+  }
+  const passwordToggle = event.target.closest("[data-toggle-password]");
+  if (passwordToggle) {
+    const inputElement = document.getElementById(passwordToggle.dataset.togglePassword);
+    const visible = inputElement.type === "password";
+    const label = passwordToggle.dataset.toggleLabel || "密碼";
+    inputElement.type = visible ? "text" : "password";
+    passwordToggle.setAttribute("aria-pressed", String(visible));
+    passwordToggle.setAttribute("aria-label", `${visible ? "隱藏" : "顯示"}${label}`);
+    passwordToggle.querySelector("img").src = visible
+      ? "assets/auth-eye-open.svg"
+      : "assets/auth-eye-closed.svg";
+    return;
+  }
+  if (event.target.closest("#auth-captcha-refresh")) {
+    const alphabet = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+    authCaptchaCode = Array.from({ length: 4 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join("");
+    const canvas = document.createElement("canvas");
+    canvas.width = 116;
+    canvas.height = 46;
+    const context = canvas.getContext("2d");
+    context.fillStyle = "#f5f5f5";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    for (let index = 0; index < 7; index += 1) {
+      context.strokeStyle = `rgba(79, 68, 195, ${0.12 + Math.random() * 0.18})`;
+      context.beginPath();
+      context.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+      context.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+      context.stroke();
+    }
+    context.font = "bold 24px sans-serif";
+    context.textBaseline = "middle";
+    [...authCaptchaCode].forEach((character, index) => {
+      context.save();
+      context.translate(12 + index * 25, 23 + (Math.random() - 0.5) * 7);
+      context.rotate((Math.random() - 0.5) * 0.24);
+      context.fillStyle = "#454545";
+      context.fillText(character, 0, 0);
+      context.restore();
+    });
+    const image = document.querySelector("#auth-captcha-image");
+    image.classList.add("is-generated");
+    image.src = canvas.toDataURL("image/png");
+    image.alt = "圖形驗證碼";
+    document.querySelector("#login-captcha-input").value = "";
+    setAuthFieldError("login-captcha-input", "");
+    updateAuthPrimary();
+    return;
+  }
+  if (event.target.closest("#auth-captcha-audio")) {
+    if ("speechSynthesis" in window) window.speechSynthesis.speak(new SpeechSynthesisUtterance([...authCaptchaCode].join(" ")));
+    return;
+  }
+  if (event.target.closest("#signup-otp-resend, #login-otp-resend, #forgot-otp-resend")) { resendAuthOtp(); return; }
+});
 document.addEventListener("keydown", (event) => {
   if (event.key !== "Escape") return;
   if (!filePickerScreen.hidden) hideFilePicker();
   else if (!uploadSourceMenu.hidden) hideUploadSourceMenu();
+  else if (!signupStatementDialog.hidden) closeSignupStatement();
+  else if (!authDialog.hidden) closeAuthDialog();
   else if (!uploadDialog.hidden) closeUploadDialog();
+  else if (!otpDialog.hidden) closeOtpDialog();
+  else if (!bankInfoDialog.hidden) closeBankInfoDialog();
   else if (!boardingInfoDialog.hidden) closeBoardingInfoDialog();
   else if (!personalDataDialog.hidden) closePersonalDataNotice();
   else if (!policyDialog.hidden) closePolicy();
@@ -1185,6 +2578,13 @@ uploadDialog.querySelectorAll("[data-close-upload]").forEach((button) => {
   button.addEventListener("click", () => closeUploadDialog());
 });
 uploadHelpTrigger.addEventListener("click", showUploadHelp);
+uploadHelpClose.addEventListener("click", () => hideUploadHelp({ restoreFocus: true }));
+uploadBody.addEventListener("scroll", () => {
+  if (!uploadHelpCopy.hidden) positionUploadHelp();
+}, { passive: true });
+window.addEventListener("resize", () => {
+  if (!uploadHelpCopy.hidden) positionUploadHelp();
+});
 uploadDropzone.addEventListener("click", showUploadSourceMenu);
 uploadSourceMenu.querySelectorAll("[data-close-source]").forEach((button) => button.addEventListener("click", hideUploadSourceMenu));
 uploadSourceMenu.querySelectorAll("[data-upload-source]").forEach((button) => {
@@ -1212,24 +2612,26 @@ uploadSourceMenu.querySelectorAll("[data-upload-source]").forEach((button) => {
 });
 filePickerScreen.querySelector("[data-close-picker]").addEventListener("click", hideFilePicker);
 filePickerList.querySelectorAll("[data-sample-file]").forEach((button) => {
-  button.addEventListener("click", () => selectSampleBoardingPass(button.dataset.sampleFile));
+  button.addEventListener("click", () => selectSampleFile(button.dataset.sampleFile));
 });
 filePickerSearch.addEventListener("input", () => {
   const query = filePickerSearch.value.trim().toLowerCase();
   filePickerList.querySelectorAll(".file-picker-row").forEach((row) => {
     row.hidden = !row.textContent.toLowerCase().includes(query);
   });
+  filePickerList.querySelectorAll(".file-picker-group").forEach((group) => {
+    group.hidden = [...group.querySelectorAll(".file-picker-row")].every((row) => row.hidden);
+  });
 });
 document.querySelector("#file-picker-sort").addEventListener("click", (event) => {
-  const rows = [...filePickerList.querySelectorAll(".file-picker-row")];
   const sortByName = event.currentTarget.dataset.sort === "recent";
-  rows.forEach((row, index) => {
-    if (row.dataset.recentOrder === undefined) row.dataset.recentOrder = String(index);
+  filePickerList.querySelectorAll(".file-picker-group").forEach((group) => {
+    const rows = [...group.querySelectorAll(".file-picker-row")];
+    rows.sort((a, b) => sortByName
+      ? a.querySelector(".file-picker-name").textContent.localeCompare(b.querySelector(".file-picker-name").textContent, "zh-Hant")
+      : Number(b.dataset.recentOrder) - Number(a.dataset.recentOrder));
+    rows.forEach((row) => group.append(row));
   });
-  rows.sort((a, b) => sortByName
-    ? a.querySelector(".file-picker-name").textContent.localeCompare(b.querySelector(".file-picker-name").textContent, "zh-Hant")
-    : Number(a.dataset.recentOrder) - Number(b.dataset.recentOrder));
-  rows.forEach((row) => filePickerList.append(row));
   event.currentTarget.dataset.sort = sortByName ? "name" : "recent";
   event.currentTarget.textContent = sortByName ? "日期" : "名稱";
 });
@@ -1316,42 +2718,263 @@ airportComboboxes.forEach((field) => {
   });
 });
 
+renderBankOptions();
+bankComboboxInput.addEventListener("focus", openBankCombobox);
+bankComboboxInput.addEventListener("input", () => {
+  if (bankCombobox.classList.contains("is-open")) filterBankOptions();
+});
+bankCombobox.addEventListener("mousedown", (event) => {
+  if (event.target.closest("[data-bank-option]")) event.preventDefault();
+});
+bankCombobox.addEventListener("click", (event) => {
+  const option = event.target.closest("[data-bank-option]");
+  if (option) chooseBankOption(option);
+});
+bankCombobox.addEventListener("keydown", (event) => {
+  if ((event.key === "ArrowDown" || event.key === "ArrowUp") && bankCombobox.classList.contains("is-open")) {
+    event.preventDefault();
+    moveBankActiveOption(event.key === "ArrowDown" ? 1 : -1);
+  } else if (event.key === "Enter" && bankCombobox.classList.contains("is-open")) {
+    event.preventDefault();
+    const activeIndex = Number(bankCombobox.dataset.activeIndex ?? -1);
+    const options = [...bankCombobox.querySelectorAll("[data-bank-option]")].filter((option) => !option.hidden);
+    if (activeIndex >= 0) chooseBankOption(options[activeIndex]);
+  } else if (event.key === "Escape" && bankCombobox.classList.contains("is-open")) {
+    event.preventDefault();
+    event.stopPropagation();
+    closeBankCombobox();
+  }
+});
+bankCombobox.addEventListener("focusout", () => {
+  window.setTimeout(() => {
+    if (!bankCombobox.contains(document.activeElement)) closeBankCombobox();
+  }, 0);
+});
+
+branchComboboxInput.addEventListener("focus", openBranchCombobox);
+branchComboboxInput.addEventListener("input", () => {
+  if (branchCombobox.classList.contains("is-open")) filterBranchOptions();
+});
+branchCombobox.addEventListener("mousedown", (event) => {
+  if (event.target.closest("[data-branch-option]")) event.preventDefault();
+});
+branchCombobox.addEventListener("click", (event) => {
+  const option = event.target.closest("[data-branch-option]");
+  if (option) chooseBranchOption(option);
+});
+branchCombobox.addEventListener("keydown", (event) => {
+  if ((event.key === "ArrowDown" || event.key === "ArrowUp") && branchCombobox.classList.contains("is-open")) {
+    event.preventDefault();
+    moveBranchActiveOption(event.key === "ArrowDown" ? 1 : -1);
+  } else if (event.key === "Enter" && branchCombobox.classList.contains("is-open")) {
+    event.preventDefault();
+    const activeIndex = Number(branchCombobox.dataset.activeIndex ?? -1);
+    const options = [...branchCombobox.querySelectorAll("[data-branch-option]")].filter((option) => !option.hidden);
+    if (activeIndex >= 0) chooseBranchOption(options[activeIndex]);
+    else if (options.length === 1) chooseBranchOption(options[0]);
+  } else if (event.key === "Escape" && branchCombobox.classList.contains("is-open")) {
+    event.preventDefault();
+    event.stopPropagation();
+    closeBranchCombobox();
+  }
+});
+branchCombobox.addEventListener("focusout", () => {
+  window.setTimeout(() => {
+    if (!branchCombobox.contains(document.activeElement)) closeBranchCombobox();
+  }, 0);
+});
+
 document.addEventListener("pointerdown", (event) => {
   airportComboboxes.forEach((field) => {
     if (!field.contains(event.target)) closeAirportCombobox(field);
   });
+  if (!bankCombobox.contains(event.target)) closeBankCombobox();
+  if (!branchCombobox.contains(event.target)) closeBranchCombobox();
 });
 
 boardingInfoDialog.querySelectorAll("[data-close-info]").forEach((button) => button.addEventListener("click", closeBoardingInfoDialog));
+bankInfoDialog.querySelectorAll("[data-close-bank-info]").forEach((button) => button.addEventListener("click", () => closeBankInfoDialog()));
+bankbookDropzone.addEventListener("click", () => showFilePicker("bankbook"));
+bankbookFileInput.addEventListener("change", () => handleBankbookFile(bankbookFileInput.files[0]));
+bankbookRemove.addEventListener("click", removeBankbookFile);
+bankInfoForm.addEventListener("input", (event) => {
+  if (event.target.name === "account") event.target.value = event.target.value.replace(/\D/g, "").slice(0, 16);
+  updateBankInfoButton();
+});
+bankInfoForm.addEventListener("change", updateBankInfoButton);
+bankInfoForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (confirmBankInfoButton.disabled) return;
+  closeBankInfoDialog({ restoreFocus: false });
+  appendUserMessage("確認送出");
+  openOtpDialog({ resetSession: true });
+});
+otpForm.addEventListener("input", () => {
+  otpInput.value = otpInput.value.replace(/\D/g, "").slice(0, 6);
+  if (!otpExpired && otpAttemptCount < 5) {
+    otpError.hidden = true;
+    otpField.classList.remove("is-invalid");
+    otpInput.setAttribute("aria-invalid", "false");
+  }
+  renderOtpState();
+});
+otpForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (otpNext.disabled || otpIsVerifying) return;
+  otpIsVerifying = true;
+  otpNext.textContent = "驗證中...";
+  renderOtpState();
+  window.clearTimeout(otpVerifyTimer);
+  otpVerifyTimer = window.setTimeout(() => {
+    otpIsVerifying = false;
+    otpNext.textContent = "下一步";
+    if (otpExpired || otpExpirySeconds <= 0) {
+      otpExpired = true;
+      showOtpError("動態密碼已失效，請重新發送");
+      renderOtpState();
+      return;
+    }
+    if (otpInput.value !== simulatedOtpCode) {
+      otpAttemptCount += 1;
+      otpInput.value = "";
+      showOtpError(otpAttemptCount >= 5 ? "輸入錯誤達 5 次，請重新發送驗證碼" : "動態密碼輸入錯誤");
+      renderOtpState();
+      return;
+    }
+    finishOtpVerification();
+  }, 1000);
+});
+otpResend.addEventListener("click", resendOtp);
+otpHelpTrigger.addEventListener("click", () => {
+  otpHelpNote.hidden = !otpHelpNote.hidden;
+  otpHelpTrigger.setAttribute("aria-expanded", String(!otpHelpNote.hidden));
+});
+otpHelpClose.addEventListener("click", () => {
+  otpHelpNote.hidden = true;
+  otpHelpTrigger.setAttribute("aria-expanded", "false");
+});
+otpDialog.querySelectorAll("[data-close-otp]").forEach((button) => button.addEventListener("click", closeOtpDialog));
+updateBankInfoButton();
+
+function isValidBoardingDate(yearValue, dateValue) {
+  const dateMatch = /^(\d{2})\/(\d{2})$/.exec(dateValue.trim());
+  if (!dateMatch) return false;
+
+  const month = Number(dateMatch[1]);
+  const day = Number(dateMatch[2]);
+  if (month < 1 || month > 12 || day < 1) return false;
+
+  const year = /^\d{4}$/.test(yearValue.trim()) ? Number(yearValue) : 2000;
+  const isLeapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const daysInMonth = [31, isLeapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  return day <= daysInMonth[month - 1];
+}
+
+function setBoardingFieldError(input, message) {
+  const field = input.closest(".boarding-field");
+  const error = field.querySelector(".boarding-field-error");
+  const isInvalid = Boolean(message);
+  field.classList.toggle("is-invalid", isInvalid);
+  input.setAttribute("aria-invalid", String(isInvalid));
+  error.hidden = !isInvalid;
+  if (isInvalid) error.textContent = message;
+}
+
+function formatBoardingDateInput(input) {
+  const selectionStart = input.selectionStart ?? input.value.length;
+  const digitsBeforeCaret = input.value.slice(0, selectionStart).replace(/\D/g, "").length;
+  const digits = input.value.replace(/\D/g, "").slice(0, 4);
+  const hasMonth = digits.length >= 2;
+  input.value = hasMonth
+    ? `${digits.slice(0, 2)}/${digits.slice(2)}`
+    : digits;
+
+  const caretPosition = digitsBeforeCaret + (hasMonth && digitsBeforeCaret >= 2 ? 1 : 0);
+  input.setSelectionRange(Math.min(caretPosition, input.value.length), Math.min(caretPosition, input.value.length));
+}
+
+function validateBoardingInfo() {
+  const { passenger, flight, origin, destination, year, date } = boardingInfoForm.elements;
+  const errors = [];
+  const requiredFields = [
+    [passenger, "請輸入乘客姓名"],
+    [flight, "請輸入航班編號"],
+    [origin, "請選擇出發地"],
+    [destination, "請選擇目的地"],
+  ];
+
+  requiredFields.forEach(([field, message]) => {
+    const value = field.value.trim();
+    let fieldMessage = value ? "" : message;
+    if (value && (field.name === "origin" || field.name === "destination")) {
+      const options = field.closest("[data-airport]").querySelectorAll("[data-airport-option]");
+      if (![...options].some((option) => option.dataset.value === value)) fieldMessage = message;
+    }
+    setBoardingFieldError(field, fieldMessage);
+    if (fieldMessage) errors.push(field);
+  });
+
+  const yearMessage = /^\d{4}$/.test(year.value.trim()) ? "" : "請輸入正確年份";
+  const dateMessage = isValidBoardingDate(year.value, date.value) ? "" : "請輸入正確的起飛日期";
+  setBoardingFieldError(year, yearMessage);
+  setBoardingFieldError(date, dateMessage);
+  if (yearMessage) errors.push(year);
+  if (dateMessage) errors.push(date);
+
+  return errors;
+}
+
+function updateBoardingInfoButton() {
+  const fields = [...boardingInfoForm.querySelectorAll("[name]")];
+  const isComplete = fields.every((field) => {
+    if (field.matches(".airport-input") && field.closest(".airport-combobox").classList.contains("is-open")) {
+      return Boolean(field.dataset.selectedValue?.trim());
+    }
+    return Boolean(field.value.trim());
+  });
+  confirmInfoButton.disabled = boardingInfoConfirmed || !isComplete;
+  confirmInfoButton.textContent = "確認資訊";
+}
+
 boardingInfoForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  if (!boardingInfoForm.reportValidity()) return;
-  confirmInfoButton.disabled = true;
-  confirmInfoButton.textContent = "已確認資訊";
+  boardingInfoValidationAttempted = true;
+  const invalidFields = validateBoardingInfo();
+  if (invalidFields.length) {
+    invalidFields[0].focus({ preventScroll: true });
+    invalidFields[0].closest(".boarding-field").scrollIntoView({ block: "nearest", behavior: "smooth" });
+    return;
+  }
+  boardingInfoConfirmed = true;
+  updateBoardingInfoButton();
   airportComboboxes.forEach((field) => closeAirportCombobox(field));
   boardingInfoDialog.hidden = true;
   showUploadDialog("delay-proof", input);
 });
+boardingInfoForm.elements.date.addEventListener("input", (event) => {
+  formatBoardingDateInput(event.currentTarget);
+});
 boardingInfoForm.addEventListener("input", () => {
-  if (!confirmInfoButton.disabled) return;
-  confirmInfoButton.disabled = false;
-  confirmInfoButton.textContent = "確認資訊";
+  boardingInfoConfirmed = false;
+  updateBoardingInfoButton();
+  if (boardingInfoValidationAttempted) validateBoardingInfo();
 });
 boardingInfoForm.addEventListener("change", () => {
-  if (!confirmInfoButton.disabled) return;
-  confirmInfoButton.disabled = false;
-  confirmInfoButton.textContent = "確認資訊";
+  boardingInfoConfirmed = false;
+  updateBoardingInfoButton();
+  if (boardingInfoValidationAttempted) validateBoardingInfo();
 });
+updateBoardingInfoButton();
 
 chatScreen.addEventListener("click", (event) => {
   const button = event.target.closest("[data-chat-action]");
   if (!button) return;
   switch (button.dataset.chatAction) {
     case "claim-confirm":
-      beginPersonalDataConsent();
+      openClaimLogin(button);
       break;
     case "application-confirm":
-      beginPersonalDataConsent();
+      openClaimLogin(button);
       break;
     case "application-later":
       appendUserMessage("稍後再說");
@@ -1360,11 +2983,17 @@ chatScreen.addEventListener("click", (event) => {
     case "return-personal-data":
       showPersonalDataNotice();
       break;
+    case "return-login":
+      showAuthDialog({ origin: "claim", returnFocus: button });
+      break;
     case "open-upload":
       showUploadDialog();
       break;
     case "retry-delay-proof":
       showUploadDialog("delay-proof");
+      break;
+    case "fill-bank-info":
+      openBankInfoDialog();
       break;
     case "return-boarding-info":
       boardingInfoDialog.hidden = false;
@@ -1372,6 +3001,9 @@ chatScreen.addEventListener("click", (event) => {
       break;
     case "claim-member":
       showOfficialConfirm("你即將離開阿發，前往國泰產險官網。", "https://www.cathay-ins.com.tw/");
+      break;
+    case "claim-register":
+      openClaimSignup(button);
       break;
     case "claim-website":
       showOfficialConfirm("你即將離開阿發，前往產險服務條款頁。", officialClaimUrl);
