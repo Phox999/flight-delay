@@ -2,6 +2,7 @@ const app = document.querySelector(".app");
 const previewStage = document.querySelector("#preview-stage");
 const previewFullscreenButton = document.querySelector("#preview-fullscreen");
 const previewRestartButton = document.querySelector("#preview-restart");
+const previewImmersiveButton = document.querySelector("#preview-immersive");
 const previewFullscreenEnterIcon = previewFullscreenButton.querySelector("[data-fullscreen-enter]");
 const previewFullscreenExitIcon = previewFullscreenButton.querySelector("[data-fullscreen-exit]");
 const welcome = document.querySelector(".welcome");
@@ -41,6 +42,11 @@ const confirmInfoButton = document.querySelector("#confirm-info");
 const airportComboboxes = [...boardingInfoDialog.querySelectorAll("[data-airport]")];
 let boardingInfoValidationAttempted = false;
 let boardingInfoConfirmed = false;
+let boardingPassRecognitionFailures = 0;
+let boardingInfoOriginalSnapshot = null;
+let boardingInfoPreviousSnapshot = null;
+let boardingInfoModificationCount = 0;
+let boardingInfoHasSubstantiveEdits = false;
 const bankInfoDialog = document.querySelector("#bank-info-dialog");
 const bankInfoForm = document.querySelector("#bank-info-form");
 const bankCombobox = document.querySelector("#bank-combobox");
@@ -143,18 +149,22 @@ const uploadLoadingDurationMs = 2800;
 
 function updatePreviewFullscreenControl() {
   const isFullscreen = document.fullscreenElement === previewStage || previewStage.classList.contains("is-fullscreen");
+  const isImmersive = previewStage.classList.contains("is-immersive");
   previewFullscreenButton.setAttribute("aria-pressed", String(isFullscreen));
   previewFullscreenButton.setAttribute("aria-label", isFullscreen ? "退出全螢幕" : "進入全螢幕");
   previewFullscreenButton.title = isFullscreen ? "退出全螢幕" : "全螢幕";
   previewFullscreenEnterIcon.hidden = isFullscreen;
   previewFullscreenExitIcon.hidden = !isFullscreen;
+  previewImmersiveButton.setAttribute("aria-pressed", String(isImmersive));
+  previewImmersiveButton.setAttribute("aria-label", isImmersive ? "退出沉浸全螢幕" : "進入沉浸全螢幕");
+  previewImmersiveButton.title = isImmersive ? "退出沉浸全螢幕" : "沉浸全螢幕";
 }
 
 previewFullscreenButton.addEventListener("click", async () => {
   const isFullscreen = document.fullscreenElement === previewStage || previewStage.classList.contains("is-fullscreen");
   if (isFullscreen) {
     if (document.fullscreenElement === previewStage && document.exitFullscreen) await document.exitFullscreen();
-    else previewStage.classList.remove("is-fullscreen");
+    previewStage.classList.remove("is-fullscreen", "is-immersive");
   } else if (previewStage.requestFullscreen) {
     try {
       await previewStage.requestFullscreen();
@@ -167,10 +177,36 @@ previewFullscreenButton.addEventListener("click", async () => {
   updatePreviewFullscreenControl();
 });
 
-document.addEventListener("fullscreenchange", updatePreviewFullscreenControl);
+previewImmersiveButton.addEventListener("click", async () => {
+  const isImmersive = previewStage.classList.contains("is-immersive");
+  if (isImmersive) {
+    if (document.fullscreenElement === previewStage && document.exitFullscreen) await document.exitFullscreen();
+    previewStage.classList.remove("is-fullscreen", "is-immersive");
+  } else {
+    previewStage.classList.add("is-immersive");
+    if (document.fullscreenElement !== previewStage && previewStage.requestFullscreen) {
+      try {
+        await previewStage.requestFullscreen();
+      } catch {
+        previewStage.classList.add("is-fullscreen");
+      }
+    } else if (!previewStage.requestFullscreen) {
+      previewStage.classList.add("is-fullscreen");
+    }
+  }
+  updatePreviewFullscreenControl();
+});
+
+document.addEventListener("fullscreenchange", () => {
+  if (document.fullscreenElement !== previewStage) {
+    previewStage.classList.remove("is-fullscreen", "is-immersive");
+  }
+  updatePreviewFullscreenControl();
+});
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && previewStage.classList.contains("is-fullscreen")) {
-    previewStage.classList.remove("is-fullscreen");
+  if (event.key === "Escape" && (previewStage.classList.contains("is-fullscreen") || previewStage.classList.contains("is-immersive"))) {
+    if (document.fullscreenElement === previewStage && document.exitFullscreen) void document.exitFullscreen().catch(() => {});
+    previewStage.classList.remove("is-fullscreen", "is-immersive");
     updatePreviewFullscreenControl();
   }
 });
@@ -552,6 +588,10 @@ function makeAction(label, action, { primary = false } = {}) {
   return button;
 }
 
+function disableChatActions(button) {
+  button.closest(".chat-actions")?.querySelectorAll("button").forEach((action) => { action.disabled = true; });
+}
+
 function appendDefaultConsultation() {
   appendUserMessage("我想詢問班機延誤相關問題");
   const answer = document.createElement("div");
@@ -575,6 +615,13 @@ function startChat(prompt = "") {
   keepChatHash();
   setScreen(true);
   chatScreen.replaceChildren();
+  boardingInfoValidationAttempted = false;
+  boardingInfoConfirmed = false;
+  boardingPassRecognitionFailures = 0;
+  boardingInfoOriginalSnapshot = null;
+  boardingInfoPreviousSnapshot = null;
+  boardingInfoModificationCount = 0;
+  boardingInfoHasSubstantiveEdits = false;
   if (!prompt) {
     appendDefaultConsultation();
     return;
@@ -713,6 +760,13 @@ function clearAuthErrors(form) {
 function isValidMemberId(value) {
   const normalized = value.trim().toUpperCase();
   return /^[A-Z][12]\d{8}$/.test(normalized) || /^[A-Z]{1,3}\d{8}$/.test(normalized);
+}
+
+function isValidLoginAccount(value) {
+  const normalized = value.trim().toUpperCase();
+  return /^[A-Z][12]\d{8}$/.test(normalized)
+    || /^[A-Z][89]\d{8}$/.test(normalized)
+    || /^[A-Z]{2}\d{8}$/.test(normalized);
 }
 
 function parseAuthBirthday(value) {
@@ -1021,8 +1075,13 @@ function renderAuthOtpState() {
   const canResend = authOtpResendSeconds <= 0 || authOtpExpired || authOtpAttemptCount >= 5;
   const formattedCountdown = authOtpPurpose === "signup"
     ? `${Math.floor(authOtpResendSeconds / 60)}:${String(authOtpResendSeconds % 60).padStart(2, "0")}`
-    : `${String(Math.floor(authOtpResendSeconds / 60)).padStart(2, "0")}:${String(authOtpResendSeconds % 60).padStart(2, "0")} 後可以重新發送`;
+    : authOtpPurpose === "login"
+      ? `${Math.floor(authOtpResendSeconds / 60)}:${String(authOtpResendSeconds % 60).padStart(2, "0")}`
+      : `${String(Math.floor(authOtpResendSeconds / 60)).padStart(2, "0")}:${String(authOtpResendSeconds % 60).padStart(2, "0")} 後可以重新發送`;
   if (authOtpPurpose === "signup") {
+    countdown.hidden = canResend;
+    countdown.querySelector("[data-countdown-time]").textContent = formattedCountdown;
+  } else if (authOtpPurpose === "login") {
     countdown.hidden = canResend;
     countdown.querySelector("[data-countdown-time]").textContent = formattedCountdown;
   } else {
@@ -1048,7 +1107,7 @@ function startAuthOtpTimers() {
     if (authOtpExpirySeconds <= 0) {
       authOtpExpired = true;
       const controls = authOtpControls();
-      setAuthOtpError(controls.input.slice(1), controls.error, "動態密碼已失效，請重新發送");
+      setAuthOtpError(controls.input.slice(1), controls.error, authOtpPurpose === "login" ? "驗證碼已失效，請重新發送" : "動態密碼已失效，請重新發送");
     }
     renderAuthOtpState();
     if (authOtpResendSeconds <= 0 && authOtpExpirySeconds <= 0) window.clearInterval(authOtpInterval);
@@ -1092,7 +1151,7 @@ function submitAuthForm(form) {
     const password = document.querySelector("#login-password").value;
     const captcha = value("login-captcha-input").toUpperCase();
     let valid = true;
-    if (!isValidMemberId(identity)) { setAuthFieldError("login-id", "身分證號 / 居留證號格式錯誤"); valid = false; }
+    if (!isValidLoginAccount(identity)) { setAuthFieldError("login-id", "身分證號 / 居留證號格式錯誤"); valid = false; }
     if (!password) { setAuthFieldError("login-password", "請輸入密碼"); valid = false; }
     if (captcha !== authCaptchaCode) { setAuthFieldError("login-captcha-input", "驗證碼輸入錯誤"); valid = false; }
     if (!valid) return;
@@ -1202,13 +1261,13 @@ function submitAuthOtp() {
     authIsVerifying = false;
     if (authOtpExpired || authOtpExpirySeconds <= 0) {
       authOtpExpired = true;
-      setAuthOtpError(controls.input.slice(1), controls.error, "動態密碼已失效，請重新發送");
+      setAuthOtpError(controls.input.slice(1), controls.error, authOtpPurpose === "login" ? "驗證碼已失效，請重新發送" : "動態密碼已失效，請重新發送");
       renderAuthOtpState();
       return;
     }
     if (inputElement.value !== "123123") {
       authOtpAttemptCount += 1;
-      setAuthOtpError(controls.input.slice(1), controls.error, authOtpAttemptCount >= 5 ? "輸入錯誤達 5 次，請重新發送驗證碼" : "動態密碼輸入錯誤");
+      setAuthOtpError(controls.input.slice(1), controls.error, authOtpAttemptCount >= 5 ? "輸入錯誤達 5 次，請重新發送驗證碼" : authOtpPurpose === "login" ? "驗證碼輸入錯誤" : "動態密碼輸入錯誤");
       renderAuthOtpState();
       return;
     }
@@ -1590,9 +1649,137 @@ function updateBoardingPass(file) {
 
 function finishBoardingPassUpload() {
   if (!selectedBoardingPass || uploadConfirm.disabled) return;
+  if (previousUploadFocus?.dataset.chatAction === "retry-boarding-pass") {
+    disableChatActions(previousUploadFocus);
+  }
+  if (selectedBoardingPass.outcome === "recognition-error") {
+    boardingPassRecognitionFailures += 1;
+    closeUploadDialog({ restoreFocus: false, showNoProof: false });
+    appendUserMessage("確認上傳");
+
+    const content = document.createElement("div");
+    const message = document.createElement("p");
+    message.textContent = boardingPassRecognitionFailures < 2
+      ? "你上傳的文件無法辨識，請手動輸入或重新上傳。"
+      : "文件已上傳，但目前仍無法辨識內容，請改用手動輸入。";
+    const actions = document.createElement("div");
+    actions.className = "chat-actions";
+    if (boardingPassRecognitionFailures < 2) {
+      actions.append(makeAction("重新上傳", "retry-boarding-pass"));
+    }
+    actions.append(makeAction("手動輸入", "manual-boarding-info", { primary: true }));
+    content.append(message, actions);
+    appendAssistantMessage(content);
+    return;
+  }
+
   closeUploadDialog({ restoreFocus: false });
+  prepareBoardingInfoSession();
+  appendUserMessage("上傳成功");
   boardingInfoDialog.hidden = false;
   boardingInfoForm.elements.passenger.focus({ preventScroll: true });
+}
+
+function readBoardingInfoSnapshot() {
+  return Object.fromEntries(
+    ["passenger", "flight", "origin", "destination", "year", "date"]
+      .map((name) => [name, boardingInfoForm.elements[name].value.trim()]),
+  );
+}
+
+function changedBoardingInfoFields(current, previous) {
+  return Object.keys(current).filter((name) => current[name] !== previous[name]);
+}
+
+function prepareBoardingInfoSession({ manual = false } = {}) {
+  boardingInfoForm.reset();
+  boardingPassRecognitionFailures = 0;
+  if (manual) {
+    boardingInfoForm.querySelectorAll("[name]").forEach((field) => { field.value = ""; });
+  }
+  boardingInfoValidationAttempted = false;
+  boardingInfoConfirmed = false;
+  boardingInfoModificationCount = 0;
+  boardingInfoHasSubstantiveEdits = false;
+  boardingInfoPreviousSnapshot = null;
+  airportComboboxes.forEach((field) => {
+    closeAirportCombobox(field);
+    const fieldInput = field.querySelector(".airport-input");
+    fieldInput.dataset.selectedValue = fieldInput.value.trim();
+    delete fieldInput.dataset.keepSelectionOnFocus;
+  });
+  boardingInfoForm.querySelectorAll("[name]").forEach((field) => setBoardingFieldError(field, ""));
+  boardingInfoOriginalSnapshot = manual ? null : readBoardingInfoSnapshot();
+  if (boardingInfoOriginalSnapshot) {
+    boardingInfoPreviousSnapshot = { ...boardingInfoOriginalSnapshot };
+  }
+  updateBoardingInfoButton();
+}
+
+function continueAfterBoardingInfo() {
+  boardingInfoConfirmed = true;
+  updateBoardingInfoButton();
+  airportComboboxes.forEach((field) => closeAirportCombobox(field));
+  boardingInfoDialog.hidden = true;
+  showUploadDialog("delay-proof", input);
+}
+
+function continueToBankInfo() {
+  boardingInfoConfirmed = true;
+  updateBoardingInfoButton();
+  airportComboboxes.forEach((field) => closeAirportCombobox(field));
+  boardingInfoDialog.hidden = true;
+  openBankInfoDialog();
+}
+
+function showBoardingInfoReview(snapshot, { modified = false } = {}) {
+  const card = document.createElement("div");
+  const heading = document.createElement("p");
+  heading.className = "boarding-info-card-heading";
+  heading.textContent = "登機證資訊";
+
+  const fields = document.createElement("div");
+  fields.className = "boarding-info-card-fields";
+  const addField = (label, value) => {
+    const field = document.createElement("div");
+    field.className = "boarding-info-card-field";
+    const fieldLabel = document.createElement("p");
+    fieldLabel.className = "boarding-info-card-label";
+    fieldLabel.textContent = label;
+    let fieldValue;
+    if (label === "出發地 / 目的地") {
+      fieldValue = document.createElement("div");
+      fieldValue.className = "boarding-info-card-route-values";
+      [snapshot.origin, "→", snapshot.destination].forEach((part, index) => {
+        const item = document.createElement("span");
+        item.textContent = part;
+        if (index === 1) item.className = "boarding-info-card-route-arrow";
+        fieldValue.append(item);
+      });
+    } else {
+      fieldValue = document.createElement("p");
+      fieldValue.className = "boarding-info-card-value";
+      fieldValue.textContent = value;
+    }
+    field.append(fieldLabel, fieldValue);
+    fields.append(field);
+  };
+  addField("乘客姓名", snapshot.passenger);
+  addField("航班編號", snapshot.flight);
+  addField("出發地 / 目的地", "");
+  addField("航班起飛日期", `${snapshot.year}/${snapshot.date}`);
+
+  const actions = document.createElement("div");
+  actions.className = "info-confirm-actions";
+  actions.append(
+    makeAction("確認送出", "confirm-boarding-info", { primary: true }),
+    makeAction("資料有誤", "edit-boarding-info"),
+  );
+  card.append(heading, fields, actions);
+  appendAssistantSequence([
+    { content: modified ? "請確認下列修改後的資訊是否正確？" : "已收到你上傳的登機證，請確認下列資訊是否正確?" },
+    { content: card, card: true, className: "info-confirm-card boarding-info-card" },
+  ]);
 }
 
 function addDelayProofFiles(files) {
@@ -2945,11 +3132,29 @@ boardingInfoForm.addEventListener("submit", (event) => {
     invalidFields[0].closest(".boarding-field").scrollIntoView({ block: "nearest", behavior: "smooth" });
     return;
   }
+
   boardingInfoConfirmed = true;
   updateBoardingInfoButton();
   airportComboboxes.forEach((field) => closeAirportCombobox(field));
+  const currentSnapshot = readBoardingInfoSnapshot();
+  const baselineSnapshot = boardingInfoOriginalSnapshot
+    ?? Object.fromEntries(Object.keys(currentSnapshot).map((name) => [name, ""]));
+  const changesFromOriginal = changedBoardingInfoFields(currentSnapshot, baselineSnapshot);
+  boardingInfoHasSubstantiveEdits = changesFromOriginal.some((name) => name !== "year");
+  const previousSnapshot = boardingInfoPreviousSnapshot ?? baselineSnapshot;
+  const substantiveChanges = changedBoardingInfoFields(currentSnapshot, previousSnapshot)
+    .filter((name) => name !== "year");
+  if (substantiveChanges.length) boardingInfoModificationCount += 1;
+  boardingInfoPreviousSnapshot = { ...currentSnapshot };
   boardingInfoDialog.hidden = true;
-  showUploadDialog("delay-proof", input);
+
+  if (boardingInfoModificationCount >= 3) {
+    continueAfterBoardingInfo();
+    return;
+  }
+
+  appendUserMessage(changesFromOriginal.length ? "資訊修改完畢" : "確認資訊");
+  showBoardingInfoReview(currentSnapshot, { modified: changesFromOriginal.length > 0 });
 });
 boardingInfoForm.elements.date.addEventListener("input", (event) => {
   formatBoardingDateInput(event.currentTarget);
@@ -2996,6 +3201,32 @@ chatScreen.addEventListener("click", (event) => {
       openBankInfoDialog();
       break;
     case "return-boarding-info":
+      boardingInfoDialog.hidden = false;
+      boardingInfoForm.elements.passenger.focus({ preventScroll: true });
+      break;
+    case "retry-boarding-pass":
+      appendUserMessage("重新上傳");
+      showUploadDialog("boarding-pass", button);
+      break;
+    case "manual-boarding-info":
+      disableChatActions(button);
+      appendUserMessage("手動輸入");
+      prepareBoardingInfoSession({ manual: true });
+      boardingInfoDialog.hidden = false;
+      boardingInfoForm.elements.passenger.focus({ preventScroll: true });
+      break;
+    case "confirm-boarding-info":
+      disableChatActions(button);
+      appendUserMessage("確認送出");
+      if (boardingInfoHasSubstantiveEdits) continueAfterBoardingInfo();
+      else continueToBankInfo();
+      break;
+    case "edit-boarding-info":
+      disableChatActions(button);
+      appendUserMessage("資料有誤");
+      appendAssistantMessage("好的，請問修改資訊。");
+      boardingInfoConfirmed = false;
+      updateBoardingInfoButton();
       boardingInfoDialog.hidden = false;
       boardingInfoForm.elements.passenger.focus({ preventScroll: true });
       break;

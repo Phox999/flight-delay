@@ -24,6 +24,12 @@
             <path d="M3 3v5h5" />
           </svg>
         </button>
+        <button class="preview-control" id="preview-immersive" type="button" aria-label="進入沉浸全螢幕" title="沉浸全螢幕" aria-pressed="false">
+          <svg class="preview-control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <path d="M3 8h18M8 21v-3m8 3v-3" />
+          </svg>
+        </button>
       </nav>
       <main class="app" aria-label="國泰產險智能助理阿發">
       <div class="system-glow" aria-hidden="true"><img src="assets/system-bg.svg" alt="" /></div>
@@ -402,7 +408,7 @@
                     <a class="auth-inline-link" href="https://www.cathay-ins.com.tw/INSOCWeb/servlet/HttpDispatcher/OCH1_0300/prompt" target="_blank" rel="noopener noreferrer">忘記密碼</a>
                   </div>
                   <span class="auth-input-action">
-                    <input id="login-password" name="password" type="password" autocomplete="current-password" aria-describedby="login-password-error" />
+                    <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="請輸入密碼" aria-describedby="login-password-error" />
                     <button class="auth-icon-button" type="button" data-toggle-password="login-password" aria-label="顯示密碼" aria-pressed="false"><img src="assets/auth-eye-closed.svg" alt="" /></button>
                   </span>
                   <span class="auth-field-error" id="login-password-error" data-auth-error-for="login-password" role="alert" hidden></span>
@@ -446,18 +452,25 @@
 
             <section class="auth-view" id="auth-view-login-code" data-auth-view="login-code" role="tabpanel" aria-labelledby="auth-code-tab" hidden>
               <form class="auth-form" id="login-code-form" data-auth-form="login-code" novalidate>
-                <p class="auth-otp-sent">動態密碼已發送至：<br /><span id="login-otp-phone">0963-****30</span><br /><span id="login-otp-email">Cathay***@***il.com</span></p>
-                <p class="auth-otp-expiry">驗證碼將在 5 分鐘後失效</p>
-                <label class="auth-field" for="login-otp-input">
-                  <span>請輸入動態密碼</span>
-                  <span class="auth-otp-input-wrap"><span aria-hidden="true">NBDW -</span><input id="login-otp-input" name="otp" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="請輸入動態密碼" aria-describedby="login-otp-error login-otp-countdown" /></span>
-                  <span class="auth-field-error" id="login-otp-error" role="alert" hidden></span>
-                </label>
-                <div class="auth-resend-row"><span id="login-otp-countdown" aria-live="polite"></span><button class="auth-inline-link" id="login-otp-resend" type="button" hidden>重新發送</button></div>
+                <div class="login-otp-message">
+                  <p class="auth-otp-sent">驗證碼已發送至：<br /><span id="login-otp-phone">0963-****30</span><br /><span id="login-otp-email">Cathay***@***il.com</span></p>
+                  <p class="auth-otp-expiry">驗證碼將在 5 分鐘後失效</p>
+                </div>
+                <div class="login-otp-component">
+                  <label class="auth-field login-otp-field" for="login-otp-input">
+                    <span>請輸入驗證碼：</span>
+                    <span class="login-otp-entry-row">
+                      <span class="login-otp-prefix" aria-hidden="true">NBDW -</span>
+                      <input id="login-otp-input" name="otp" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="請輸入驗證碼" aria-describedby="login-otp-error login-otp-countdown" />
+                    </span>
+                    <span class="auth-field-error" id="login-otp-error" role="alert" hidden></span>
+                  </label>
+                  <div class="auth-resend-row login-otp-resend"><span id="login-otp-countdown" aria-live="polite"><span data-countdown-time>0:59</span> 後可以重新發送</span><button class="auth-inline-link" id="login-otp-resend" type="button" hidden>重新發送動態密碼</button></div>
+                </div>
                 <div class="otp-help login-code-help">
                   <button class="otp-help-trigger" id="login-otp-help-trigger" type="button" aria-expanded="false" aria-controls="login-otp-help-note">
                     <img src="assets/ic-mml-info.svg" alt="" />
-                    <span>收不到動態密碼簡訊？</span>
+                    <span>收不到驗證碼簡訊？</span>
                   </button>
                   <div class="otp-help-note" id="login-otp-help-note" role="note" hidden>
                     <p>簡訊可能有延遲，請稍候並確認手機號碼是否正確。</p>
