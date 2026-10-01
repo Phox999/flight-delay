@@ -63,6 +63,8 @@ const bankbookRemove = document.querySelector("#bankbook-remove");
 const bankbookError = document.querySelector("#bankbook-error");
 const bankInfoLoading = document.querySelector("#bank-info-loading");
 const confirmBankInfoButton = document.querySelector("#confirm-bank-info");
+const bankAccountField = document.querySelector("#bank-account-field");
+const bankAccountError = document.querySelector("#bank-account-error");
 const otpDialog = document.querySelector("#otp-dialog");
 const otpForm = document.querySelector("#otp-form");
 const otpInput = document.querySelector("#otp-input");
@@ -129,6 +131,7 @@ let otpIsVerifying = false;
 let otpInterval = null;
 let otpVerifyTimer = null;
 const simulatedOtpCode = "123123";
+const simulatedOtpApiErrorCode = "999999";
 const memberCenterUrl = "https://www.cathay-ins.com.tw/INSOCWeb/";
 const confirmDialog = document.querySelector("#confirm-dialog");
 const confirmCopy = document.querySelector("#confirm-copy");
@@ -1652,6 +1655,16 @@ function finishBoardingPassUpload() {
   if (previousUploadFocus?.dataset.chatAction === "retry-boarding-pass") {
     disableChatActions(previousUploadFocus);
   }
+  if (selectedBoardingPass.outcome === "no-data") {
+    closeUploadDialog({ restoreFocus: false, showNoProof: false });
+    appendUserMessage("上傳成功");
+    const content = document.createElement("div");
+    const message = document.createElement("p");
+    message.textContent = "查無航班資料，請手動輸入航班資訊。";
+    content.append(message, makeAction("手動輸入", "manual-boarding-info", { primary: true }));
+    appendAssistantMessage(content);
+    return;
+  }
   if (selectedBoardingPass.outcome === "recognition-error") {
     boardingPassRecognitionFailures += 1;
     closeUploadDialog({ restoreFocus: false, showNoProof: false });
@@ -1730,6 +1743,20 @@ function continueToBankInfo() {
   airportComboboxes.forEach((field) => closeAirportCombobox(field));
   boardingInfoDialog.hidden = true;
   openBankInfoDialog();
+}
+
+function appendBankInfoPrompt() {
+  const content = document.createElement("div");
+  const message = document.createElement("p");
+  const fillBankInfo = document.createElement("button");
+  message.textContent = "請完成填寫匯款帳戶資料。";
+  fillBankInfo.type = "button";
+  fillBankInfo.className = "chat-inline-action";
+  fillBankInfo.textContent = "返回填寫匯款資料";
+  fillBankInfo.dataset.chatAction = "fill-bank-info";
+  content.append(message, fillBankInfo);
+  appendAssistantMessage(content);
+  return fillBankInfo;
 }
 
 function showBoardingInfoReview(snapshot, { modified = false } = {}) {
@@ -1895,7 +1922,6 @@ function finishDelayProofUpload() {
   appendUserMessage("上傳班機延誤證明");
   const finalOutcome = outcome === "network-error" ? "success" : outcome;
   appendDelayProofOutcome(finalOutcome);
-  if (finalOutcome === "success") openBankInfoDialog();
 }
 
 function updateBankInfoButton() {
@@ -1903,6 +1929,15 @@ function updateBankInfoButton() {
   const accountIsValid = /^\d{6,16}$/.test(account.value.trim());
   const menuIsOpen = bankCombobox.classList.contains("is-open") || branchCombobox.classList.contains("is-open");
   confirmBankInfoButton.disabled = menuIsOpen || !(bank.value && branch.value && accountIsValid);
+}
+
+function validateBankAccount() {
+  const account = bankInfoForm.elements.account.value.trim();
+  const isInvalid = Boolean(account) && !/^\d{6,16}$/.test(account);
+  bankAccountError.hidden = !isInvalid;
+  bankAccountField.classList.toggle("is-invalid", isInvalid);
+  bankInfoForm.elements.account.setAttribute("aria-invalid", String(isInvalid));
+  return !isInvalid;
 }
 
 function updateBankBranches(selectedBranch = "") {
@@ -2121,12 +2156,15 @@ function openBankInfoDialog() {
   requestAnimationFrame(() => bankInfoDialog.focus({ preventScroll: true }));
 }
 
-function closeBankInfoDialog({ restoreFocus = true } = {}) {
+function closeBankInfoDialog({ restoreFocus = true, showPrompt = true } = {}) {
   if (bankInfoDialog.hidden) return;
   closeBankCombobox();
   closeBranchCombobox();
   bankInfoDialog.hidden = true;
-  if (restoreFocus) {
+  if (showPrompt) {
+    const fillBankInfo = appendBankInfoPrompt();
+    if (restoreFocus) fillBankInfo.focus({ preventScroll: true });
+  } else if (restoreFocus) {
     chatScreen.querySelector('[data-chat-action="fill-bank-info"]')?.focus({ preventScroll: true });
   }
 }
@@ -2148,6 +2186,7 @@ function handleBankbookFile(file) {
   }
 
   bankbookError.hidden = true;
+  bankbookError.textContent = "";
   bankbookSelectedName.textContent = file.name;
   bankbookSelected.hidden = false;
   bankbookDropzone.hidden = true;
@@ -2155,9 +2194,19 @@ function handleBankbookFile(file) {
   window.clearTimeout(bankbookUploadTimer);
   bankbookUploadTimer = window.setTimeout(() => {
     bankInfoLoading.hidden = true;
+    if (file.outcome === "network-error") {
+      bankbookFileInput.value = "";
+      bankbookSelected.hidden = true;
+      bankbookSelectedName.textContent = "";
+      bankbookDropzone.hidden = false;
+      bankbookError.textContent = "網路連線異常，請重新上傳。";
+      bankbookError.hidden = false;
+      return;
+    }
     setBankSelection("013");
     updateBankBranches("敦南分行");
     bankInfoForm.elements.account.value = "000190";
+    validateBankAccount();
     updateBankInfoButton();
   }, uploadLoadingDurationMs);
 }
@@ -2289,6 +2338,7 @@ function selectSampleFile(type) {
     "proof-jpg": { name: "航班延誤證明.jpg", size: 2.16 * 1024 * 1024, type: "image/jpeg" },
     "proof-pdf": { name: "航空公司證明.pdf", size: 1.24 * 1024 * 1024, type: "application/pdf" },
     "network-error": { name: "連線異常測試.png", size: 1.42 * 1024 * 1024, type: "image/png", outcome: "network-error" },
+    "no-data": { name: "查無航班資料測試.jpg", size: 1.32 * 1024 * 1024, type: "image/jpeg", outcome: "no-data" },
     "recognition-error": { name: "辨識失敗測試.jpg", size: 1.36 * 1024 * 1024, type: "image/jpeg", outcome: "recognition-error" },
     "system-error": { name: "系統異常測試.png", size: 1.51 * 1024 * 1024, type: "image/png", outcome: "system-error" },
   };
@@ -2434,6 +2484,26 @@ function finishOtpVerification() {
     { content: result },
     { content: feedback, card: true, className: "message-feedback-shell" },
   ]);
+}
+
+function finishOtpApiError() {
+  stopOtpTimers();
+  otpIsVerifying = false;
+  otpInput.disabled = false;
+  otpInput.value = "";
+  otpError.hidden = true;
+  otpField.classList.remove("is-invalid");
+  otpInput.setAttribute("aria-invalid", "false");
+  otpNext.textContent = "下一步";
+  otpDialog.hidden = true;
+  otpHelpNote.hidden = true;
+  otpHelpTrigger.setAttribute("aria-expanded", "false");
+
+  const content = document.createElement("div");
+  const message = document.createElement("p");
+  message.textContent = "系統出現異常，建議你可以到會員中心使用理賠申請服務。";
+  content.append(message, makeAction("前往會員中心", "claim-member"));
+  appendAssistantMessage(content);
 }
 
 function createExperienceFeedback() {
@@ -2985,14 +3055,15 @@ bankbookDropzone.addEventListener("click", () => showFilePicker("bankbook"));
 bankbookFileInput.addEventListener("change", () => handleBankbookFile(bankbookFileInput.files[0]));
 bankbookRemove.addEventListener("click", removeBankbookFile);
 bankInfoForm.addEventListener("input", (event) => {
-  if (event.target.name === "account") event.target.value = event.target.value.replace(/\D/g, "").slice(0, 16);
+  if (event.target.name === "account" && !bankAccountError.hidden) validateBankAccount();
   updateBankInfoButton();
 });
+bankInfoForm.elements.account.addEventListener("blur", validateBankAccount);
 bankInfoForm.addEventListener("change", updateBankInfoButton);
 bankInfoForm.addEventListener("submit", (event) => {
   event.preventDefault();
   if (confirmBankInfoButton.disabled) return;
-  closeBankInfoDialog({ restoreFocus: false });
+  closeBankInfoDialog({ restoreFocus: false, showPrompt: false });
   appendUserMessage("確認送出");
   openOtpDialog({ resetSession: true });
 });
@@ -3019,6 +3090,10 @@ otpForm.addEventListener("submit", (event) => {
       otpExpired = true;
       showOtpError("動態密碼已失效，請重新發送");
       renderOtpState();
+      return;
+    }
+    if (otpInput.value === simulatedOtpApiErrorCode) {
+      finishOtpApiError();
       return;
     }
     if (otpInput.value !== simulatedOtpCode) {
@@ -3231,7 +3306,7 @@ chatScreen.addEventListener("click", (event) => {
       boardingInfoForm.elements.passenger.focus({ preventScroll: true });
       break;
     case "claim-member":
-      showOfficialConfirm("你即將離開阿發，前往國泰產險官網。", "https://www.cathay-ins.com.tw/");
+      showOfficialConfirm("你即將離開阿發，前往國泰產險會員中心。", memberCenterUrl);
       break;
     case "claim-register":
       openClaimSignup(button);

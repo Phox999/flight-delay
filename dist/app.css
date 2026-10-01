@@ -506,9 +506,9 @@ a.inline-link { text-decoration: underline; }
 .assistant-card p { margin: 0 0 8px; }
 .assistant-card p:last-child { margin-bottom: 0; }
 .assistant-card.info-confirm-card.boarding-info-card { padding-top: 16px; }
-.assistant-card .boarding-info-card-heading { margin: 0 10px; font-size: 16px; font-weight: 600; line-height: 22px; letter-spacing: .3px; }
+.assistant-card .boarding-info-card-heading { margin: 0 16px; font-size: 16px; font-weight: 600; line-height: 22px; letter-spacing: .3px; }
 .boarding-info-card-fields { display: flex; width: 100%; flex-direction: column; padding-top: 0; }
-.boarding-info-card-field { display: flex; flex-direction: column; gap: 8px; padding: 12px 10px; }
+.boarding-info-card-field { display: flex; flex-direction: column; gap: 6px; padding: 16px; }
 .boarding-info-card-label,
 .boarding-info-card-value { margin: 0; font-size: 16px; line-height: 22px; letter-spacing: .3px; overflow-wrap: anywhere; }
 .boarding-info-card-label { color: var(--text-secondary); font-weight: 400; }
@@ -545,7 +545,7 @@ a.inline-link { text-decoration: underline; }
 .chat-action:hover { background: #f4f8ff; }
 .chat-action.primary { color: #fff; border-color: #4f8ff7; background: #4f8ff7; text-align: center; }
 .chat-action.primary:hover { background: #347ae8; }
-.assistant-card.info-confirm-card .info-confirm-actions > .chat-action.primary { color: var(--brand-highlight); background: #fff; }
+.assistant-card.info-confirm-card .info-confirm-actions > .chat-action.primary { color: var(--brand-highlight); border-color: #e8e8ed; background: #fff; }
 .assistant-card.info-confirm-card .info-confirm-actions > .chat-action.primary:hover { background: #f8f7ff; }
 
 .single-button-row {
@@ -1569,6 +1569,9 @@ a.inline-link { text-decoration: underline; }
 .bank-info-field input:not([type="hidden"]) { width: 100%; height: 48px; padding: 0 14px; border: 1.5px solid #bfbfbf; border-radius: 6px; color: var(--text-primary); background-color: #fff; font-size: 16px; font-weight: 300; line-height: 22px; letter-spacing: .3px; }
 .bank-info-field input:not([type="hidden"]):focus-visible { border-color: var(--brand-primary); outline: none; }
 .bank-info-field input[readonly] { color: var(--text-secondary); background-color: #eaeaea; }
+.bank-info-field.is-invalid input:not([type="hidden"]) { border-color: #ff3b30; }
+.bank-account-error { color: #ec464a; font-size: 12px; line-height: 16px; letter-spacing: .2px; }
+.bank-account-error[hidden] { display: none; }
 .bank-info-footer { display: flex; min-height: 78px; flex: none; align-items: flex-start; padding: 16px 24px; background: #fff; box-shadow: 0 -8px 24px rgb(68 68 68 / 8%); }
 .bank-info-footer button { width: 100%; height: 46px; border: 0; border-radius: 6px; color: var(--text-primary); background: var(--brand-primary); font-size: 16px; font-weight: 500; letter-spacing: .3px; cursor: pointer; }
 .bank-info-footer button:disabled { color: #fff; background: #eaeaea; cursor: default; }

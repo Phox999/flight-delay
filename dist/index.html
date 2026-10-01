@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#ffffff" />
     <title>國泰產險智能助理阿發</title>
+    <link rel="icon" type="image/svg+xml" href="assets/alpha-logo.svg" />
     <link rel="stylesheet" href="app.css" />
   </head>
   <body>
@@ -230,6 +231,13 @@
                 <span class="file-picker-details"><span class="file-picker-name">連線異常測試.png</span><span class="file-picker-meta">今天，下午 4:23 · 模擬網路異常</span></span><span class="file-picker-ellipsis" aria-hidden="true">•••</span>
               </button>
             </div>
+            <div class="file-picker-group" data-file-group="data-lookup">
+              <h4 class="file-picker-group-title">航班資料比對</h4>
+              <button class="file-picker-row" type="button" data-sample-file="no-data" data-recent-order="1626">
+                <span class="file-picker-icon"><img src="assets/file-picker-asset-3.svg" alt="" /><span class="file-type-badge jpg">JPG</span></span>
+                <span class="file-picker-details"><span class="file-picker-name">查無航班資料測試.jpg</span><span class="file-picker-meta">今天，下午 4:26 · 模擬查無航班資料</span></span><span class="file-picker-ellipsis" aria-hidden="true">•••</span>
+              </button>
+            </div>
           </div>
           <p class="file-picker-location">iCloud 雲碟 <span aria-hidden="true">›</span> 下載項目</p>
         </div>
@@ -329,7 +337,7 @@
                     </div>
                   </div>
                 </label>
-                <label class="bank-info-field"><span>匯款帳號</span><input name="account" type="text" inputmode="numeric" maxlength="16" autocomplete="off" placeholder="請輸入匯款帳號" required /></label>
+                <label class="bank-info-field" id="bank-account-field"><span>匯款帳號</span><input name="account" type="text" inputmode="numeric" maxlength="16" autocomplete="off" placeholder="請輸入匯款帳號" aria-describedby="bank-account-error" aria-invalid="false" required /><span class="bank-account-error" id="bank-account-error" role="alert" hidden>請輸入正確的匯款帳號</span></label>
               </div>
             </div>
             <footer class="bank-info-footer"><button id="confirm-bank-info" type="submit" disabled>確認資訊</button></footer>
