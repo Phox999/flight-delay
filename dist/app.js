@@ -48,6 +48,7 @@ let boardingInfoPreviousSnapshot = null;
 let boardingInfoModificationCount = 0;
 let boardingInfoHasSubstantiveEdits = false;
 const bankInfoDialog = document.querySelector("#bank-info-dialog");
+const bankInfoTitle = document.querySelector("#bank-info-title");
 const bankInfoForm = document.querySelector("#bank-info-form");
 const bankCombobox = document.querySelector("#bank-combobox");
 const bankComboboxInput = document.querySelector("#bank-combobox-input");
@@ -129,7 +130,6 @@ const bankSearchAliases = {
 let bankbookUploadTimer = null;
 let bankSelectionTouched = false;
 let branchSelectionTouched = false;
-let bankAccountTouched = false;
 let otpResendSeconds = 60;
 let otpExpirySeconds = 300;
 let otpAttemptCount = 0;
@@ -152,6 +152,7 @@ let selectedBoardingPass = null;
 let selectedDelayProofFiles = [];
 let uploadMode = "boarding-pass";
 let filePickerTarget = "upload";
+let uploadSourceTarget = "upload";
 let networkErrorShown = false;
 let uploadTimer = null;
 let uploadFileSequence = 0;
@@ -1561,19 +1562,50 @@ function closeUploadDialog({ restoreFocus = true, showNoProof = true } = {}) {
   if (shouldShowNoProof) appendNoDelayProofMessage();
 }
 
-function showUploadSourceMenu() {
+function showUploadSourceMenu(target = "upload") {
+  uploadSourceTarget = target;
+  const isBankbook = target === "bankbook";
+  uploadSourceMenu.classList.toggle("is-bankbook-source-menu", isBankbook);
+  uploadSourceMenu.querySelector("[role='dialog']").setAttribute("aria-label", isBankbook ? "選擇存摺封面來源" : uploadMode === "delay-proof" ? "選擇班機延誤證明來源" : "選擇登機證來源");
+  if (isBankbook) bankInfoTitle.textContent = "上傳存摺或填寫匯款資料";
   uploadSourceMenu.hidden = false;
   uploadSourceMenu.querySelector('[data-upload-source="photos"]').focus();
 }
 
 function hideUploadSourceMenu() {
   uploadSourceMenu.hidden = true;
-  uploadDropzone.focus({ preventScroll: true });
+  uploadSourceMenu.classList.remove("is-bankbook-source-menu");
+  (uploadSourceTarget === "bankbook" ? bankbookDropzone : uploadDropzone).focus({ preventScroll: true });
 }
 
 function showFilePicker(target = "upload") {
   filePickerTarget = target;
   uploadSourceMenu.hidden = true;
+  uploadSourceMenu.classList.remove("is-bankbook-source-menu");
+  const isBankbook = target === "bankbook";
+  const filePickerTitle = filePickerScreen.querySelector(".file-picker-header h2");
+  filePickerTitle.textContent = "最近項目";
+  filePickerScreen.querySelector(".file-picker-heading h3").textContent = "最近項目";
+  const bankbookSamples = {
+    png: ["存摺封面.png", "今天，下午 4:24 · 1.88 MB"],
+    "proof-pdf": ["存摺封面_掃描版.pdf", "今天，下午 4:22 · 1.24 MB"],
+    "proof-jpg": ["存摺封面.jpg", "今天，下午 4:21 · 2.16 MB"],
+    zip: ["存摺附件_不支援格式.zip", "今天，下午 4:18 · 684 KB"],
+    pdf: ["存摺封面_超過10MB.pdf", "今天，下午 4:12 · 12.4 MB"],
+    "system-error": ["存摺封面_系統異常.png", "今天，下午 4:25 · 模擬系統異常"],
+    "recognition-error": ["存摺封面_辨識失敗.jpg", "今天，下午 4:24 · 模擬辨識失敗"],
+    "network-error": ["存摺封面_連線異常.png", "今天，下午 4:23 · 模擬網路異常"],
+    "no-data": ["存摺封面_查無資料.jpg", "今天，下午 4:26 · 模擬查無資料"],
+  };
+  filePickerList.querySelectorAll("[data-sample-file]").forEach((row) => {
+    const name = row.querySelector(".file-picker-name");
+    const meta = row.querySelector(".file-picker-meta");
+    if (!row.dataset.uploadName) row.dataset.uploadName = name.textContent;
+    if (!row.dataset.uploadMeta) row.dataset.uploadMeta = meta.textContent;
+    const bankbookSample = bankbookSamples[row.dataset.sampleFile];
+    name.textContent = isBankbook && bankbookSample ? bankbookSample[0] : row.dataset.uploadName;
+    meta.textContent = isBankbook && bankbookSample ? bankbookSample[1] : row.dataset.uploadMeta;
+  });
   filePickerSearch.value = "";
   filePickerList.querySelectorAll(".file-picker-row").forEach((row) => { row.hidden = false; });
   filePickerList.querySelectorAll(".file-picker-group").forEach((group) => { group.hidden = false; });
@@ -1951,7 +1983,9 @@ function updateBankSelectionErrors() {
 }
 
 function validateBankAccount() {
-  bankAccountTouched = true;
+  if (!bankInfoForm.elements.bank.value) bankSelectionTouched = true;
+  if (!bankInfoForm.elements.branch.value) branchSelectionTouched = true;
+  updateBankSelectionErrors();
   const account = bankInfoForm.elements.account.value.trim();
   const isInvalid = !/^\d{6,16}$/.test(account);
   bankAccountError.hidden = !isInvalid;
@@ -2069,6 +2103,7 @@ function filterBankOptions() {
 function openBankCombobox() {
   if (bankCombobox.classList.contains("is-open")) return;
   closeBranchCombobox();
+  bankInfoTitle.textContent = "上傳存摺或填寫匯款資料";
   bankSelectionTouched = false;
   bankComboboxInput.value = "";
   bankComboboxInput.placeholder = "請搜尋匯款銀行";
@@ -2143,6 +2178,7 @@ function filterBranchOptions() {
 function openBranchCombobox() {
   if (branchComboboxInput.disabled || branchCombobox.classList.contains("is-open")) return;
   closeBankCombobox();
+  bankInfoTitle.textContent = "上傳存摺或填寫匯款資料";
   branchSelectionTouched = false;
   branchComboboxInput.value = "";
   branchComboboxInput.placeholder = "請搜尋分行別";
@@ -2180,6 +2216,7 @@ function moveBranchActiveOption(direction) {
 }
 
 function openBankInfoDialog() {
+  bankInfoTitle.textContent = "帳戶資訊";
   bankInfoDialog.hidden = false;
   requestAnimationFrame(() => bankInfoDialog.focus({ preventScroll: true }));
 }
@@ -2199,16 +2236,17 @@ function closeBankInfoDialog({ restoreFocus = true, showPrompt = true } = {}) {
 
 function handleBankbookFile(file) {
   if (!file) return;
+  bankInfoTitle.textContent = "上傳存摺或填寫匯款資料";
   const extension = file.name.split(".").pop().toLowerCase();
   if (file.size > 10 * 1024 * 1024) {
     bankbookFileInput.value = "";
-    bankbookError.textContent = "檔案大小超過 10 MB，請重新上傳。";
+    bankbookError.textContent = "檔案大小超過 10 MB，請重新上傳";
     bankbookError.hidden = false;
     return;
   }
   if (!["jpg", "jpeg", "png", "heic", "pdf"].includes(extension)) {
     bankbookFileInput.value = "";
-    bankbookError.textContent = "檔案格式錯誤，請重新上傳。";
+    bankbookError.textContent = "檔案格式錯誤，請重新上傳";
     bankbookError.hidden = false;
     return;
   }
@@ -2227,7 +2265,7 @@ function handleBankbookFile(file) {
       bankbookSelected.hidden = true;
       bankbookSelectedName.textContent = "";
       bankbookDropzone.hidden = false;
-      bankbookError.textContent = "網路連線異常，請重新上傳。";
+      bankbookError.textContent = "網路連線異常，請重新上傳";
       bankbookError.hidden = false;
       return;
     }
@@ -2373,6 +2411,18 @@ function selectSampleFile(type) {
   const file = samples[type];
   if (!file) return;
   if (filePickerTarget === "bankbook") {
+    const bankbookFileNames = {
+      pdf: "存摺封面_超過10MB.pdf",
+      zip: "存摺附件_不支援格式.zip",
+      png: "存摺封面.png",
+      "proof-jpg": "存摺封面.jpg",
+      "proof-pdf": "存摺封面_掃描版.pdf",
+      "network-error": "存摺封面_連線異常.png",
+      "no-data": "存摺封面_查無資料.jpg",
+      "recognition-error": "存摺封面_辨識失敗.jpg",
+      "system-error": "存摺封面_系統異常.png",
+    };
+    file.name = bankbookFileNames[type] ?? file.name;
     handleBankbookFile(file);
     hideFilePicker();
     return;
@@ -2870,20 +2920,33 @@ uploadBody.addEventListener("scroll", () => {
 window.addEventListener("resize", () => {
   if (!uploadHelpCopy.hidden) positionUploadHelp();
 });
-uploadDropzone.addEventListener("click", showUploadSourceMenu);
+uploadDropzone.addEventListener("click", () => showUploadSourceMenu("upload"));
 uploadSourceMenu.querySelectorAll("[data-close-source]").forEach((button) => button.addEventListener("click", hideUploadSourceMenu));
 uploadSourceMenu.querySelectorAll("[data-upload-source]").forEach((button) => {
   button.addEventListener("click", () => {
     const source = button.dataset.uploadSource;
+    const target = uploadSourceTarget;
     if (source === "cancel") {
       hideUploadSourceMenu();
       return;
     }
     if (source === "files") {
-      showFilePicker();
+      showFilePicker(target);
       return;
     }
     uploadSourceMenu.hidden = true;
+    uploadSourceMenu.classList.remove("is-bankbook-source-menu");
+    if (target === "bankbook") {
+      bankbookFileInput.value = "";
+      bankbookFileInput.multiple = false;
+      bankbookFileInput.accept = source === "photos"
+        ? "image/*"
+        : ".jpg,.jpeg,.png,.heic,.pdf,image/*,application/pdf";
+      if (source === "camera") bankbookFileInput.setAttribute("capture", "environment");
+      else bankbookFileInput.removeAttribute("capture");
+      bankbookFileInput.click();
+      return;
+    }
     uploadFileInput.multiple = uploadMode === "delay-proof" && source !== "camera";
     uploadFileInput.accept = source === "photos"
       ? "image/*"
@@ -3079,7 +3142,7 @@ document.addEventListener("pointerdown", (event) => {
 
 boardingInfoDialog.querySelectorAll("[data-close-info]").forEach((button) => button.addEventListener("click", closeBoardingInfoDialog));
 bankInfoDialog.querySelectorAll("[data-close-bank-info]").forEach((button) => button.addEventListener("click", () => closeBankInfoDialog()));
-bankbookDropzone.addEventListener("click", () => showFilePicker("bankbook"));
+bankbookDropzone.addEventListener("click", () => showUploadSourceMenu("bankbook"));
 bankbookFileInput.addEventListener("change", () => handleBankbookFile(bankbookFileInput.files[0]));
 bankbookRemove.addEventListener("click", removeBankbookFile);
 bankInfoForm.addEventListener("input", (event) => {

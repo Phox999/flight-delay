@@ -1235,6 +1235,7 @@ a.inline-link { text-decoration: underline; }
   place-items: center;
 }
 .upload-source-menu[hidden] { display: none; }
+#upload-source-menu.is-bankbook-source-menu { z-index: 8; }
 .upload-source-scrim {
   position: absolute;
   inset: 0;
