@@ -52,9 +52,13 @@ const bankInfoForm = document.querySelector("#bank-info-form");
 const bankCombobox = document.querySelector("#bank-combobox");
 const bankComboboxInput = document.querySelector("#bank-combobox-input");
 const bankComboboxResults = document.querySelector("#bank-options");
+const bankField = document.querySelector("#bank-field");
+const bankSelectionError = document.querySelector("#bank-selection-error");
 const branchCombobox = document.querySelector("#branch-combobox");
 const branchComboboxInput = document.querySelector("#branch-combobox-input");
 const branchComboboxResults = document.querySelector("#branch-options");
+const branchField = document.querySelector("#branch-field");
+const branchSelectionError = document.querySelector("#branch-selection-error");
 const bankbookFileInput = document.querySelector("#bankbook-file-input");
 const bankbookDropzone = document.querySelector("#bankbook-dropzone");
 const bankbookSelected = document.querySelector("#bankbook-selected");
@@ -123,6 +127,9 @@ const bankSearchAliases = {
   "812": "台新銀行 Taishin Bank",
 };
 let bankbookUploadTimer = null;
+let bankSelectionTouched = false;
+let branchSelectionTouched = false;
+let bankAccountTouched = false;
 let otpResendSeconds = 60;
 let otpExpirySeconds = 300;
 let otpAttemptCount = 0;
@@ -1928,12 +1935,25 @@ function updateBankInfoButton() {
   const { bank, branch, account } = bankInfoForm.elements;
   const accountIsValid = /^\d{6,16}$/.test(account.value.trim());
   const menuIsOpen = bankCombobox.classList.contains("is-open") || branchCombobox.classList.contains("is-open");
+  updateBankSelectionErrors();
   confirmBankInfoButton.disabled = menuIsOpen || !(bank.value && branch.value && accountIsValid);
 }
 
+function updateBankSelectionErrors() {
+  const bankIsInvalid = bankSelectionTouched && !bankInfoForm.elements.bank.value;
+  const branchIsInvalid = branchSelectionTouched && !bankInfoForm.elements.branch.value;
+  bankSelectionError.hidden = !bankIsInvalid;
+  branchSelectionError.hidden = !branchIsInvalid;
+  bankField.classList.toggle("is-invalid", bankIsInvalid);
+  branchField.classList.toggle("is-invalid", branchIsInvalid);
+  bankComboboxInput.setAttribute("aria-invalid", String(bankIsInvalid));
+  branchComboboxInput.setAttribute("aria-invalid", String(branchIsInvalid));
+}
+
 function validateBankAccount() {
+  bankAccountTouched = true;
   const account = bankInfoForm.elements.account.value.trim();
-  const isInvalid = Boolean(account) && !/^\d{6,16}$/.test(account);
+  const isInvalid = !/^\d{6,16}$/.test(account);
   bankAccountError.hidden = !isInvalid;
   bankAccountField.classList.toggle("is-invalid", isInvalid);
   bankInfoForm.elements.account.setAttribute("aria-invalid", String(isInvalid));
@@ -1948,8 +1968,9 @@ function updateBankBranches(selectedBranch = "") {
   branch.value = "";
   branchComboboxInput.value = "";
   branchComboboxInput.dataset.selectedLabel = "";
+  branchSelectionTouched = false;
   branchComboboxInput.disabled = !bankRecord;
-  branchComboboxInput.placeholder = bankRecord ? "請選擇分行別" : "請先選擇銀行";
+  branchComboboxInput.placeholder = "請搜尋分行別";
   branchComboboxInput.setAttribute("aria-expanded", "false");
   branchComboboxInput.removeAttribute("aria-activedescendant");
   branchCombobox.classList.remove("is-open");
@@ -1965,14 +1986,15 @@ function updateBankBranches(selectedBranch = "") {
     option.setAttribute("aria-selected", "false");
     option.dataset.branchOption = "";
     option.dataset.value = code;
-    option.dataset.label = name;
-    option.dataset.search = `${code} ${name} ${address}`;
-    option.textContent = name;
+    option.dataset.name = name;
+    option.dataset.label = `${bank.value}${code} ${name}`;
+    option.dataset.search = `${bank.value}${code} ${code} ${name} ${address}`;
+    option.textContent = option.dataset.label;
     branchComboboxResults.append(option);
   });
 
   const selectedOption = [...branchCombobox.querySelectorAll("[data-branch-option]")]
-    .find((option) => option.dataset.value === selectedBranch || option.dataset.label === selectedBranch);
+    .find((option) => option.dataset.value === selectedBranch || option.dataset.name === selectedBranch || option.dataset.label === selectedBranch);
   if (selectedOption) {
     branch.value = selectedOption.dataset.value;
     branchComboboxInput.value = selectedOption.dataset.label;
@@ -1983,9 +2005,10 @@ function updateBankBranches(selectedBranch = "") {
 
 function renderBankOptions() {
   bankCombobox.querySelectorAll("[data-bank-option]").forEach((option) => option.remove());
+  const displayNames = { "004": "臺灣銀行", "013": "國泰世華", "700": "中華郵政", "812": "台新銀行" };
   taiwanBankDirectory.forEach((bank) => {
     const option = document.createElement("button");
-    const displayName = bank.code === "700" ? "中華郵政" : bank.name;
+    const displayName = displayNames[bank.code] ?? bank.name;
     option.className = "airport-option";
     option.type = "button";
     option.id = `bank-option-${bank.code}`;
@@ -2011,7 +2034,8 @@ function closeBankCombobox({ restoreSelection = true } = {}) {
   if (!bankCombobox.classList.contains("is-open")) return;
   const icon = bankCombobox.querySelector(".airport-state-icon img");
   if (restoreSelection) bankComboboxInput.value = bankComboboxInput.dataset.selectedLabel ?? "";
-  bankComboboxInput.placeholder = bankInfoForm.elements.bank.value ? "" : "請選擇你的帳號";
+  if (!bankInfoForm.elements.bank.value) bankSelectionTouched = true;
+  bankComboboxInput.placeholder = bankInfoForm.elements.bank.value ? "" : "請搜尋匯款銀行";
   bankComboboxInput.setCustomValidity("");
   bankComboboxInput.setAttribute("aria-expanded", "false");
   bankComboboxInput.removeAttribute("aria-activedescendant");
@@ -2045,14 +2069,16 @@ function filterBankOptions() {
 function openBankCombobox() {
   if (bankCombobox.classList.contains("is-open")) return;
   closeBranchCombobox();
+  bankSelectionTouched = false;
   bankComboboxInput.value = "";
-  bankComboboxInput.placeholder = "搜尋銀行";
+  bankComboboxInput.placeholder = "請搜尋匯款銀行";
   bankComboboxInput.setCustomValidity("請從搜尋結果中選擇銀行。");
   bankComboboxInput.setAttribute("aria-expanded", "true");
   bankCombobox.classList.add("is-open");
   bankComboboxResults.hidden = false;
   bankCombobox.querySelector(".airport-state-icon img").src = "assets/airport-search.svg";
   filterBankOptions();
+  updateBankInfoButton();
 }
 
 function chooseBankOption(option) {
@@ -2081,7 +2107,8 @@ function moveBankActiveOption(direction) {
 function closeBranchCombobox({ restoreSelection = true } = {}) {
   if (!branchCombobox.classList.contains("is-open")) return;
   if (restoreSelection) branchComboboxInput.value = branchComboboxInput.dataset.selectedLabel ?? "";
-  branchComboboxInput.placeholder = bankInfoForm.elements.bank.value ? "請選擇分行別" : "請先選擇銀行";
+  if (bankInfoForm.elements.bank.value && !bankInfoForm.elements.branch.value) branchSelectionTouched = true;
+  branchComboboxInput.placeholder = "請搜尋分行別";
   branchComboboxInput.setCustomValidity("");
   branchComboboxInput.setAttribute("aria-expanded", "false");
   branchComboboxInput.removeAttribute("aria-activedescendant");
@@ -2116,8 +2143,9 @@ function filterBranchOptions() {
 function openBranchCombobox() {
   if (branchComboboxInput.disabled || branchCombobox.classList.contains("is-open")) return;
   closeBankCombobox();
+  branchSelectionTouched = false;
   branchComboboxInput.value = "";
-  branchComboboxInput.placeholder = "搜尋分行";
+  branchComboboxInput.placeholder = "請搜尋分行別";
   branchComboboxInput.setCustomValidity("請從搜尋結果中選擇分行別。");
   branchComboboxInput.setAttribute("aria-expanded", "true");
   branchCombobox.classList.add("is-open");
@@ -2204,8 +2232,8 @@ function handleBankbookFile(file) {
       return;
     }
     setBankSelection("013");
-    updateBankBranches("敦南分行");
-    bankInfoForm.elements.account.value = "000190";
+    updateBankBranches("新竹分行");
+    bankInfoForm.elements.account.value = "0001907088923";
     validateBankAccount();
     updateBankInfoButton();
   }, uploadLoadingDurationMs);

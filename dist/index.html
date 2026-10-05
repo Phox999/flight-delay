@@ -290,7 +290,7 @@
         <button class="bank-info-scrim" type="button" data-close-bank-info aria-label="關閉匯款資料"></button>
         <section class="bank-info-sheet">
           <header class="sheet-header bank-info-header">
-            <h2 class="dialog-title" id="bank-info-title">填寫匯款資料</h2>
+            <h2 class="dialog-title" id="bank-info-title">上傳存摺或填寫匯款資料</h2>
             <button class="dialog-x" type="button" data-close-bank-info aria-label="關閉"><img src="assets/close.svg" alt="" /></button>
           </header>
           <form class="bank-info-form" id="bank-info-form" novalidate>
@@ -298,11 +298,11 @@
               <div class="bankbook-section-group">
                 <p class="bankbook-error" id="bankbook-error" role="alert" hidden></p>
                 <section class="bankbook-section" aria-labelledby="bankbook-intro">
-                  <p class="bank-info-intro" id="bankbook-intro">上傳存摺封面或直接填寫下方匯款資訊</p>
+                  <p class="bankbook-label" id="bankbook-intro">上傳存摺封面(選填)</p>
                   <input class="bankbook-file-input" id="bankbook-file-input" type="file" accept=".jpg,.jpeg,.png,.heic,.pdf" aria-label="上傳存摺封面" />
                   <button class="bankbook-dropzone" id="bankbook-dropzone" type="button" aria-describedby="bankbook-error">
                     <img src="assets/file-upload.svg" alt="" />
-                    <span>上傳存摺封面</span>
+                    <span>上傳文件</span>
                   </button>
                   <div class="bankbook-selected" id="bankbook-selected" aria-live="polite" hidden>
                     <span class="bankbook-selected-name" id="bankbook-selected-name"></span>
@@ -315,36 +315,37 @@
                 </section>
               </div>
               <div class="bank-info-fields">
-                <label class="bank-info-field"><span>身分證字號</span><input name="nationalId" value="A403***978" readonly aria-readonly="true" /></label>
                 <label class="bank-info-field"><span>匯款戶名</span><input name="accountName" value="星見雅" readonly aria-readonly="true" /></label>
-                <label class="bank-info-field"><span id="bank-label">匯款銀行</span>
+                <label class="bank-info-field" id="bank-field"><span id="bank-label">匯款銀行</span>
                   <input type="hidden" name="bank" value="" />
                   <div class="bank-combobox" id="bank-combobox">
-                    <input class="bank-combobox-input" id="bank-combobox-input" type="text" placeholder="請選擇你的帳號" role="combobox" aria-labelledby="bank-label" aria-required="true" aria-autocomplete="list" aria-expanded="false" aria-controls="bank-options" autocomplete="off" />
+                    <input class="bank-combobox-input" id="bank-combobox-input" type="text" placeholder="請搜尋匯款銀行" role="combobox" aria-labelledby="bank-label" aria-describedby="bank-selection-error" aria-required="true" aria-invalid="false" aria-autocomplete="list" aria-expanded="false" aria-controls="bank-options" autocomplete="off" />
                     <span class="airport-state-icon" aria-hidden="true"><img src="assets/Direction=down.svg" alt="" /></span>
                     <div class="airport-results" id="bank-options" role="listbox" hidden>
                       <p class="airport-empty" role="status" hidden>找不到符合的銀行</p>
                     </div>
                   </div>
+                  <span class="bank-info-field-error" id="bank-selection-error" role="alert" hidden>請選擇匯款銀行</span>
                 </label>
-                <label class="bank-info-field"><span id="branch-label">分行別</span>
+                <label class="bank-info-field" id="branch-field"><span id="branch-label">分行別</span>
                   <input type="hidden" name="branch" value="" />
                   <div class="bank-combobox" id="branch-combobox">
-                    <input class="bank-combobox-input" id="branch-combobox-input" type="text" placeholder="請先選擇銀行" role="combobox" aria-labelledby="branch-label" aria-required="true" aria-autocomplete="list" aria-expanded="false" aria-controls="branch-options" autocomplete="off" disabled />
+                    <input class="bank-combobox-input" id="branch-combobox-input" type="text" placeholder="請搜尋分行別" role="combobox" aria-labelledby="branch-label" aria-describedby="branch-selection-error" aria-required="true" aria-invalid="false" aria-autocomplete="list" aria-expanded="false" aria-controls="branch-options" autocomplete="off" disabled />
                     <span class="airport-state-icon" aria-hidden="true"><img src="assets/Direction=down.svg" alt="" /></span>
                     <div class="airport-results" id="branch-options" role="listbox" hidden>
                       <p class="airport-empty" role="status" hidden>找不到符合的分行</p>
                     </div>
                   </div>
+                  <span class="bank-info-field-error" id="branch-selection-error" role="alert" hidden>請選擇你的分行別</span>
                 </label>
-                <label class="bank-info-field" id="bank-account-field"><span>匯款帳號</span><input name="account" type="text" inputmode="numeric" maxlength="16" autocomplete="off" placeholder="請輸入匯款帳號" aria-describedby="bank-account-error" aria-invalid="false" required /><span class="bank-account-error" id="bank-account-error" role="alert" hidden>請輸入正確的匯款帳號</span></label>
+                <label class="bank-info-field" id="bank-account-field"><span>匯款帳號</span><input name="account" type="text" inputmode="numeric" maxlength="16" autocomplete="off" placeholder="請輸入匯款帳號" aria-describedby="bank-account-error" aria-invalid="false" required /><span class="bank-info-field-error" id="bank-account-error" role="alert" hidden>請輸入正確的匯款帳號</span></label>
               </div>
             </div>
             <footer class="bank-info-footer"><button id="confirm-bank-info" type="submit" disabled>確認資訊</button></footer>
           </form>
         </section>
         <div class="bank-info-loading" id="bank-info-loading" role="status" aria-live="polite" hidden>
-          <div class="bank-info-loading-card"><img src="assets/loading-star.svg" alt="" /><span>檔案上傳中</span></div>
+          <div class="bank-info-loading-card"><img src="assets/loading-star.svg" alt="" /><span>圖片辨識中</span></div>
         </div>
       </div>
 
