@@ -190,8 +190,7 @@
         <div class="file-picker-content">
           <div class="file-picker-heading"><h3>最近項目</h3><button type="button" id="file-picker-sort" data-sort="recent">名稱</button></div>
           <div class="file-picker-list" id="file-picker-list">
-            <div class="file-picker-group" data-file-group="valid-files">
-              <h4 class="file-picker-group-title">可正常上傳的文件</h4>
+            <div class="file-picker-group" data-file-group="files">
               <button class="file-picker-row" type="button" data-sample-file="png" data-recent-order="1624">
                 <span class="file-picker-icon"><img src="assets/file-picker-asset-3.svg" alt="" /><span class="file-type-badge png">PNG</span></span>
                 <span class="file-picker-details"><span class="file-picker-name">登機證.png</span><span class="file-picker-meta">今天，下午 4:24 · 1.88 MB</span></span><span class="file-picker-ellipsis" aria-hidden="true">•••</span>
@@ -208,16 +207,13 @@
                 <span class="file-picker-icon"><img src="assets/file-picker-asset-3.svg" alt="" /><span class="file-type-badge jpg">JPG</span></span>
                 <span class="file-picker-details"><span class="file-picker-name">存摺.jpg</span><span class="file-picker-meta">今天，下午 4:20 · 1.42 MB</span></span><span class="file-picker-ellipsis" aria-hidden="true">•••</span>
               </button>
-            </div>
-            <div class="file-picker-group" data-file-group="file-validation">
-              <h4 class="file-picker-group-title">格式與大小限制測試</h4>
               <button class="file-picker-row" type="button" data-sample-file="zip" data-recent-order="1618">
                 <span class="file-picker-icon"><img src="assets/file-picker-asset-3.svg" alt="" /><span class="file-type-badge zip">ZIP</span></span>
-                <span class="file-picker-details"><span class="file-picker-name">zip.zip</span><span class="file-picker-meta">今天，下午 4:18 · 684 KB</span></span><span class="file-picker-ellipsis" aria-hidden="true">•••</span>
+                <span class="file-picker-details"><span class="file-picker-name">不支援格式.zip</span><span class="file-picker-meta">今天，下午 4:18 · 684 KB</span></span><span class="file-picker-ellipsis" aria-hidden="true">•••</span>
               </button>
               <button class="file-picker-row" type="button" data-sample-file="pdf" data-recent-order="1612">
                 <span class="file-picker-icon"><img src="assets/file-picker-asset-3.svg" alt="" /><span class="file-type-badge pdf">PDF</span></span>
-                <span class="file-picker-details"><span class="file-picker-name">20MB的檔案.pdf</span><span class="file-picker-meta">今天，下午 4:12 · 20 MB</span></span><span class="file-picker-ellipsis" aria-hidden="true">•••</span>
+                <span class="file-picker-details"><span class="file-picker-name">超過大小限制.pdf</span><span class="file-picker-meta">今天，下午 4:12 · 20 MB</span></span><span class="file-picker-ellipsis" aria-hidden="true">•••</span>
               </button>
             </div>
           </div>

@@ -2752,8 +2752,8 @@ function closeBoardingInfoDialog() {
 
 function selectSampleFile(type) {
   const samples = {
-    pdf: { name: "20MB的檔案.pdf", size: 20 * 1024 * 1024, type: "application/pdf" },
-    zip: { name: "zip.zip", size: 684 * 1024, type: "application/zip" },
+    pdf: { name: "超過大小限制.pdf", size: 20 * 1024 * 1024, type: "application/pdf" },
+    zip: { name: "不支援格式.zip", size: 684 * 1024, type: "application/zip" },
     png: { name: "登機證.png", size: 1.88 * 1024 * 1024, type: "image/png" },
     "proof-jpg": { name: "延誤證明.jpg", size: 2.16 * 1024 * 1024, type: "image/jpeg" },
     "aaaa-jpg": { name: "存摺.jpg", size: 1.42 * 1024 * 1024, type: "image/jpeg" },
