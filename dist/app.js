@@ -161,6 +161,7 @@ const simulatedOtpCode = "123123";
 const simulatedOtpApiErrorCode = "999999";
 const memberCenterUrl = "https://www.cathay-ins.com.tw/INSOCWeb/";
 const confirmDialog = document.querySelector("#confirm-dialog");
+const confirmTitle = document.querySelector("#confirm-title");
 const confirmCopy = document.querySelector("#confirm-copy");
 const confirmGo = document.querySelector("#confirm-go");
 const officialClaimUrl = "https://www.cathay-ins.com.tw/cathayins/personal/claim/travel/";
@@ -1443,7 +1444,7 @@ function submitAuthForm(form) {
     const identity = value("login-code-id").toUpperCase();
     // This is a front-end prototype without a member lookup; account existence is checked by the real service.
     if (!identity) { setAuthFieldError("login-code-id", "請輸入身分證號 / 居留證號"); return; }
-    if (!parseAuthBirthday(value("login-birthday"))) { setAuthFieldError("login-birthday", "請輸入正確生日，格式為西元年月日"); return; }
+    if (!parseAuthBirthday(value("login-birthday"))) { setAuthFieldError("login-birthday", "生日格式錯誤"); return; }
     startAuthOtp("login");
     return;
   }
@@ -1793,13 +1794,13 @@ function showUploadDialog(mode = "boarding-pass", returnFocus = document.activeE
   uploadFileInput.removeAttribute("capture");
   uploadTitle.textContent = mode === "delay-proof" ? "班機延誤證明上傳" : "登機證上傳";
   uploadDialog.querySelector(".upload-scrim").setAttribute("aria-label", mode === "delay-proof" ? "關閉班機延誤證明上傳" : "關閉登機證上傳");
-  uploadDropLabel.textContent = mode === "delay-proof" ? "點擊上傳班機延誤證明" : "點擊上傳登機證";
+  uploadDropLabel.textContent = mode === "delay-proof" ? "上傳文件" : "點擊上傳登機證";
   uploadHelpWrap.hidden = mode !== "delay-proof";
   uploadHelpCopy.hidden = true;
   uploadHelpTrigger.setAttribute("aria-expanded", "false");
   setUploadNotes(mode === "delay-proof"
     ? ["支援 JPG、JPEG、PNG、HEIC、PDF，單檔上限 10 MB", "最多上傳 3 張班機延誤證明"]
-    : ["支援 JPG、JPEG、PNG、HEIC，單檔上限 10 MB", "如有 2 張（含）以上登機證或多段航班皆延誤，產險官網或線下通路(包含臨櫃及郵寄)申請"]);
+    : ["支援 JPG、JPEG、PNG、HEIC，單檔上限 10 MB", "如有2張(含)以上登機證或多段航班皆延誤，請透過產險官網或其他通路(臨櫃或郵寄)申請"]);
   uploadSourceMenu.querySelector("[role='dialog']").setAttribute("aria-label", mode === "delay-proof" ? "選擇班機延誤證明來源" : "選擇登機證來源");
   uploadDropzone.hidden = false;
   uploadFileList.replaceChildren();
@@ -1839,6 +1840,10 @@ function hideUploadSourceMenu() {
 
 function showFilePicker(target = "upload") {
   filePickerTarget = target;
+  if (target === "bankbook") {
+    bankComboboxInput.placeholder = "請選擇你的帳號";
+    branchComboboxInput.placeholder = "請選擇分行別";
+  }
   uploadSourceMenu.hidden = true;
   filePickerSearch.value = "";
   filePickerList.querySelectorAll(".file-picker-row").forEach((row) => { row.hidden = false; });
@@ -2065,6 +2070,17 @@ function finishBoardingPassUpload() {
     appendAssistantMessage(content);
     return;
   }
+  if (selectedBoardingPass.outcome === "system-error") {
+    closeUploadDialog({ restoreFocus: false, showNoProof: false });
+    appendUserMessage("確認上傳");
+
+    const content = document.createElement("div");
+    const message = document.createElement("p");
+    message.textContent = "系統出現異常，建議你可以到會員中心使用理賠申請服務。";
+    content.append(message, makeAction("前往會員中心", "claim-member"));
+    appendAssistantMessage(content);
+    return;
+  }
   if (selectedBoardingPass.outcome === "recognition-error") {
     boardingPassRecognitionFailures += 1;
     closeUploadDialog({ restoreFocus: false, showNoProof: false });
@@ -2073,7 +2089,7 @@ function finishBoardingPassUpload() {
     const content = document.createElement("div");
     const message = document.createElement("p");
     message.textContent = boardingPassRecognitionFailures < 2
-      ? "你上傳的文件無法辨識，請手動輸入或重新上傳。"
+      ? "系統辨識出現異常，可以點選重新上傳或直接手動輸入。"
       : "文件已上傳成功，但目前無法辨識內容，請改用手動輸入。";
     const actions = document.createElement("div");
     actions.className = "single-button-row";
@@ -2235,6 +2251,8 @@ function addDelayProofFiles(files) {
       entry.error = "檔案大小超過 10 MB，請刪除後重新上傳。";
     } else if (!["jpg", "jpeg", "png", "heic", "pdf"].includes(extension)) {
       entry.error = "此檔案格式不支援，請刪除後重新上傳。";
+    } else if (file.outcome === "recognition-error") {
+      entry.error = "檔案辨識失敗，請刪除後重新上傳。";
     }
     selectedDelayProofFiles.push(entry);
   });
@@ -2365,7 +2383,7 @@ function updateBankBranches(selectedBranch = "") {
   branchComboboxInput.value = "";
   branchComboboxInput.dataset.selectedLabel = "";
   branchComboboxInput.disabled = !bankRecord;
-  branchComboboxInput.placeholder = "請搜尋分行別";
+  branchComboboxInput.placeholder = bankRecord ? "請選擇分行別" : "請搜尋分行別";
   branchComboboxInput.setAttribute("aria-expanded", "false");
   branchComboboxInput.removeAttribute("aria-activedescendant");
   branchCombobox.classList.remove("is-open");
@@ -2374,6 +2392,7 @@ function updateBankBranches(selectedBranch = "") {
 
   (bankRecord?.branches ?? []).forEach(([code, name, address]) => {
     const option = document.createElement("button");
+    const displayLabel = `${bank.value}${code} ${name}`;
     option.className = "airport-option";
     option.type = "button";
     option.id = `branch-option-${code}`;
@@ -2381,18 +2400,20 @@ function updateBankBranches(selectedBranch = "") {
     option.setAttribute("aria-selected", "false");
     option.dataset.branchOption = "";
     option.dataset.value = code;
-    option.dataset.label = name;
-    option.dataset.search = `${code} ${name} ${address}`;
-    option.textContent = name;
+    option.dataset.label = displayLabel;
+    option.dataset.name = name;
+    option.dataset.search = `${displayLabel} ${address}`;
+    option.textContent = displayLabel;
     branchComboboxResults.append(option);
   });
 
   const selectedOption = [...branchCombobox.querySelectorAll("[data-branch-option]")]
-    .find((option) => option.dataset.value === selectedBranch || option.dataset.label === selectedBranch);
+    .find((option) => option.dataset.value === selectedBranch || option.dataset.label === selectedBranch || option.dataset.name === selectedBranch);
   if (selectedOption) {
     branch.value = selectedOption.dataset.value;
-    branchComboboxInput.value = selectedOption.dataset.label;
-    branchComboboxInput.dataset.selectedLabel = selectedOption.dataset.label;
+    const selectedLabel = selectedBranch === selectedOption.dataset.name ? selectedOption.dataset.name : selectedOption.dataset.label;
+    branchComboboxInput.value = selectedLabel;
+    branchComboboxInput.dataset.selectedLabel = selectedLabel;
   }
   updateBankInfoButton();
 }
@@ -2463,7 +2484,8 @@ function openBankCombobox() {
   closeBranchCombobox();
   bankComboboxInput.value = "";
   bankComboboxInput.placeholder = "請搜尋匯款銀行";
-  bankComboboxInput.setCustomValidity("請從搜尋結果中選擇銀行。");
+  branchComboboxInput.placeholder = "請選擇分行別";
+  bankComboboxInput.setCustomValidity("請選擇匯款銀行");
   bankComboboxInput.setAttribute("aria-expanded", "true");
   bankCombobox.classList.add("is-open");
   bankComboboxResults.hidden = false;
@@ -2497,7 +2519,7 @@ function moveBankActiveOption(direction) {
 function closeBranchCombobox({ restoreSelection = true } = {}) {
   if (!branchCombobox.classList.contains("is-open")) return;
   if (restoreSelection) branchComboboxInput.value = branchComboboxInput.dataset.selectedLabel ?? "";
-  branchComboboxInput.placeholder = "請搜尋分行別";
+  branchComboboxInput.placeholder = bankInfoForm.elements.bank.value ? "請選擇分行別" : "請搜尋分行別";
   branchComboboxInput.setCustomValidity("");
   branchComboboxInput.setAttribute("aria-expanded", "false");
   branchComboboxInput.removeAttribute("aria-activedescendant");
@@ -2508,7 +2530,10 @@ function closeBranchCombobox({ restoreSelection = true } = {}) {
 }
 
 function filterBranchOptions() {
-  const query = branchComboboxInput.value.trim().toLocaleLowerCase("zh-Hant");
+  const selectedLabel = branchComboboxInput.dataset.selectedLabel ?? "";
+  const query = (branchComboboxInput.value === selectedLabel ? "" : branchComboboxInput.value)
+    .trim()
+    .toLocaleLowerCase("zh-Hant");
   const options = [...branchCombobox.querySelectorAll("[data-branch-option]")];
   const matches = options.filter((option) => {
     const searchableText = `${option.dataset.search} ${option.textContent}`.toLocaleLowerCase("zh-Hant");
@@ -2532,9 +2557,16 @@ function filterBranchOptions() {
 function openBranchCombobox() {
   if (branchComboboxInput.disabled || branchCombobox.classList.contains("is-open")) return;
   closeBankCombobox();
-  branchComboboxInput.value = "";
-  branchComboboxInput.placeholder = "請搜尋分行別";
-  branchComboboxInput.setCustomValidity("請從搜尋結果中選擇分行別。");
+  const selectedLabel = branchComboboxInput.dataset.selectedLabel ?? "";
+  if (selectedLabel) {
+    branchComboboxInput.value = selectedLabel;
+    branchComboboxInput.placeholder = "";
+    branchComboboxInput.select();
+  } else {
+    branchComboboxInput.value = "";
+    branchComboboxInput.placeholder = "請搜尋分行別";
+  }
+  branchComboboxInput.setCustomValidity("請選擇你的分行別");
   branchComboboxInput.setAttribute("aria-expanded", "true");
   branchCombobox.classList.add("is-open");
   branchComboboxResults.hidden = false;
@@ -2594,13 +2626,17 @@ function handleBankbookFile(file) {
   const extension = file.name.split(".").pop().toLowerCase();
   if (file.size > 10 * 1024 * 1024) {
     bankbookFileInput.value = "";
-    bankbookError.textContent = "檔案大小超過 10 MB，請重新上傳。";
+    bankComboboxInput.placeholder = "請選擇你的帳號";
+    branchComboboxInput.placeholder = "請選擇分行別";
+    bankbookError.textContent = "檔案大小超過 10 MB，請重新上傳或手動填寫匯款資料";
     bankbookError.hidden = false;
     return;
   }
   if (!["jpg", "jpeg", "png", "heic", "pdf"].includes(extension)) {
     bankbookFileInput.value = "";
-    bankbookError.textContent = "檔案格式錯誤，請重新上傳。";
+    bankComboboxInput.placeholder = "請選擇匯款銀行";
+    branchComboboxInput.placeholder = "請選擇分行別";
+    bankbookError.textContent = "檔案格式錯誤，請重新上傳或手動填寫匯款資料";
     bankbookError.hidden = false;
     return;
   }
@@ -2610,6 +2646,8 @@ function handleBankbookFile(file) {
   bankbookSelectedName.textContent = file.name;
   bankbookSelected.hidden = false;
   bankbookDropzone.hidden = true;
+  bankComboboxInput.placeholder = "請選擇你的帳號";
+  branchComboboxInput.placeholder = "請選擇分行別";
   bankInfoLoading.hidden = false;
   window.clearTimeout(bankbookUploadTimer);
   bankbookUploadTimer = window.setTimeout(() => {
@@ -2619,7 +2657,9 @@ function handleBankbookFile(file) {
       bankbookSelected.hidden = true;
       bankbookSelectedName.textContent = "";
       bankbookDropzone.hidden = false;
-      bankbookError.textContent = "網路連線異常，請重新上傳。";
+      bankComboboxInput.placeholder = "請選擇匯款銀行";
+      branchComboboxInput.placeholder = "請選擇分行別";
+      bankbookError.textContent = "網路連線異常，請重新上傳";
       bankbookError.hidden = false;
       return;
     }
@@ -2924,7 +2964,7 @@ function finishOtpVerification() {
   otpDialog.hidden = true;
   const result = document.createElement("div");
   const message = document.createElement("p");
-  message.textContent = "已收到你的匯款資料，案件編號 00910-HAC，可以隨時在會員中心查看理賠進度。";
+  message.textContent = "已收到你的匯款資料，案件號碼 00910-HAC，可以隨時在會員中心查看理賠進度。\n\n如果還要繼續諮詢班機延誤問題，阿發可以繼續為您解答喔~\n";
   const memberLink = document.createElement("a");
   memberLink.className = "otp-member-link";
   memberLink.href = memberCenterUrl;
@@ -2937,7 +2977,7 @@ function finishOtpVerification() {
   memberLink.append(externalIcon);
   memberLink.addEventListener("click", (event) => {
     event.preventDefault();
-    showOfficialConfirm("你即將離開阿發，前往國泰產險會員中心。", memberCenterUrl);
+    showOfficialConfirm("你將前往國泰產險會員中心", memberCenterUrl, "查看理賠進度", "前往會員中心");
   });
   result.append(message, memberLink);
 
@@ -2963,8 +3003,8 @@ function finishOtpApiError() {
 
   const content = document.createElement("div");
   const message = document.createElement("p");
-  message.textContent = "系統出現異常，建議你可以到會員中心使用理賠申請服務。";
-  content.append(message, makeAction("前往會員中心", "claim-member"));
+  message.textContent = "已收到你的匯款資料，案件號碼 00910-HAC，可以隨時在會員中心查看理賠進度。\n\n如果還要繼續諮詢班機延誤問題，阿發可以繼續為您解答喔~\n";
+  content.append(message, makeAction("前往理賠專區", "claim-website"));
   appendAssistantMessage(content);
 }
 
@@ -3057,8 +3097,10 @@ function completeExperienceFeedback(card) {
   card.replaceChildren(check, message);
 }
 
-function showOfficialConfirm(description = "您即將離開阿發，前往產險服務條款頁。", url = officialClaimUrl) {
+function showOfficialConfirm(description = "你將前往國泰產險官網", url = officialClaimUrl, title = "即將前往國泰產險官網", actionLabel = "前往官網") {
+  confirmTitle.textContent = title;
   confirmCopy.textContent = description;
+  confirmGo.textContent = actionLabel;
   confirmGo.href = url;
   confirmDialog.showModal();
 }
@@ -3066,7 +3108,12 @@ function showOfficialConfirm(description = "您即將離開阿發，前往產險
 const aiDisclaimerLink = document.querySelector("#ai-disclaimer-link");
 aiDisclaimerLink.addEventListener("click", (event) => {
   event.preventDefault();
-  showOfficialConfirm("你即將離開阿發，前往 AI 告知聲明頁。", aiDisclaimerLink.href);
+  showOfficialConfirm("你將前往國泰產險官網", aiDisclaimerLink.href, "查看 AI 服務條款");
+});
+const forgotPasswordLink = document.querySelector("#forgot-password-link");
+forgotPasswordLink.addEventListener("click", (event) => {
+  event.preventDefault();
+  showOfficialConfirm("你將前往國泰產險會員中心", forgotPasswordLink.href, "重設密碼", "前往官網");
 });
 confirmGo.addEventListener("click", () => confirmDialog.close());
 
@@ -3905,13 +3952,13 @@ chatScreen.addEventListener("click", (event) => {
       boardingInfoForm.elements.passenger.focus({ preventScroll: true });
       break;
     case "claim-member":
-      showOfficialConfirm("你即將離開阿發，前往國泰產險會員中心。", memberCenterUrl);
+      showOfficialConfirm("你將前往國泰產險會員中心", memberCenterUrl, "查看理賠進度", "前往會員中心");
       break;
     case "claim-register":
       openClaimSignup(button);
       break;
     case "claim-website":
-      showOfficialConfirm("你即將離開阿發，前往產險服務條款頁。", officialClaimUrl);
+      showOfficialConfirm("你將前往國泰產險官網", officialClaimUrl, "使用理賠服務", "前往理賠專區");
       break;
     case "restart-chat":
       startChat();

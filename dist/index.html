@@ -303,7 +303,7 @@
               <div class="bankbook-section-group">
                 <p class="bankbook-error" id="bankbook-error" role="alert" hidden></p>
                 <section class="bankbook-section" aria-labelledby="bankbook-intro">
-                  <p class="bank-info-intro" id="bankbook-intro">上傳存摺或填寫匯款資料</p>
+                  <p class="bank-info-intro" id="bankbook-intro">上傳要保人或填寫匯款資料</p>
                   <input class="bankbook-file-input" id="bankbook-file-input" type="file" accept=".jpg,.jpeg,.png,.heic,.pdf" aria-label="上傳文件" />
                   <button class="bankbook-dropzone" id="bankbook-dropzone" type="button" aria-describedby="bankbook-error">
                     <img src="assets/file-upload.svg" alt="" />
@@ -315,7 +315,7 @@
                   </div>
                   <ol class="bankbook-notes">
                     <li>支援 JPG、JPEG、PNG、HEIC 及 PDF，單檔上限 10 MB，最多上傳 1 個檔案。</li>
-                    <li>上傳存摺後，填寫內容將被直接覆蓋</li>
+                    <li>上傳存摺後，已填寫的匯款資料將被覆蓋</li>
                   </ol>
                 </section>
               </div>
@@ -417,7 +417,7 @@
                 <div class="auth-field auth-password-field">
                   <div class="auth-password-heading">
                     <label for="login-password">密碼</label>
-                    <a class="auth-inline-link" href="https://www.cathay-ins.com.tw/INSOCWeb/servlet/HttpDispatcher/OCH1_0300/prompt" target="_blank" rel="noopener noreferrer">忘記密碼</a>
+                    <a class="auth-inline-link" id="forgot-password-link" href="https://www.cathay-ins.com.tw/INSOCWeb/servlet/HttpDispatcher/OCH1_0300/prompt" target="_blank" rel="noopener noreferrer">忘記密碼</a>
                   </div>
                   <span class="auth-input-action">
                     <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="請輸入密碼" aria-describedby="login-password-error" />
@@ -516,7 +516,7 @@
                 <label class="auth-field" for="signup-id"><span>帳號</span><input id="signup-id" name="identity" type="text" autocomplete="username" autocapitalize="characters" placeholder="請輸入你的身分證或居留證號" aria-describedby="signup-id-error" /><span class="auth-field-error" id="signup-id-error" data-auth-error-for="signup-id" role="alert" hidden></span></label>
                 <label class="auth-field" for="signup-birthday"><span>生日(需年滿 18 歲)</span><input id="signup-birthday" name="birthday" type="text" inputmode="numeric" maxlength="10" autocomplete="bday" placeholder="YYYY/MM/DD" aria-describedby="signup-birthday-error" /><span class="auth-field-error" id="signup-birthday-error" data-auth-error-for="signup-birthday" role="alert" hidden></span></label>
                 <div class="auth-field auth-nationality-field" id="signup-nationality-field" hidden>
-                  <div class="auth-nationality-heading"><label id="signup-nationality-label" for="signup-nationality-trigger">國籍</label><button class="auth-nationality-help-trigger" id="signup-nationality-help" type="button" aria-expanded="false" aria-controls="signup-nationality-tooltip"><img src="assets/ic-mml-info.svg" alt="" /><span>無法注冊的國籍</span></button></div>
+                  <div class="auth-nationality-heading"><label id="signup-nationality-label" for="signup-nationality-trigger">國籍</label><button class="auth-nationality-help-trigger" id="signup-nationality-help" type="button" aria-expanded="false" aria-controls="signup-nationality-tooltip"><img src="assets/ic-mml-info.svg" alt="" /><span>無法註冊的國籍</span></button></div>
                   <div class="auth-nationality-control">
                     <select class="auth-nationality-native" id="signup-nationality" name="nationality" autocomplete="country-name" aria-describedby="signup-nationality-error" aria-hidden="true" tabindex="-1" required><option value="" selected disabled>輸入國籍</option></select>
                     <div class="auth-nationality-search-wrap" id="signup-nationality-search-wrap" hidden>
@@ -590,7 +590,7 @@
         </div>
         <div class="auth-nationality-tooltip" id="signup-nationality-tooltip" role="tooltip" data-placement="above" hidden>
           <div class="auth-nationality-tooltip-body">
-            <p>南蘇丹、黎巴嫩、剛果民主共和國、蘇丹、伊朗、利比亞及北韓 無法注冊。</p>
+            <p>SS 南蘇丹<br />CLB 黎巴嫩<br />CD 剛果民主共和國<br />SD 蘇丹<br />IR 伊朗<br />LY 利比亞<br />KP 北韓</p>
             <button type="button" id="signup-nationality-help-close" aria-label="關閉提示"><img src="assets/tooltip-close.svg" alt="" /></button>
           </div>
           <img class="auth-nationality-tooltip-tail" src="assets/tooltip-tail.svg" alt="" aria-hidden="true" />
@@ -638,8 +638,8 @@
           <img class="mascot-face" src="assets/mascot-face.png" alt="" />
           <span class="avatar-star-position"><span class="avatar-star-inset"><img class="mascot-star" src="assets/mascot-star.svg" alt="" /></span></span>
         </div>
-        <h2 class="dialog-title" id="confirm-title">即將前往國泰產險官網</h2>
-        <p class="dialog-copy" id="confirm-copy">您即將離開阿發，前往產險服務頁面。</p>
+        <h2 class="dialog-title" id="confirm-title">查看 AI 服務條款 </h2>
+        <p class="dialog-copy" id="confirm-copy">你將前往國泰產險官網</p>
         <div class="confirm-actions">
           <button class="dialog-secondary" id="confirm-cancel" type="button">取消</button>
           <a class="dialog-close dialog-link" id="confirm-go" href="https://www.cathay-ins.com.tw/cathayins/personal/claim/travel/" target="_blank" rel="noopener">前往官網</a>
