@@ -2752,13 +2752,12 @@ function closeBoardingInfoDialog() {
 
 function selectSampleFile(type) {
   const samples = {
-    pdf: { name: "班機延誤證明_超過10MB.pdf", size: 12.4 * 1024 * 1024, type: "application/pdf" },
-    "docx-large": { name: "交易明細.docx", size: 12.4 * 1024 * 1024, type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
-    zip: { name: "航班資料_不支援格式.zip", size: 684 * 1024, type: "application/zip" },
-    png: { name: "班機延誤證明.png", size: 1.88 * 1024 * 1024, type: "image/png" },
-    "proof-jpg": { name: "航班延誤證明.jpg", size: 2.16 * 1024 * 1024, type: "image/jpeg" },
-    "aaaa-jpg": { name: "AAAA.jpg", size: 1.42 * 1024 * 1024, type: "image/jpeg" },
-    "proof-pdf": { name: "航空公司證明.pdf", size: 1.24 * 1024 * 1024, type: "application/pdf" },
+    pdf: { name: "20MB的檔案.pdf", size: 20 * 1024 * 1024, type: "application/pdf" },
+    zip: { name: "zip.zip", size: 684 * 1024, type: "application/zip" },
+    png: { name: "登機證.png", size: 1.88 * 1024 * 1024, type: "image/png" },
+    "proof-jpg": { name: "延誤證明.jpg", size: 2.16 * 1024 * 1024, type: "image/jpeg" },
+    "aaaa-jpg": { name: "存摺.jpg", size: 1.42 * 1024 * 1024, type: "image/jpeg" },
+    "proof-pdf": { name: "延誤證明2.pdf", size: 1.24 * 1024 * 1024, type: "application/pdf" },
     "not-boarding-pass": { name: "非登機證測試.jpg", size: 1.35 * 1024 * 1024, type: "image/jpeg", outcome: "not-boarding-pass" },
     "network-error": { name: "連線異常測試.png", size: 1.42 * 1024 * 1024, type: "image/png", outcome: "network-error" },
     "no-data": { name: "查無航班資料測試.jpg", size: 1.32 * 1024 * 1024, type: "image/jpeg", outcome: "no-data" },
