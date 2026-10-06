@@ -765,6 +765,7 @@ a.inline-link { text-decoration: underline; }
 }
 
 .message-input::placeholder { color: var(--text-placeholder); opacity: 1; }
+.message-input:disabled { color: var(--text-secondary); cursor: not-allowed; }
 
 .message-field:focus-within .field-art { filter: drop-shadow(0 0 1px rgb(79 68 195 / 32%)); }
 

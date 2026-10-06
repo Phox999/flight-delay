@@ -10,6 +10,9 @@ const welcome = document.querySelector(".welcome");
 const chatScreen = document.querySelector("#chat-screen");
 const input = document.querySelector("#message-input");
 const sendButton = document.querySelector("#send-button");
+const composerPlaceholder = input.placeholder;
+const composerLabel = input.getAttribute("aria-label") || composerPlaceholder;
+let composerLocked = false;
 const policyDialog = document.querySelector("#policy-dialog");
 const policyTitle = document.querySelector("#dialog-title");
 const policyCopy = document.querySelector("#dialog-copy");
@@ -558,6 +561,14 @@ function scrollChatToBottom() {
   requestAnimationFrame(() => { chatScreen.scrollTop = chatScreen.scrollHeight; });
 }
 
+function setComposerLocked(locked) {
+  composerLocked = locked;
+  input.disabled = locked;
+  input.placeholder = locked ? "申請流程進行中，請依步驟完成" : composerPlaceholder;
+  input.setAttribute("aria-label", locked ? input.placeholder : composerLabel);
+  sendButton.disabled = locked || input.value.trim().length === 0;
+}
+
 function appendUserMessage(message) {
   const row = document.createElement("div");
   row.className = "chat-user-row";
@@ -645,6 +656,7 @@ function appendDefaultConsultation() {
 function startChat(prompt = "") {
   keepChatHash();
   setScreen(true);
+  setComposerLocked(false);
   chatScreen.replaceChildren();
   boardingInfoValidationAttempted = false;
   boardingInfoConfirmed = false;
@@ -776,7 +788,7 @@ function isTaiwanNationalId(value) {
 
 function isResidencePermitId(value) {
   const normalized = value.trim().toUpperCase();
-  return /^[A-Z][89]\d{8}$/.test(normalized) || /^[A-Z]{1,3}\d{8}$/.test(normalized);
+  return /^[A-Z][89]\d{8}$/.test(normalized) || /^[A-Z]{2}\d{8}$/.test(normalized);
 }
 
 function isValidMemberId(value) {
@@ -1285,17 +1297,20 @@ function closeAuthDialog() {
   authDialog.hidden = true;
   clearAuthOtpTimers();
   authIsVerifying = false;
+  setComposerLocked(false);
   if (authOrigin === "claim") appendLoginDeclinedMessage();
   else previousAuthFocus?.focus?.({ preventScroll: true });
 }
 
 function openClaimLogin(returnFocus = document.activeElement) {
   if (!authDialog.hidden) return;
+  setComposerLocked(true);
   showAuthDialog({ origin: "claim", returnFocus });
   appendUserMessage("確認申請");
 }
 
 function openClaimSignup(returnFocus = document.activeElement) {
+  setComposerLocked(true);
   appendUserMessage("加入國泰產險會員");
   showAuthDialog({ origin: "signup", returnFocus });
   showSignupFlow();
@@ -1718,6 +1733,7 @@ function closePersonalDataNotice({ agreed = false } = {}) {
     showUploadDialog();
     return;
   }
+  setComposerLocked(false);
   appendConsentDeclinedMessage();
 }
 
@@ -2962,6 +2978,7 @@ function finishOtpVerification() {
   otpInput.disabled = false;
   otpNext.textContent = "下一步";
   otpDialog.hidden = true;
+  setComposerLocked(false);
   const result = document.createElement("div");
   const message = document.createElement("p");
   message.textContent = "已收到你的匯款資料，案件號碼 00910-HAC，可以隨時在會員中心查看理賠進度。\n\n如果還要繼續諮詢班機延誤問題，阿發可以繼續為您解答喔~\n";
@@ -2998,6 +3015,7 @@ function finishOtpApiError() {
   otpInput.setAttribute("aria-invalid", "false");
   otpNext.textContent = "下一步";
   otpDialog.hidden = true;
+  setComposerLocked(false);
   otpHelpNote.hidden = true;
   otpHelpTrigger.setAttribute("aria-expanded", "false");
 
@@ -3122,11 +3140,12 @@ document.querySelectorAll("[data-prompt]").forEach((button) => {
 });
 
 input.addEventListener("input", () => {
-  sendButton.disabled = input.value.trim().length === 0;
+  sendButton.disabled = composerLocked || input.value.trim().length === 0;
 });
 
 document.querySelector("#composer-form").addEventListener("submit", (event) => {
   event.preventDefault();
+  if (composerLocked) return;
   const message = input.value.trim();
   if (!message) return;
   if (/模擬逾時|久未回覆|服務已結束/.test(message)) {
@@ -3779,7 +3798,14 @@ function isValidBoardingDate(yearValue, dateValue) {
   const year = /^\d{4}$/.test(yearValue.trim()) ? Number(yearValue) : 2000;
   const isLeapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
   const daysInMonth = [31, isLeapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  return day <= daysInMonth[month - 1];
+  if (day > daysInMonth[month - 1]) return false;
+
+  const flightDate = new Date(0);
+  flightDate.setHours(0, 0, 0, 0);
+  flightDate.setFullYear(year, month - 1, day);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return flightDate <= today;
 }
 
 function setBoardingFieldError(input, message) {
@@ -3826,8 +3852,14 @@ function validateBoardingInfo() {
     if (fieldMessage) errors.push(field);
   });
 
-  const yearMessage = /^\d{4}$/.test(year.value.trim()) ? "" : "請輸入正確年份";
-  const dateMessage = isValidBoardingDate(year.value, date.value) ? "" : "請輸入正確的起飛日期";
+  const yearValue = year.value.trim();
+  const yearNumber = Number(yearValue);
+  const yearMessage = /^\d{4}$/.test(yearValue) && yearNumber > 0 && yearNumber <= new Date().getFullYear()
+    ? ""
+    : "請輸入正確年份";
+  const dateMessage = yearMessage
+    ? ""
+    : isValidBoardingDate(yearValue, date.value) ? "" : "請輸入正確的起飛日期";
   setBoardingFieldError(year, yearMessage);
   setBoardingFieldError(date, dateMessage);
   if (yearMessage) errors.push(year);
@@ -3904,9 +3936,11 @@ chatScreen.addEventListener("click", (event) => {
       openClaimLogin(button);
       break;
     case "return-personal-data":
+      setComposerLocked(true);
       showPersonalDataNotice();
       break;
     case "return-login":
+      setComposerLocked(true);
       showAuthDialog({ origin: "claim", returnFocus: button });
       break;
     case "open-upload":
