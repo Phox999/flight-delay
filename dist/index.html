@@ -50,7 +50,7 @@
 
       <section class="chat-screen" id="chat-screen" aria-label="班機延誤諮詢對話" aria-live="polite" hidden></section>
 
-      <section class="welcome" id="flow-1" aria-labelledby="welcome-title">
+      <section class="welcome" aria-labelledby="welcome-title">
         <div class="mascot" role="img" aria-label="阿發吉祥物">
           <img class="mascot-face" src="assets/mascot-face.png" alt="" />
           <img class="mascot-star" src="assets/mascot-star.svg" alt="" />
@@ -204,6 +204,10 @@
                 <span class="file-picker-icon"><img src="assets/file-picker-asset-3.svg" alt="" /><span class="file-type-badge jpg">JPG</span></span>
                 <span class="file-picker-details"><span class="file-picker-name">航班延誤證明.jpg</span><span class="file-picker-meta">今天，下午 4:21 · 2.16 MB</span></span><span class="file-picker-ellipsis" aria-hidden="true">•••</span>
               </button>
+              <button class="file-picker-row" type="button" data-sample-file="aaaa-jpg" data-recent-order="1620">
+                <span class="file-picker-icon"><img src="assets/file-picker-asset-3.svg" alt="" /><span class="file-type-badge jpg">JPG</span></span>
+                <span class="file-picker-details"><span class="file-picker-name">AAAA.jpg</span><span class="file-picker-meta">今天，下午 4:20 · 1.42 MB</span></span><span class="file-picker-ellipsis" aria-hidden="true">•••</span>
+              </button>
             </div>
             <div class="file-picker-group" data-file-group="file-validation">
               <h4 class="file-picker-group-title">格式與大小限制測試</h4>
@@ -215,6 +219,10 @@
                 <span class="file-picker-icon"><img src="assets/file-picker-asset-3.svg" alt="" /><span class="file-type-badge pdf">PDF</span></span>
                 <span class="file-picker-details"><span class="file-picker-name">班機延誤證明_超過10MB.pdf</span><span class="file-picker-meta">今天，下午 4:12 · 12.4 MB</span></span><span class="file-picker-ellipsis" aria-hidden="true">•••</span>
               </button>
+              <button class="file-picker-row" type="button" data-sample-file="docx-large" data-recent-order="1611">
+                <span class="file-picker-icon"><img src="assets/file-picker-asset-3.svg" alt="" /><span class="file-type-badge docx">DOCX</span></span>
+                <span class="file-picker-details"><span class="file-picker-name">交易明細.docx</span><span class="file-picker-meta">今天，下午 4:11 · 12.4 MB</span></span><span class="file-picker-ellipsis" aria-hidden="true">•••</span>
+              </button>
             </div>
             <div class="file-picker-group" data-file-group="upload-outcomes">
               <h4 class="file-picker-group-title">上傳錯誤情境</h4>
@@ -225,6 +233,10 @@
               <button class="file-picker-row" type="button" data-sample-file="recognition-error" data-recent-order="1624">
                 <span class="file-picker-icon"><img src="assets/file-picker-asset-3.svg" alt="" /><span class="file-type-badge jpg">JPG</span></span>
                 <span class="file-picker-details"><span class="file-picker-name">辨識失敗測試.jpg</span><span class="file-picker-meta">今天，下午 4:24 · 模擬辨識失敗</span></span><span class="file-picker-ellipsis" aria-hidden="true">•••</span>
+              </button>
+              <button class="file-picker-row" type="button" data-sample-file="not-boarding-pass" data-recent-order="1622">
+                <span class="file-picker-icon"><img src="assets/file-picker-asset-3.svg" alt="" /><span class="file-type-badge jpg">JPG</span></span>
+                <span class="file-picker-details"><span class="file-picker-name">非登機證測試.jpg</span><span class="file-picker-meta">今天，下午 4:22 · 模擬辨識為非登機證</span></span><span class="file-picker-ellipsis" aria-hidden="true">•••</span>
               </button>
               <button class="file-picker-row" type="button" data-sample-file="network-error" data-recent-order="1623">
                 <span class="file-picker-icon"><img src="assets/file-picker-asset-3.svg" alt="" /><span class="file-type-badge png">PNG</span></span>
@@ -286,11 +298,38 @@
         </section>
       </div>
 
+      <div class="scheduled-time-dialog" id="scheduled-time-dialog" role="dialog" aria-modal="true" aria-labelledby="scheduled-time-title" tabindex="-1" hidden>
+        <button class="scheduled-time-scrim" type="button" data-close-scheduled-time aria-label="關閉原定班機時間" tabindex="-1"></button>
+        <section class="scheduled-time-sheet">
+          <header class="sheet-header scheduled-time-header">
+            <h2 class="dialog-title" id="scheduled-time-title">原定班機時間</h2>
+            <button class="dialog-x" type="button" data-close-scheduled-time aria-label="關閉"><img src="assets/close.svg" alt="" /></button>
+          </header>
+          <form id="scheduled-time-form" class="scheduled-time-form" novalidate>
+            <div class="scheduled-time-fields">
+              <label class="scheduled-time-field" id="scheduled-date-field">
+                <span>原定起飛日期</span>
+                <input id="scheduled-date" name="scheduled-date" type="text" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="YYYY/MM/DD" aria-describedby="scheduled-date-error" />
+                <span class="scheduled-time-error" id="scheduled-date-error" role="alert" hidden>請輸入正確的日期</span>
+              </label>
+              <label class="scheduled-time-field" id="scheduled-hour-field">
+                <span>原定起飛時間(24hr)</span>
+                <input id="scheduled-hour" name="scheduled-hour" type="text" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="HH:MM" aria-describedby="scheduled-hour-error" />
+                <span class="scheduled-time-error" id="scheduled-hour-error" role="alert" hidden>請輸入正確的時間</span>
+              </label>
+            </div>
+            <footer class="scheduled-time-footer">
+              <button id="confirm-scheduled-time" type="submit" disabled>確認資訊</button>
+            </footer>
+          </form>
+        </section>
+      </div>
+
       <div class="bank-info-dialog" id="bank-info-dialog" role="dialog" aria-modal="true" aria-labelledby="bank-info-title" tabindex="-1" hidden>
         <button class="bank-info-scrim" type="button" data-close-bank-info aria-label="關閉匯款資料"></button>
         <section class="bank-info-sheet">
           <header class="sheet-header bank-info-header">
-            <h2 class="dialog-title" id="bank-info-title">上傳存摺或填寫匯款資料</h2>
+            <h2 class="dialog-title" id="bank-info-title">帳戶資訊</h2>
             <button class="dialog-x" type="button" data-close-bank-info aria-label="關閉"><img src="assets/close.svg" alt="" /></button>
           </header>
           <form class="bank-info-form" id="bank-info-form" novalidate>
@@ -298,47 +337,45 @@
               <div class="bankbook-section-group">
                 <p class="bankbook-error" id="bankbook-error" role="alert" hidden></p>
                 <section class="bankbook-section" aria-labelledby="bankbook-intro">
-                  <p class="bankbook-label" id="bankbook-intro">上傳存摺封面(選填)</p>
-                  <input class="bankbook-file-input" id="bankbook-file-input" type="file" accept=".jpg,.jpeg,.png,.heic,.pdf" aria-label="上傳存摺封面" />
+                  <p class="bank-info-intro" id="bankbook-intro">上傳存摺或填寫匯款資料</p>
+                  <input class="bankbook-file-input" id="bankbook-file-input" type="file" accept=".jpg,.jpeg,.png,.heic,.pdf" aria-label="上傳文件" />
                   <button class="bankbook-dropzone" id="bankbook-dropzone" type="button" aria-describedby="bankbook-error">
                     <img src="assets/file-upload.svg" alt="" />
                     <span>上傳文件</span>
                   </button>
                   <div class="bankbook-selected" id="bankbook-selected" aria-live="polite" hidden>
                     <span class="bankbook-selected-name" id="bankbook-selected-name"></span>
-                    <button class="bankbook-remove" id="bankbook-remove" type="button" aria-label="移除存摺封面"><img src="assets/file-delete.svg" alt="" /></button>
+                    <button class="bankbook-remove" id="bankbook-remove" type="button" aria-label="移除上傳文件"><img src="assets/file-delete.svg" alt="" /></button>
                   </div>
                   <ol class="bankbook-notes">
-                    <li>支援 JPG、JPEG、PNG、HEIC 及 PDF，單檔上限 10 MB，最多上傳 1 個檔案</li>
+                    <li>支援 JPG、JPEG、PNG、HEIC 及 PDF，單檔上限 10 MB，最多上傳 1 個檔案。</li>
                     <li>上傳存摺後，填寫內容將被直接覆蓋</li>
                   </ol>
                 </section>
               </div>
               <div class="bank-info-fields">
-                <label class="bank-info-field"><span>匯款戶名</span><input name="accountName" value="星見雅" readonly aria-readonly="true" /></label>
-                <label class="bank-info-field" id="bank-field"><span id="bank-label">匯款銀行</span>
+                <label class="bank-info-field"><span>匯款戶名</span><input name="accountName" value="星O雅" readonly aria-readonly="true" /></label>
+                <label class="bank-info-field"><span id="bank-label">匯款銀行</span>
                   <input type="hidden" name="bank" value="" />
                   <div class="bank-combobox" id="bank-combobox">
-                    <input class="bank-combobox-input" id="bank-combobox-input" type="text" placeholder="請搜尋匯款銀行" role="combobox" aria-labelledby="bank-label" aria-describedby="bank-selection-error" aria-required="true" aria-invalid="false" aria-autocomplete="list" aria-expanded="false" aria-controls="bank-options" autocomplete="off" />
+                    <input class="bank-combobox-input" id="bank-combobox-input" type="text" placeholder="請搜尋匯款銀行" role="combobox" aria-labelledby="bank-label" aria-required="true" aria-autocomplete="list" aria-expanded="false" aria-controls="bank-options" autocomplete="off" />
                     <span class="airport-state-icon" aria-hidden="true"><img src="assets/Direction=down.svg" alt="" /></span>
                     <div class="airport-results" id="bank-options" role="listbox" hidden>
                       <p class="airport-empty" role="status" hidden>找不到符合的銀行</p>
                     </div>
                   </div>
-                  <span class="bank-info-field-error" id="bank-selection-error" role="alert" hidden>請選擇匯款銀行</span>
                 </label>
-                <label class="bank-info-field" id="branch-field"><span id="branch-label">分行別</span>
+                <label class="bank-info-field"><span id="branch-label">分行別</span>
                   <input type="hidden" name="branch" value="" />
                   <div class="bank-combobox" id="branch-combobox">
-                    <input class="bank-combobox-input" id="branch-combobox-input" type="text" placeholder="請搜尋分行別" role="combobox" aria-labelledby="branch-label" aria-describedby="branch-selection-error" aria-required="true" aria-invalid="false" aria-autocomplete="list" aria-expanded="false" aria-controls="branch-options" autocomplete="off" disabled />
+                    <input class="bank-combobox-input" id="branch-combobox-input" type="text" placeholder="請搜尋分行別" role="combobox" aria-labelledby="branch-label" aria-required="true" aria-autocomplete="list" aria-expanded="false" aria-controls="branch-options" autocomplete="off" disabled />
                     <span class="airport-state-icon" aria-hidden="true"><img src="assets/Direction=down.svg" alt="" /></span>
                     <div class="airport-results" id="branch-options" role="listbox" hidden>
                       <p class="airport-empty" role="status" hidden>找不到符合的分行</p>
                     </div>
                   </div>
-                  <span class="bank-info-field-error" id="branch-selection-error" role="alert" hidden>請選擇你的分行別</span>
                 </label>
-                <label class="bank-info-field" id="bank-account-field"><span>匯款帳號</span><input name="account" type="text" inputmode="numeric" maxlength="16" autocomplete="off" placeholder="請輸入匯款帳號" aria-describedby="bank-account-error" aria-invalid="false" required /><span class="bank-info-field-error" id="bank-account-error" role="alert" hidden>請輸入正確的匯款帳號</span></label>
+                <label class="bank-info-field" id="bank-account-field"><span>匯款帳號</span><input name="account" type="text" inputmode="numeric" maxlength="14" autocomplete="off" placeholder="請輸入匯款帳號" aria-describedby="bank-account-error" aria-invalid="false" required /><span class="bank-account-error" id="bank-account-error" role="alert" hidden>請輸入正確的匯款帳號</span></label>
               </div>
             </div>
             <footer class="bank-info-footer"><button id="confirm-bank-info" type="submit" disabled>確認資訊</button></footer>
@@ -369,38 +406,38 @@
                 <span class="otp-countdown" id="otp-countdown" aria-live="polite"></span>
                 <button class="otp-resend" id="otp-resend" type="button" hidden>重新發送</button>
               </div>
-              <div class="otp-help">
+              <div class="otp-help" id="otp-help">
                 <button class="otp-help-trigger" id="otp-help-trigger" type="button" aria-expanded="false" aria-controls="otp-help-note">
                   <img src="assets/ic-mml-info.svg" alt="" />
                   <span>收不到動態密碼簡訊？</span>
                 </button>
-                <div class="otp-help-note" id="otp-help-note" role="note" hidden>
-                  <p>簡訊可能有延遲，請稍候並確認手機號碼是否正確。</p>
-                  <button type="button" id="otp-help-close" aria-label="關閉提示">×</button>
-                </div>
               </div>
             </div>
             <footer class="otp-footer">
               <button id="otp-next" type="submit" disabled>下一步</button>
             </footer>
           </form>
+          <div class="otp-help-note" id="otp-help-note" role="note" hidden>
+            <p>簡訊可能有延遲，請稍候並確認手機號碼是否正確。</p>
+            <button type="button" id="otp-help-close" aria-label="關閉提示">×</button>
+          </div>
         </section>
       </div>
 
       <div class="auth-dialog" id="auth-dialog" role="dialog" aria-modal="true" aria-labelledby="auth-title" tabindex="-1" hidden>
         <button class="auth-scrim" type="button" data-close-auth aria-label="關閉登入或註冊"></button>
-        <section class="auth-sheet" id="auth-sheet" data-view="login-birthday">
+        <section class="auth-sheet" id="auth-sheet" data-view="login-password">
           <header class="sheet-header auth-header">
             <button class="auth-back" id="auth-back" type="button" hidden>上一步</button>
             <h2 class="dialog-title" id="auth-title">登入</h2>
             <button class="dialog-x" type="button" data-close-auth aria-label="關閉"><img src="assets/close.svg" alt="" /></button>
           </header>
           <div class="auth-tabs" id="auth-tabs" role="tablist" aria-label="登入方式">
-            <button type="button" role="tab" id="auth-password-tab" aria-controls="auth-view-login-password" aria-selected="false" data-auth-tab="login-password">密碼登入</button>
-            <button type="button" role="tab" id="auth-code-tab" aria-controls="auth-view-login-birthday" aria-selected="true" data-auth-tab="login-birthday">驗證碼登入</button>
+            <button type="button" role="tab" id="auth-password-tab" aria-controls="auth-view-login-password" aria-selected="true" data-auth-tab="login-password">密碼登入</button>
+            <button type="button" role="tab" id="auth-code-tab" aria-controls="auth-view-login-birthday" aria-selected="false" data-auth-tab="login-birthday">驗證碼登入</button>
           </div>
           <div class="auth-scroll" id="auth-scroll">
-            <section class="auth-view" id="auth-view-login-password" data-auth-view="login-password" role="tabpanel" aria-labelledby="auth-password-tab" hidden>
+            <section class="auth-view" id="auth-view-login-password" data-auth-view="login-password" role="tabpanel" aria-labelledby="auth-password-tab">
               <form class="auth-form" id="auth-password-form" data-auth-form="login-password" novalidate>
                 <p class="auth-status" id="auth-status" role="status" hidden></p>
                 <div class="auth-field">
@@ -435,7 +472,7 @@
               </form>
             </section>
 
-            <section class="auth-view" id="auth-view-login-birthday" data-auth-view="login-birthday" role="tabpanel" aria-labelledby="auth-code-tab">
+            <section class="auth-view" id="auth-view-login-birthday" data-auth-view="login-birthday" role="tabpanel" aria-labelledby="auth-code-tab" hidden>
               <form class="auth-form" id="auth-birthday-form" data-auth-form="login-birthday" novalidate>
                 <div class="auth-field">
                   <label for="login-code-id">帳號</label>
@@ -446,10 +483,7 @@
                   <span class="auth-field-error" id="login-code-id-error" data-auth-error-for="login-code-id" role="alert" hidden></span>
                 </div>
                 <div class="auth-field auth-password-field">
-                  <div class="auth-password-heading">
-                    <label for="login-birthday">生日</label>
-                    <a class="auth-inline-link" href="https://www.cathay-ins.com.tw/INSOCWeb/servlet/HttpDispatcher/OCH1_0300/prompt" target="_blank" rel="noopener noreferrer">忘記密碼</a>
-                  </div>
+                  <label for="login-birthday">生日</label>
                   <span class="auth-input-action">
                     <input id="login-birthday" name="birthday" type="password" inputmode="numeric" maxlength="8" autocomplete="bday" placeholder="請輸入西元年格式，例如19990511" aria-describedby="login-birthday-error" />
                     <button class="auth-icon-button" type="button" data-toggle-password="login-birthday" data-toggle-label="生日" aria-label="顯示生日" aria-pressed="false"><img src="assets/auth-eye-closed.svg" alt="" /></button>
@@ -476,15 +510,11 @@
                   </label>
                   <div class="auth-resend-row login-otp-resend"><span id="login-otp-countdown" aria-live="polite"><span data-countdown-time>0:59</span> 後可以重新發送</span><button class="auth-inline-link" id="login-otp-resend" type="button" hidden>重新發送動態密碼</button></div>
                 </div>
-                <div class="otp-help login-code-help">
+                <div class="otp-help login-code-help" id="login-code-help">
                   <button class="otp-help-trigger" id="login-otp-help-trigger" type="button" aria-expanded="false" aria-controls="login-otp-help-note">
                     <img src="assets/ic-mml-info.svg" alt="" />
-                    <span>收不到驗證碼簡訊？</span>
+                    <span>收不到動態密碼簡訊？</span>
                   </button>
-                  <div class="otp-help-note" id="login-otp-help-note" role="note" hidden>
-                    <p>簡訊可能有延遲，請稍候並確認手機號碼是否正確。</p>
-                    <button type="button" id="login-otp-help-close" aria-label="關閉提示">×</button>
-                  </div>
                 </div>
               </form>
             </section>
@@ -517,12 +547,25 @@
             <section class="auth-view" id="auth-view-signup-1" data-auth-view="signup-1" hidden>
               <div class="auth-progress" data-step="1"><div class="auth-progress-label"><span>填寫基本資料</span><span>1 / 4</span></div><div class="auth-progress-track"><img class="auth-progress-fill" src="assets/signup-progress-bar.png" alt="" /></div></div>
               <form class="auth-form auth-signup-form" id="signup-basic-form" data-auth-form="signup-1" novalidate>
-                <label class="auth-field" for="signup-id"><span>身分證字號</span><input id="signup-id" name="identity" type="text" autocomplete="username" autocapitalize="characters" placeholder="請輸入你的身分證字號" aria-describedby="signup-id-error" /><span class="auth-field-error" id="signup-id-error" data-auth-error-for="signup-id" role="alert" hidden></span></label>
-                <label class="auth-field" for="signup-birthday"><span>生日</span><input id="signup-birthday" name="birthday" type="text" inputmode="numeric" maxlength="10" autocomplete="bday" placeholder="YYYY/MM/DD" aria-describedby="signup-birthday-error" /><span class="auth-field-error" id="signup-birthday-error" data-auth-error-for="signup-birthday" role="alert" hidden></span></label>
-                <label class="auth-field" for="signup-name"><span>姓名</span><input id="signup-name" name="name" type="text" autocomplete="name" placeholder="請輸入你的姓名" aria-describedby="signup-name-error" /><span class="auth-field-error" id="signup-name-error" data-auth-error-for="signup-name" role="alert" hidden></span></label>
-                <label class="auth-field" for="signup-phone"><span>手機號碼</span><input id="signup-phone" name="phone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="請輸入你的手機號碼" aria-describedby="signup-phone-error" /><span class="auth-field-error" id="signup-phone-error" data-auth-error-for="signup-phone" role="alert" hidden></span></label>
-                <label class="auth-field" for="signup-email"><span>Email</span><input id="signup-email" name="email" type="email" autocomplete="email" placeholder="請輸入你的 Email" aria-describedby="signup-email-error" /><span class="auth-field-error" id="signup-email-error" data-auth-error-for="signup-email" role="alert" hidden></span></label>
-                <label class="auth-field" for="signup-promo"><span>活動代碼（選填）</span><input id="signup-promo" name="promo" type="text" autocomplete="off" placeholder="非必填，無代碼可以不用輸入" aria-describedby="signup-promo-error" /><span class="auth-field-error" id="signup-promo-error" data-auth-error-for="signup-promo" role="alert" hidden></span></label>
+                <label class="auth-field" for="signup-id"><span>帳號</span><input id="signup-id" name="identity" type="text" autocomplete="username" autocapitalize="characters" placeholder="請輸入你的身分證或居留證號" aria-describedby="signup-id-error" /><span class="auth-field-error" id="signup-id-error" data-auth-error-for="signup-id" role="alert" hidden></span></label>
+                <label class="auth-field" for="signup-birthday"><span>生日(需年滿 18 歲)</span><input id="signup-birthday" name="birthday" type="text" inputmode="numeric" maxlength="10" autocomplete="bday" placeholder="YYYY/MM/DD" aria-describedby="signup-birthday-error" /><span class="auth-field-error" id="signup-birthday-error" data-auth-error-for="signup-birthday" role="alert" hidden></span></label>
+                <div class="auth-field auth-nationality-field" id="signup-nationality-field" hidden>
+                  <div class="auth-nationality-heading"><label id="signup-nationality-label" for="signup-nationality-trigger">國籍</label><button class="auth-nationality-help-trigger" id="signup-nationality-help" type="button" aria-expanded="false" aria-controls="signup-nationality-tooltip"><img src="assets/ic-mml-info.svg" alt="" /><span>無法注冊的國籍</span></button></div>
+                  <div class="auth-nationality-control">
+                    <select class="auth-nationality-native" id="signup-nationality" name="nationality" autocomplete="country-name" aria-describedby="signup-nationality-error" aria-hidden="true" tabindex="-1" required><option value="" selected disabled>輸入國籍</option></select>
+                    <div class="auth-nationality-search-wrap" id="signup-nationality-search-wrap" hidden>
+                      <input class="auth-nationality-search" id="signup-nationality-search" type="search" placeholder="輸入國籍" role="combobox" aria-label="搜尋國籍" aria-autocomplete="list" aria-expanded="false" aria-controls="signup-nationality-options" aria-describedby="signup-nationality-error" aria-required="true" autocomplete="off" />
+                      <img src="assets/airport-search.svg" alt="" aria-hidden="true" />
+                    </div>
+                    <button class="auth-nationality-select" id="signup-nationality-trigger" type="button" aria-labelledby="signup-nationality-label signup-nationality-value" aria-haspopup="listbox" aria-expanded="false" aria-controls="signup-nationality-options" aria-describedby="signup-nationality-error" aria-required="true">
+                      <span class="auth-nationality-value is-placeholder" id="signup-nationality-value">輸入國籍</span><img src="assets/Direction=down.svg" alt="" />
+                    </button>
+                  </div>
+                  <span class="auth-field-error" id="signup-nationality-error" data-auth-error-for="signup-nationality" role="alert" hidden></span>
+                </div>
+                <label class="auth-field" for="signup-name"><span>姓名</span><input id="signup-name" name="name" type="text" autocomplete="name" placeholder="輸入姓名" aria-describedby="signup-name-error" /><span class="auth-field-error" id="signup-name-error" data-auth-error-for="signup-name" role="alert" hidden></span></label>
+                <label class="auth-field" for="signup-phone"><span>手機號碼</span><input id="signup-phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="請輸入你的手機號碼" aria-describedby="signup-phone-error" /><span class="auth-field-error" id="signup-phone-error" data-auth-error-for="signup-phone" role="alert" hidden></span></label>
+                <label class="auth-field" for="signup-promo"><span>活動碼(非必填)</span><input id="signup-promo" name="promo" type="text" autocomplete="off" placeholder="非必填，無代碼可以不用輸入" aria-describedby="signup-promo-error" /><span class="auth-field-error" id="signup-promo-error" data-auth-error-for="signup-promo" role="alert" hidden></span></label>
               </form>
             </section>
 
@@ -542,7 +585,7 @@
               <div class="auth-progress" data-step="3"><div class="auth-progress-label"><span>動態密碼驗證</span><span class="auth-progress-count"><strong>3</strong><span class="auth-progress-total"> / 4</span></span></div><div class="auth-progress-track"><img class="auth-progress-fill" src="assets/signup-progress-bar.png" alt="" /></div></div>
               <form class="auth-form auth-signup-otp-form" id="signup-otp-form" data-auth-form="signup-3" novalidate>
                 <div class="auth-otp-message">
-                  <p class="auth-otp-sent">動態密碼已發送至：<br /><strong id="signup-otp-phone">09XX-****XX</strong><br /><strong id="signup-otp-email">使用者 Email</strong></p>
+                  <p class="auth-otp-sent">動態密碼已發送至：<br /><strong id="signup-otp-phone">09XX-****XX</strong></p>
                   <p class="auth-otp-expiry">動態密碼將在 5 分鐘後失效</p>
                 </div>
                 <div class="auth-otp-component">
@@ -561,16 +604,31 @@
             <section class="auth-view" id="auth-view-signup-4" data-auth-view="signup-4" hidden>
               <div class="auth-progress" data-step="4"><div class="auth-progress-label"><span>設定密碼</span><span>4 / 4</span></div><div class="auth-progress-track"><img class="auth-progress-fill" src="assets/signup-progress-bar.png" alt="" /></div></div>
               <form class="auth-form" id="signup-password-form" data-auth-form="signup-4" novalidate>
-                <label class="auth-field" for="signup-password"><span>設定會員密碼</span><span class="auth-input-action"><input id="signup-password" name="password" type="password" autocomplete="new-password" placeholder="8-12位英數混合且不得為連續3碼及特殊符號" aria-describedby="signup-password-error" /><button class="auth-icon-button" type="button" data-toggle-password="signup-password" aria-label="顯示密碼" aria-pressed="false"><img src="assets/auth-eye-closed.svg" alt="" /></button></span><span class="auth-field-error" id="signup-password-error" data-auth-error-for="signup-password" role="alert" hidden></span></label>
-                <label class="auth-field" for="signup-confirm-password"><span>再次輸入密碼</span><span class="auth-input-action"><input id="signup-confirm-password" name="confirmPassword" type="password" autocomplete="new-password" placeholder="8-12位英數混合且不得為連續3碼及特殊符號" aria-describedby="signup-confirm-password-error" /><button class="auth-icon-button" type="button" data-toggle-password="signup-confirm-password" data-toggle-label="再次輸入的密碼" aria-label="顯示再次輸入的密碼" aria-pressed="false"><img src="assets/auth-eye-closed.svg" alt="" /></button></span><span class="auth-field-error" id="signup-confirm-password-error" data-auth-error-for="signup-confirm-password" role="alert" hidden></span></label>
+                <label class="auth-field" for="signup-password"><span>設定會員密碼</span><span class="auth-input-action"><input id="signup-password" name="password" type="password" autocomplete="new-password" placeholder="8-12 英數字，禁連續 3 碼及特殊符號" aria-describedby="signup-password-error" /><button class="auth-icon-button" type="button" data-toggle-password="signup-password" aria-label="顯示密碼" aria-pressed="false"><img src="assets/auth-eye-closed.svg" alt="" /></button></span><span class="auth-field-error" id="signup-password-error" data-auth-error-for="signup-password" role="alert" hidden></span></label>
+                <label class="auth-field" for="signup-confirm-password"><span>再次輸入密碼</span><span class="auth-input-action"><input id="signup-confirm-password" name="confirmPassword" type="password" autocomplete="new-password" placeholder="8-12 英數字，禁連續 3 碼及特殊符號" aria-describedby="signup-confirm-password-error" /><button class="auth-icon-button" type="button" data-toggle-password="signup-confirm-password" data-toggle-label="再次輸入的密碼" aria-label="顯示再次輸入的密碼" aria-pressed="false"><img src="assets/auth-eye-closed.svg" alt="" /></button></span><span class="auth-field-error" id="signup-confirm-password-error" data-auth-error-for="signup-confirm-password" role="alert" hidden></span></label>
               </form>
             </section>
           </div>
           <footer class="auth-footer">
-            <button class="auth-primary" id="auth-primary" type="submit" form="auth-birthday-form" disabled>登入</button>
+            <button class="auth-primary" id="auth-primary" type="submit" form="auth-password-form" disabled>登入</button>
             <p class="auth-footer-prompt" id="auth-footer-prompt"><button type="button" data-auth-register><span class="auth-footer-prompt-intro">還不是會員？</span> <span>立即註冊</span></button></p>
           </footer>
+          <div class="otp-help-note login-otp-help-note" id="login-otp-help-note" role="note" hidden>
+            <p>簡訊可能有延遲，請稍候並確認手機號碼是否正確。</p>
+            <button type="button" id="login-otp-help-close" aria-label="關閉提示">×</button>
+          </div>
         </section>
+        <div class="auth-nationality-menu" id="signup-nationality-menu" hidden>
+          <div class="auth-nationality-options" id="signup-nationality-options" role="listbox" aria-label="國籍"></div>
+          <p class="auth-nationality-empty" id="signup-nationality-empty" role="status" hidden>找不到符合的國籍</p>
+        </div>
+        <div class="auth-nationality-tooltip" id="signup-nationality-tooltip" role="tooltip" data-placement="above" hidden>
+          <div class="auth-nationality-tooltip-body">
+            <p>南蘇丹、黎巴嫩、剛果民主共和國、蘇丹、伊朗、利比亞及北韓 無法注冊。</p>
+            <button type="button" id="signup-nationality-help-close" aria-label="關閉提示"><img src="assets/tooltip-close.svg" alt="" /></button>
+          </div>
+          <img class="auth-nationality-tooltip-tail" src="assets/tooltip-tail.svg" alt="" aria-hidden="true" />
+        </div>
         <div class="auth-statement-dialog" id="signup-statement-dialog" role="dialog" aria-modal="true" aria-labelledby="signup-statement-title" hidden>
           <section class="auth-statement-sheet">
             <header class="sheet-header auth-statement-header">
