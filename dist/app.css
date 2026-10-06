@@ -1935,6 +1935,9 @@ a.inline-link { text-decoration: underline; }
 
 #auth-sheet[data-view="login-birthday"] .auth-scroll { padding: 32px 24px; }
 #auth-sheet[data-view="login-birthday"] .auth-form { gap: 16px; }
+@media (max-height: 760px) {
+  #auth-sheet[data-view="login-birthday"] { top: 12%; height: auto; bottom: 104px; }
+}
 #auth-sheet[data-view="login-code"] .auth-scroll { padding: 32px 24px; }
 #auth-sheet[data-view="login-code"] .auth-form { gap: 24px; }
 #auth-sheet[data-view="login-code"] .login-otp-message { display: flex; flex-direction: column; gap: 0; }

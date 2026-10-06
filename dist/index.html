@@ -50,7 +50,7 @@
 
       <section class="chat-screen" id="chat-screen" aria-label="班機延誤諮詢對話" aria-live="polite" hidden></section>
 
-      <section class="welcome" aria-labelledby="welcome-title">
+      <section class="welcome" id="flow-1" aria-labelledby="welcome-title">
         <div class="mascot" role="img" aria-label="阿發吉祥物">
           <img class="mascot-face" src="assets/mascot-face.png" alt="" />
           <img class="mascot-star" src="assets/mascot-star.svg" alt="" />
@@ -309,8 +309,8 @@
                     <button class="bankbook-remove" id="bankbook-remove" type="button" aria-label="移除存摺封面"><img src="assets/file-delete.svg" alt="" /></button>
                   </div>
                   <ol class="bankbook-notes">
-                    <li>支援 JPG、JPEG、PNG、HEIC 及 PDF，單檔上限 10 MB</li>
-                    <li>最多上傳 1 個檔案</li>
+                    <li>支援 JPG、JPEG、PNG、HEIC 及 PDF，單檔上限 10 MB，最多上傳 1 個檔案</li>
+                    <li>上傳存摺後，填寫內容將被直接覆蓋</li>
                   </ol>
                 </section>
               </div>
@@ -389,18 +389,18 @@
 
       <div class="auth-dialog" id="auth-dialog" role="dialog" aria-modal="true" aria-labelledby="auth-title" tabindex="-1" hidden>
         <button class="auth-scrim" type="button" data-close-auth aria-label="關閉登入或註冊"></button>
-        <section class="auth-sheet" id="auth-sheet" data-view="login-password">
+        <section class="auth-sheet" id="auth-sheet" data-view="login-birthday">
           <header class="sheet-header auth-header">
             <button class="auth-back" id="auth-back" type="button" hidden>上一步</button>
             <h2 class="dialog-title" id="auth-title">登入</h2>
             <button class="dialog-x" type="button" data-close-auth aria-label="關閉"><img src="assets/close.svg" alt="" /></button>
           </header>
           <div class="auth-tabs" id="auth-tabs" role="tablist" aria-label="登入方式">
-            <button type="button" role="tab" id="auth-password-tab" aria-controls="auth-view-login-password" aria-selected="true" data-auth-tab="login-password">密碼登入</button>
-            <button type="button" role="tab" id="auth-code-tab" aria-controls="auth-view-login-birthday" aria-selected="false" data-auth-tab="login-birthday">驗證碼登入</button>
+            <button type="button" role="tab" id="auth-password-tab" aria-controls="auth-view-login-password" aria-selected="false" data-auth-tab="login-password">密碼登入</button>
+            <button type="button" role="tab" id="auth-code-tab" aria-controls="auth-view-login-birthday" aria-selected="true" data-auth-tab="login-birthday">驗證碼登入</button>
           </div>
           <div class="auth-scroll" id="auth-scroll">
-            <section class="auth-view" id="auth-view-login-password" data-auth-view="login-password" role="tabpanel" aria-labelledby="auth-password-tab">
+            <section class="auth-view" id="auth-view-login-password" data-auth-view="login-password" role="tabpanel" aria-labelledby="auth-password-tab" hidden>
               <form class="auth-form" id="auth-password-form" data-auth-form="login-password" novalidate>
                 <p class="auth-status" id="auth-status" role="status" hidden></p>
                 <div class="auth-field">
@@ -435,7 +435,7 @@
               </form>
             </section>
 
-            <section class="auth-view" id="auth-view-login-birthday" data-auth-view="login-birthday" role="tabpanel" aria-labelledby="auth-code-tab" hidden>
+            <section class="auth-view" id="auth-view-login-birthday" data-auth-view="login-birthday" role="tabpanel" aria-labelledby="auth-code-tab">
               <form class="auth-form" id="auth-birthday-form" data-auth-form="login-birthday" novalidate>
                 <div class="auth-field">
                   <label for="login-code-id">帳號</label>
@@ -567,7 +567,7 @@
             </section>
           </div>
           <footer class="auth-footer">
-            <button class="auth-primary" id="auth-primary" type="submit" form="auth-password-form" disabled>登入</button>
+            <button class="auth-primary" id="auth-primary" type="submit" form="auth-birthday-form" disabled>登入</button>
             <p class="auth-footer-prompt" id="auth-footer-prompt"><button type="button" data-auth-register><span class="auth-footer-prompt-intro">還不是會員？</span> <span>立即註冊</span></button></p>
           </footer>
         </section>

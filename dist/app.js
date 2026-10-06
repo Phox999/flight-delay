@@ -99,7 +99,8 @@ const authViews = [...authDialog.querySelectorAll("[data-auth-view]")];
 let previousAuthFocus = null;
 let authOrigin = "claim";
 let authReturnToLogin = false;
-let authActiveView = "login-password";
+let authActiveView = "login-birthday";
+let authLoginReturnView = "login-birthday";
 let authSignupProfile = {};
 let authPasswordAttempts = 0;
 let authPasswordLocked = false;
@@ -145,6 +146,10 @@ const confirmCopy = document.querySelector("#confirm-copy");
 const confirmGo = document.querySelector("#confirm-go");
 const officialClaimUrl = "https://www.cathay-ins.com.tw/cathayins/personal/claim/travel/";
 const generalClaimUrl = "https://www.cathay-ins.com.tw/cathayins/personal/claim/";
+const legacyAssistantUrl = "";
+const claimFlowIdleTimeoutMs = 20 * 60 * 1000;
+let claimFlowActive = false;
+let claimFlowIdleTimer = null;
 let previousPolicyFocus = null;
 let previousPersonalDataFocus = null;
 let previousUploadFocus = null;
@@ -213,6 +218,9 @@ document.addEventListener("fullscreenchange", () => {
   }
   updatePreviewFullscreenControl();
 });
+document.addEventListener("pointerdown", resetClaimFlowIdleTimer, true);
+document.addEventListener("keydown", resetClaimFlowIdleTimer, true);
+document.addEventListener("input", resetClaimFlowIdleTimer, true);
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && (previewStage.classList.contains("is-fullscreen") || previewStage.classList.contains("is-immersive"))) {
     if (document.fullscreenElement === previewStage && document.exitFullscreen) void document.exitFullscreen().catch(() => {});
@@ -501,6 +509,34 @@ function setScreen(showChat) {
   chatScreen.hidden = !showChat;
 }
 
+function endClaimFlowIdleTimer() {
+  claimFlowActive = false;
+  window.clearTimeout(claimFlowIdleTimer);
+  claimFlowIdleTimer = null;
+}
+
+function resetClaimFlowIdleTimer() {
+  if (!claimFlowActive) return;
+  window.clearTimeout(claimFlowIdleTimer);
+  claimFlowIdleTimer = window.setTimeout(() => {
+    claimFlowActive = false;
+    claimFlowIdleTimer = null;
+    clearAuthOtpTimers();
+    stopOtpTimers();
+    window.clearTimeout(uploadTimer);
+    window.clearTimeout(bankbookUploadTimer);
+    [authDialog, signupStatementDialog, personalDataDialog, uploadDialog, uploadSourceMenu, filePickerScreen,
+      boardingInfoDialog, bankInfoDialog, bankInfoLoading, otpDialog].forEach((dialog) => { dialog.hidden = true; });
+    uploadLoading.hidden = true;
+    appendTimeoutReply();
+  }, claimFlowIdleTimeoutMs);
+}
+
+function startClaimFlowIdleTimer() {
+  claimFlowActive = true;
+  resetClaimFlowIdleTimer();
+}
+
 function keepChatHash() {
   if (window.location.hash !== "#chat") window.location.hash = "chat";
 }
@@ -622,6 +658,7 @@ function appendDefaultConsultation() {
 }
 
 function startChat(prompt = "") {
+  endClaimFlowIdleTimer();
   keepChatHash();
   setScreen(true);
   chatScreen.replaceChildren();
@@ -853,7 +890,8 @@ function setAuthView(view, { focus = "" } = {}) {
   authTitle.textContent = signupTitles[view] || (view.startsWith("forgot-") ? "忘記密碼" : "登入");
   authTabs.hidden = !isLogin;
   authFooterPrompt.hidden = !isLogin;
-  authBack.hidden = !view.startsWith("forgot-");
+  const signupStep = view.startsWith("signup-") ? Number(view.slice(-1)) : 0;
+  authBack.hidden = !(view.startsWith("forgot-") || (signupStep > 1) || (signupStep === 1 && authReturnToLogin));
   authTabs.querySelectorAll("[data-auth-tab]").forEach((tab) => {
     const selected = tab.dataset.authTab === (view === "login-password" ? "login-password" : isLogin ? "login-birthday" : "");
     tab.setAttribute("aria-selected", String(selected));
@@ -955,12 +993,14 @@ function showAuthDialog({ origin = "claim", returnToLogin = false, returnFocus =
   previousAuthFocus = returnFocus;
   authOrigin = origin;
   authReturnToLogin = returnToLogin;
+  authLoginReturnView = "login-birthday";
   authDialog.hidden = false;
   resetAuthFlow();
-  setAuthView("login-password", { focus: "#login-id" });
+  setAuthView("login-birthday", { focus: "#login-code-id" });
 }
 
 function showSignupFlow({ returnToLogin = false } = {}) {
+  if (returnToLogin) authLoginReturnView = authActiveView;
   authReturnToLogin = returnToLogin;
   authDialog.querySelectorAll("#signup-basic-form, #signup-otp-form, #signup-password-form").forEach((form) => {
     form.reset();
@@ -1012,7 +1052,7 @@ function closeAuthDialog() {
     clearAuthOtpTimers();
     authIsVerifying = false;
     authReturnToLogin = false;
-    setAuthView("login-password", { focus: "#login-id" });
+    setAuthView(authLoginReturnView, { focus: authLoginReturnView === "login-password" ? "#login-id" : "#login-code-id" });
     return;
   }
   authDialog.hidden = true;
@@ -1020,15 +1060,18 @@ function closeAuthDialog() {
   authIsVerifying = false;
   if (authOrigin === "claim") appendLoginDeclinedMessage();
   else previousAuthFocus?.focus?.({ preventScroll: true });
+  endClaimFlowIdleTimer();
 }
 
 function openClaimLogin(returnFocus = document.activeElement) {
   if (!authDialog.hidden) return;
+  startClaimFlowIdleTimer();
   showAuthDialog({ origin: "claim", returnFocus });
   appendUserMessage("確認申請");
 }
 
 function openClaimSignup(returnFocus = document.activeElement) {
+  startClaimFlowIdleTimer();
   appendUserMessage("加入國泰產險會員");
   showAuthDialog({ origin: "signup", returnFocus });
   showSignupFlow();
@@ -1312,11 +1355,9 @@ function appendAskClaimType() {
 
 function appendOutOfScopeReply() {
   const content = document.createElement("div");
-  const first = document.createElement("p");
-  first.textContent = "哇！你是想問怎麼樣才能寫出完美的使用手冊嗎？還是你想找什麼產品的使用手冊呀？🤔";
-  const second = document.createElement("p");
-  second.textContent = "阿發我主要是處理國泰產險班機延誤相關的問題啦，這個可能不在我的服務範圍喔～";
-  content.append(first, second);
+  const message = document.createElement("p");
+  message.textContent = "我只能回答班機延誤相關問題喔。若要詢問其他產險問題，可以切換至一般阿發。";
+  content.append(message, makeAction("回到舊版阿發", "legacy-assistant"));
   appendAssistantMessage(content);
 }
 
@@ -1344,16 +1385,36 @@ function appendTimeoutReply() {
   restart.textContent = "重啟對話";
   restart.dataset.chatAction = "restart-chat";
   content.append(p1, p2, restart);
-  appendAssistantMessage(content);
+  appendAssistantSequence([
+    { content },
+    { content: createExperienceFeedback("這次服務，阿發有幫上忙嗎？"), card: true, className: "message-feedback-shell" },
+  ]);
 }
 
 function replyTo(message) {
   const text = message.trim();
   if (/模擬逾時|久未回覆|服務已結束/.test(text)) {
+    endClaimFlowIdleTimer();
     appendTimeoutReply();
     return;
   }
-  if (/使用手冊|服務範圍|非服務|天氣|股價/.test(text)) {
+  if (/[A-Z][12]\d{8}\b|09\d{8}\b|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/i.test(text)) {
+    appendAssistantMessage("請勿輸入個人資料（如身分證號、聯絡方式等），建議你重新輸入。");
+    return;
+  }
+  if (/騙人的.*垃圾|垃圾|白癡|白痴|智障|廢物|去死/.test(text)) {
+    appendAssistantMessage("無法回應不合適的內容。建議你詢問其他問題");
+    return;
+  }
+  if (/我還有一個問題想問|模擬.*(詢問|問題).*(上限|達上限)|回答數量達到上限/.test(text)) {
+    const content = document.createElement("div");
+    const message = document.createElement("p");
+    message.textContent = "你今日的詢問次數已達上限，可改用舊版阿發或於隔日再次使用。";
+    content.append(message, makeAction("回到舊版阿發", "legacy-assistant"));
+    appendAssistantMessage(content);
+    return;
+  }
+  if (/使用手冊|服務範圍|非服務|天氣|股價|機車|汽車保險|投保/.test(text)) {
     appendOutOfScopeReply();
     return;
   }
@@ -1451,6 +1512,7 @@ function closePersonalDataNotice({ agreed = false } = {}) {
     showUploadDialog();
     return;
   }
+  endClaimFlowIdleTimer();
   appendConsentDeclinedMessage();
 }
 
@@ -1533,7 +1595,7 @@ function showUploadDialog(mode = "boarding-pass", returnFocus = document.activeE
   uploadHelpTrigger.setAttribute("aria-expanded", "false");
   setUploadNotes(mode === "delay-proof"
     ? ["支援 JPG、JPEG、PNG、HEIC、PDF，單檔上限 10 MB", "最多上傳 3 張班機延誤證明"]
-    : ["支援 JPG、JPEG、PNG、HEIC，單檔上限 10 MB", "如有 2 張（含）以上登機證或多段航班皆延誤，請由其他通路提出申請"]);
+    : ["支援 JPG、JPEG、PNG、HEIC，單檔上限 10 MB", "如有 2 張（含）以上登機證或多段航班皆延誤，產險官網或線下通路(包含臨櫃及郵寄)申請"]);
   uploadSourceMenu.querySelector("[role='dialog']").setAttribute("aria-label", mode === "delay-proof" ? "選擇班機延誤證明來源" : "選擇登機證來源");
   uploadDropzone.hidden = false;
   uploadFileList.replaceChildren();
@@ -1670,6 +1732,17 @@ function finishBoardingPassUpload() {
     message.textContent = "查無航班資料，請手動輸入航班資訊。";
     content.append(message, makeAction("手動輸入", "manual-boarding-info", { primary: true }));
     appendAssistantMessage(content);
+    return;
+  }
+  if (["system-error", "network-error"].includes(selectedBoardingPass.outcome)) {
+    closeUploadDialog({ restoreFocus: false, showNoProof: false });
+    appendUserMessage("確認上傳");
+    const content = document.createElement("div");
+    const message = document.createElement("p");
+    message.textContent = "系統出現異常，建議你可以到會員中心使用理賠申請服務。";
+    content.append(message, makeAction("前往會員中心註冊", "claim-member"));
+    appendAssistantMessage(content);
+    endClaimFlowIdleTimer();
     return;
   }
   if (selectedBoardingPass.outcome === "recognition-error") {
@@ -1895,7 +1968,8 @@ function appendDelayProofOutcome(outcome) {
     content.append(message, retry);
   } else if (outcome === "system-error") {
     message.textContent = "系統出現異常，建議你可以到會員中心使用理賠申請服務。";
-    content.append(message, makeAction("前往會員中心", "claim-member"));
+    content.append(message, makeAction("前往理賠專區", "claim-website"));
+    endClaimFlowIdleTimer();
   } else {
     message.textContent = "班機延誤證明已上傳完成，接下來請填寫匯款資料。";
     const fillBankInfo = document.createElement("button");
@@ -2484,6 +2558,7 @@ function resendOtp() {
 
 function finishOtpVerification() {
   stopOtpTimers();
+  endClaimFlowIdleTimer();
   otpIsVerifying = false;
   otpInput.disabled = false;
   otpNext.textContent = "下一步";
@@ -2516,6 +2591,7 @@ function finishOtpVerification() {
 
 function finishOtpApiError() {
   stopOtpTimers();
+  endClaimFlowIdleTimer();
   otpIsVerifying = false;
   otpInput.disabled = false;
   otpInput.value = "";
@@ -2530,11 +2606,11 @@ function finishOtpApiError() {
   const content = document.createElement("div");
   const message = document.createElement("p");
   message.textContent = "系統出現異常，建議你可以到會員中心使用理賠申請服務。";
-  content.append(message, makeAction("前往會員中心", "claim-member"));
+  content.append(message, makeAction("前往理賠專區", "claim-website"));
   appendAssistantMessage(content);
 }
 
-function createExperienceFeedback() {
+function createExperienceFeedback(questionText = "這次體驗，阿發有幫上忙嗎？") {
   const card = document.createElement("div");
   card.className = "feedback-component";
   card.dataset.state = "default";
@@ -2543,7 +2619,7 @@ function createExperienceFeedback() {
 
   const question = document.createElement("p");
   question.className = "feedback-question";
-  question.textContent = "這次體驗，阿發有幫上忙嗎？";
+  question.textContent = questionText;
   const dismiss = document.createElement("button");
   dismiss.type = "button";
   dismiss.className = "feedback-dismiss";
@@ -2765,7 +2841,8 @@ authDialog.addEventListener("click", (event) => {
       else if (authReturnToLogin) {
         clearAuthOtpTimers();
         authIsVerifying = false;
-        setAuthView("login-password", { focus: "#login-id" });
+        authReturnToLogin = false;
+        setAuthView(authLoginReturnView, { focus: authLoginReturnView === "login-password" ? "#login-id" : "#login-code-id" });
       }
       else closeAuthDialog();
     } else if (authActiveView === "forgot-code") {
@@ -3292,6 +3369,7 @@ chatScreen.addEventListener("click", (event) => {
       showPersonalDataNotice();
       break;
     case "return-login":
+      startClaimFlowIdleTimer();
       showAuthDialog({ origin: "claim", returnFocus: button });
       break;
     case "open-upload":
@@ -3334,13 +3412,20 @@ chatScreen.addEventListener("click", (event) => {
       boardingInfoForm.elements.passenger.focus({ preventScroll: true });
       break;
     case "claim-member":
+      endClaimFlowIdleTimer();
       showOfficialConfirm("你即將離開阿發，前往國泰產險會員中心。", memberCenterUrl);
       break;
     case "claim-register":
       openClaimSignup(button);
       break;
     case "claim-website":
-      showOfficialConfirm("你即將離開阿發，前往產險服務條款頁。", officialClaimUrl);
+      endClaimFlowIdleTimer();
+      showOfficialConfirm("你即將離開阿發，前往國泰產險官網理賠專區。", officialClaimUrl);
+      break;
+    case "legacy-assistant":
+      endClaimFlowIdleTimer();
+      if (legacyAssistantUrl) showOfficialConfirm("你即將離開阿發，前往舊版阿發。", legacyAssistantUrl);
+      else appendAssistantMessage("舊版阿發網址尚未設定，請在 app.js 的 legacyAssistantUrl 補上正式連結。");
       break;
     case "restart-chat":
       startChat();
