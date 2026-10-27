@@ -3,34 +3,41 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>阿發｜Streaming 顯示方式對照</title>
+<title>阿發｜三種回覆呈現比較</title>
 <link rel="stylesheet" href="app.css">
 <style>
-/* Comparison wrapper only. Chat components below reuse dist/app.css unmodified. */
+/* Minimal comparison controls; original Afa components retain dist/app.css. */
 html,body{min-width:320px;min-height:100%;}
 body{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;padding:18px 12px 28px;background:#f6f6f8;}
 .compare-bar{width:min(393px,100%);display:flex;gap:7px;align-items:stretch;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-serif;}
 .compare-choice{flex:1;min-width:0;padding:10px 8px;border:1px solid #dddde9;border-radius:11px;background:#fff;color:#3a3a3a;text-align:center;cursor:pointer;font-size:12px;line-height:18px;}
 .compare-choice[aria-pressed=true]{border-color:#4f44c3;background:#f5f3ff;color:#4f44c3;font-weight:600;box-shadow:inset 0 0 0 1px #4f44c3;}
 .compare-replay{flex:none;padding:0 13px;border:1px solid #dddde9;border-radius:11px;background:white;color:#4f44c3;font-size:13px;cursor:pointer;}
-.compare-status{width:min(393px,100%);font-size:12px;color:#777;display:flex;align-items:center;justify-content:space-between;min-height:18px;}
+.compare-status{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
 .compare-status strong{color:#4f44c3;font-weight:500;}
 .app{max-width:100%;}
 /* Figma: Next-Chatbot Library > Message/Loading (32124:18914) */
 .message-loading{display:flex;gap:1px;align-items:flex-start;padding:0 16px;flex:none;}
 .message-loading-content{display:flex;width:325px;max-width:calc(100% - 33px);min-width:0;align-items:flex-start;padding:3px 10px 10px;}
 .message-loading-bubble{display:flex;gap:10px;align-items:center;justify-content:center;min-height:46px;max-width:305px;padding:12px 16px;border:1px solid rgb(224 224 224 / 8%);border-radius:10px;background:linear-gradient(133.77deg,#fff 8.1421%,rgb(255 255 255 / 50%) 95.691%);box-shadow:0 2px 9px rgb(27 31 68 / 8%);-webkit-backdrop-filter:blur(27.5px);backdrop-filter:blur(27.5px);font-size:16px;font-weight:400;line-height:22px;letter-spacing:.3px;white-space:nowrap;}
-.message-loading-star{display:block;width:20px;height:20px;object-fit:contain;}
+.message-loading-star{display:block;width:20px;height:20px;object-fit:contain;animation:spark-motion 1s linear infinite,spark-pulse 1s ease-in-out infinite;}
+.message-loading-label{opacity:.8;animation:thinking-breathe 1s ease-in-out infinite;}
+.message-loading-label.loading-label-enter{animation:loading-label-change .42s ease-out,thinking-breathe 1s ease-in-out .42s infinite;}
+@keyframes spark-motion{to{transform:rotate(360deg)}}
+@keyframes spark-pulse{0%,100%{scale:.84}50%{scale:1.14}}
+@keyframes thinking-breathe{0%,100%{opacity:.58}50%{opacity:1}}
+@keyframes loading-label-change{from{opacity:.2;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
 .stream-caret{display:inline-block;width:2px;height:16px;background:#4f44c3;vertical-align:-3px;margin-left:2px;animation:blink .8s step-end infinite;}
 @keyframes blink{50%{opacity:0;}}
 @media(max-width:440px){body{padding:10px 0 22px;gap:8px}.compare-bar,.compare-status{width:calc(100% - 18px)}.app{border-radius:0}.compare-choice{padding:10px 4px;font-size:11px}}
-@media(prefers-reduced-motion:reduce){.stream-caret{animation:none;}}
+@media(prefers-reduced-motion:reduce){.stream-caret,.message-loading-star,.message-loading-label,.message-loading-label.loading-label-enter{animation:none;}}
 </style>
 </head>
 <body>
 <div class="compare-bar" aria-label="選擇顯示模式">
-<button type="button" class="compare-choice" data-mode="card-first" aria-pressed="true">① 卡片立即顯示<br>10 秒後文字 Streaming</button>
-<button type="button" class="compare-choice" data-mode="wait-all" aria-pressed="false">② 思考中 10 秒<br>文字＋卡片一次出現</button>
+<button type="button" class="compare-choice" data-mode="card-first" aria-pressed="true">A｜一般串流<br>卡牌先出</button>
+<button type="button" class="compare-choice" data-mode="slow-stream" aria-pressed="false">C｜慢速串流<br>卡牌先出</button>
+<button type="button" class="compare-choice" data-mode="wait-all" aria-pressed="false">B｜完整回覆<br>思考中 10 秒</button>
 <button type="button" class="compare-replay" id="replay" aria-label="重新播放">↻ 重播</button>
 </div>
 <div class="compare-status" role="status" aria-live="polite"><span>iPhone 393 × 852</span><strong id="status">準備開始</strong></div>
@@ -56,6 +63,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   const modeButtons = Array.from(document.querySelectorAll('[data-mode]'));
   const WAIT_MS = 10000;
   const STEP_MS = 28;
+  const SLOW_STEP_MS = 145;
+  const LOADING_TEXTS = ['思考中','分析你的需求','查找相關資訊','確認資訊內容','彙整解答重點','整理回覆中，請稍候'];
   let mode = 'card-first';
   let generation = 0;
   let timers = [];
@@ -105,23 +114,42 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     });
     wrapper.append(heading,list,actions);return wrapper;
   }
+  // Figma: chat_loading_動態展示_預覽, node 32124:25069.
+  // Six sequential labels, pulsating/rotating Spark; accelerated to the 10s demo window.
   function loading() {
-    const row=el('div','message-loading');row.dataset.component='Message/Loading';row.dataset.nodeId='32124:18914';
+    const row=el('div','message-loading');
+    row.dataset.component='Message/Loading';row.dataset.nodeId='32124:25069';
     const content=el('div','message-loading-content'),bubble=el('div','message-loading-bubble');
     const star=el('img','message-loading-star');star.src='assets/loading-star.svg';star.alt='';
-    bubble.append(star,el('span',null,'思考中'));content.append(bubble);row.append(avatar(),content);return row;
+    const word=el('span','message-loading-label',LOADING_TEXTS[0]);
+    bubble.append(star,word);content.append(bubble);row.append(avatar(),content);
+    return {row,word};
+  }
+  function animateLoading(word,token) {
+    LOADING_TEXTS.slice(1).forEach((phrase,index) => {
+      schedule(() => {
+        word.classList.remove('loading-label-enter');
+        void word.offsetWidth;
+        word.textContent=phrase;
+        word.classList.add('loading-label-enter');
+        scroll();
+      }, Math.round(WAIT_MS * (index+1)/LOADING_TEXTS.length), token);
+    });
   }
   function streamDetails(node,token) {
     // Keep the original list/card DOM and progressively reveal its text nodes.
-    const {bubble,body}=details();node.column.append(bubble,node.meta);
+    // A/C: card is visible first. Once Streaming starts, prepend the bubble
+    // to the SAME assistant-content stack, so final order is text THEN card.
+    const {bubble,body}=details();node.column.insertBefore(bubble,node.column.firstChild);
     const walk=document.createTreeWalker(body,NodeFilter.SHOW_TEXT);
     const chunks=[];let n;while((n=walk.nextNode())){if(n.nodeValue){chunks.push({node:n,value:n.nodeValue});n.nodeValue='';}}
     const characters=[];for(const chunk of chunks){for(const c of Array.from(chunk.value)){characters.push([chunk.node,c]);}}
     let i=0;status.textContent='文字 Streaming 中';scroll();
     const run=()=>{
       if(token!==generation)return;
-      for(let k=0;k<2&&i<characters.length;k++,i++){const [part,c]=characters[i];part.nodeValue+=c;}
-      if(i<characters.length){schedule(run,STEP_MS,token);}else{status.textContent='播放完成';}
+      const stepCount=mode==='slow-stream'?1:2;
+      for(let k=0;k<stepCount&&i<characters.length;k++,i++){const [part,c]=characters[i];part.nodeValue+=c;}
+      if(i<characters.length){schedule(run,mode==='slow-stream'?SLOW_STEP_MS:STEP_MS,token);}else{status.textContent='播放完成';}
       scroll();
     };
     run();
@@ -130,13 +158,15 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
     generation++;const token=generation;
     timers.forEach(clearTimeout);timers=[];chat.replaceChildren();userMessage();
     status.textContent='等待 10 秒';
-    if(mode==='card-first') {
+    if(mode==='card-first'||mode==='slow-stream') {
       const node=assistantRow();node.column.append(card(),node.meta);scroll();
       schedule(()=>streamDetails(node,token),WAIT_MS,token);
     } else {
-      const waiting=loading();chat.append(waiting);scroll();
+      const waiting=loading();chat.append(waiting.row);animateLoading(waiting.word,token);scroll();
       schedule(()=>{
-        waiting.remove();const node=assistantRow();node.column.append(details().bubble,card(),node.meta);status.textContent='播放完成';scroll();
+        waiting.row.remove();const node=assistantRow();
+        node.column.append(details().bubble,card(),node.meta);
+        status.textContent='播放完成';scroll();
       },WAIT_MS,token);
     }
   }
