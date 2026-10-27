@@ -36,8 +36,8 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
 <body>
 <div class="compare-bar" aria-label="選擇顯示模式">
 <button type="button" class="compare-choice" data-mode="card-first" aria-pressed="true">A｜一般串流<br>卡牌先出</button>
-<button type="button" class="compare-choice" data-mode="slow-stream" aria-pressed="false">C｜慢速串流<br>卡牌先出</button>
-<button type="button" class="compare-choice" data-mode="wait-all" aria-pressed="false">B｜完整回覆<br>思考中 10 秒</button>
+<button type="button" class="compare-choice" data-mode="slow-stream" aria-pressed="false">B｜慢速串流<br>卡牌先出</button>
+<button type="button" class="compare-choice" data-mode="wait-all" aria-pressed="false">C｜完整回覆<br>思考中 10 秒</button>
 <button type="button" class="compare-replay" id="replay" aria-label="重新播放">↻ 重播</button>
 </div>
 <div class="compare-status" role="status" aria-live="polite"><span>iPhone 393 × 852</span><strong id="status">準備開始</strong></div>
@@ -138,7 +138,7 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:flex-
   }
   function streamDetails(node,token) {
     // Keep the original list/card DOM and progressively reveal its text nodes.
-    // A/C: card is visible first. Once Streaming starts, prepend the bubble
+    // A/B: card is visible first. Once Streaming starts, prepend the bubble
     // to the SAME assistant-content stack, so final order is text THEN card.
     const {bubble,body}=details();node.column.insertBefore(bubble,node.column.firstChild);
     const walk=document.createTreeWalker(body,NodeFilter.SHOW_TEXT);
